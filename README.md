@@ -103,3 +103,4 @@ Before deploying to production, make sure to:
 - [ ] **Update splash screens and adaptive icons** in `assets/` and `app.json` as needed.
 - [ ] **Review all configuration in `app.json` and `package.json` for accuracy.**
 - [ ] **Test on all target platforms** (web, iOS, Android) for correct branding and icon display.
+# Force Vercel deployment
