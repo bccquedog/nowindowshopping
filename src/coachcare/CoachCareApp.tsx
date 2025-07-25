@@ -1,6 +1,5 @@
 import React from 'react';
 import { CoachCareProvider, useAuth } from './context';
-import { LoginScreen } from './components/LoginScreen';
 import { LoadingScreen } from './components/LoadingScreen';
 import { AdminPortal } from './components/AdminPortal';
 import { CoachPortal } from './components/CoachPortal';
