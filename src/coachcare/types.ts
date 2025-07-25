@@ -7,6 +7,10 @@ export interface User {
   name: string;
   role: 'admin' | 'coach' | 'client';
   profilePicture?: string;
+  bio?: string;
+  phone?: string;
+  company?: string;
+  title?: string;
   createdAt: string;
   lastLogin?: string;
   isActive: boolean;

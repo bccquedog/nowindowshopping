@@ -171,8 +171,13 @@ export const LoginScreen: React.FC = () => {
                 Demo accounts:
               </p>
               <div className="space-y-2 text-xs text-gray-500 dark:text-gray-400">
+                <div className="font-semibold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-700 rounded p-2 bg-blue-50 dark:bg-blue-900/20">
+                  <strong>Owner/Admin:</strong> NoWindowShoppingOnline@gmail.com / NWS2024!
+                </div>
+                <div className="font-semibold text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-700 rounded p-2 bg-purple-50 dark:bg-purple-900/20">
+                  <strong>Coach:</strong> brian@coachcare.com / coach123
+                </div>
                 <div>Admin: admin@coachcare.com / admin123</div>
-                <div>Coach: brian@coachcare.com / coach123</div>
                 <div>Client: john@example.com / client123</div>
                 <div>Client: sarah@example.com / client123</div>
               </div>

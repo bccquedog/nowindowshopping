@@ -3,19 +3,36 @@ import { User, UserRole } from './types';
 // Mock user database - in production, this would be a real database
 const mockUsers: User[] = [
   {
-    id: 'admin-1',
-    email: 'admin@coachcare.com',
-    name: 'System Administrator',
+    id: 'owner-1',
+    email: 'NoWindowShoppingOnline@gmail.com',
+    name: 'Brian Proctor',
     role: 'admin',
+    profilePicture: '/assets/founder.png',
     createdAt: '2024-01-01T00:00:00Z',
     isActive: true,
+    bio: 'Founder of No Window Shopping Professional Services. Business leader, training expert, and executive coach dedicated to empowering individuals and organizations.',
+    phone: '(410) 871-8392',
+    company: 'No Window Shopping Professional Services',
+    title: 'Founder & CEO',
   },
   {
     id: 'coach-1',
     email: 'brian@coachcare.com',
     name: 'Brian Proctor',
     role: 'coach',
-    profilePicture: '/api/avatars/brian.jpg',
+    profilePicture: '/assets/founder.png',
+    createdAt: '2024-01-01T00:00:00Z',
+    isActive: true,
+    bio: 'Executive coach and business consultant specializing in leadership development, professional growth, and organizational transformation.',
+    phone: '(410) 871-8392',
+    company: 'No Window Shopping Professional Services',
+    title: 'Executive Coach',
+  },
+  {
+    id: 'admin-1',
+    email: 'admin@coachcare.com',
+    name: 'System Administrator',
+    role: 'admin',
     createdAt: '2024-01-01T00:00:00Z',
     isActive: true,
   },
@@ -39,8 +56,9 @@ const mockUsers: User[] = [
 
 // Mock passwords - in production, these would be hashed
 const mockPasswords: Record<string, string> = {
-  'admin@coachcare.com': 'admin123',
+  'NoWindowShoppingOnline@gmail.com': 'NWS2024!',
   'brian@coachcare.com': 'coach123',
+  'admin@coachcare.com': 'admin123',
   'john@example.com': 'client123',
   'sarah@example.com': 'client123',
 };
