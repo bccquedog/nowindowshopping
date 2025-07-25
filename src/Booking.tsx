@@ -49,6 +49,56 @@ const services = [
     startingAt: true,
     icon: '📈'
   },
+  // Creative Services
+  { 
+    name: 'Brand Design', 
+    description: 'Create a powerful visual identity that tells your story and connects with your audience. From logos to complete brand systems, we craft designs that make lasting impressions.',
+    details: 'Logo design, brand identity, visual storytelling, style guides, and brand collateral for your business.',
+    price: 800,
+    startingAt: true,
+    icon: '🎨'
+  },
+  { 
+    name: 'Content Creation', 
+    description: 'Engage your audience with compelling content that drives action. Our copywriting and multimedia content strategies help you connect, convert, and grow your business.',
+    details: 'Copywriting, blog posts, social media content, email campaigns, and multimedia content creation.',
+    price: 300,
+    startingAt: true,
+    icon: '✍️'
+  },
+  { 
+    name: 'Web Development', 
+    description: 'Build a digital presence that converts visitors into customers. Modern, responsive websites designed for impact, performance, and user experience.',
+    details: 'Custom website development, responsive design, e-commerce solutions, and ongoing maintenance.',
+    price: 1500,
+    startingAt: true,
+    icon: '💻'
+  },
+  // Consulting Services
+  { 
+    name: 'Business Strategy', 
+    description: 'Navigate growth challenges with confidence. Our strategic consulting helps you identify opportunities, optimize operations, and build sustainable competitive advantages.',
+    details: 'Growth planning, market analysis, operational consulting, competitive positioning, and strategic roadmaps.',
+    price: 1200,
+    startingAt: true,
+    icon: '📊'
+  },
+  { 
+    name: 'Workshops & Training', 
+    description: 'Empower your team with the skills they need to succeed. Interactive workshops and training sessions that build capabilities and drive performance improvements.',
+    details: 'Custom skill-building sessions for teams and individuals, leadership development, and specialized training programs.',
+    price: 900,
+    startingAt: true,
+    icon: '👥'
+  },
+  { 
+    name: 'Project Management', 
+    description: 'Keep your projects on track and deliver results on time. From kickoff to delivery, we provide the structure, oversight, and expertise to ensure project success.',
+    details: 'Project planning, execution oversight, risk management, stakeholder communication, and delivery coordination.',
+    price: 600,
+    startingAt: true,
+    icon: '📋'
+  },
 ];
 
 const steps = ['Service', 'Date/Time', 'Contact', 'Review', 'Done'];
