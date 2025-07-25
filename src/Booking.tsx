@@ -9,11 +9,46 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const services = [
-  { name: 'Speaking Engagement', description: 'Keynote, panel, or workshop. Includes prep call, custom content, and up to 60 minutes on stage.', price: 2500 },
-  { name: 'Training/Workshop', description: 'Custom training or workshop for your team or organization. Includes materials and Q&A.', price: 1800 },
-  { name: 'Speech Writing', description: 'Custom-written speech (up to 20 minutes). Includes consultation and 1 revision.', price: 500 },
-  { name: 'Coaching', description: '1:1 or group coaching for professional or personal development. Packages available.', price: 300 },
-  { name: 'Professional Development', description: 'Career, leadership, or skills development sessions tailored to your needs.', price: 350 },
+  { 
+    name: 'Speaking Engagement', 
+    description: 'Transform your event with a powerful keynote, engaging panel discussion, or interactive workshop. Brian brings his signature "No Window Shopping" energy to every stage, delivering actionable insights that inspire real change.',
+    details: 'Includes prep call, custom content creation, and up to 60 minutes on stage. Perfect for conferences, corporate events, and leadership summits.',
+    price: 2500,
+    startingAt: true,
+    icon: '🎤'
+  },
+  { 
+    name: 'Training/Workshop', 
+    description: 'Elevate your team\'s performance with customized training that goes beyond theory. Brian\'s hands-on approach ensures your organization gains practical skills and strategies that stick.',
+    details: 'Custom training or workshop for your team or organization. Includes materials, Q&A sessions, and follow-up resources.',
+    price: 1800,
+    startingAt: true,
+    icon: '🏢'
+  },
+  { 
+    name: 'Speech Writing', 
+    description: 'Words have power. Let Brian craft a compelling speech that captures your voice and moves your audience. From boardroom presentations to keynote addresses, your message will resonate.',
+    details: 'Custom-written speech (up to 20 minutes). Includes consultation, research, and 1 revision to ensure perfection.',
+    price: 500,
+    startingAt: true,
+    icon: '✍️'
+  },
+  { 
+    name: 'Coaching', 
+    description: 'Break through barriers and unlock your potential with personalized coaching. Whether you\'re navigating career transitions, building leadership skills, or seeking personal growth, Brian provides the guidance you need.',
+    details: '1:1 or group coaching for professional or personal development. Flexible packages available to fit your journey.',
+    price: 100,
+    startingAt: true,
+    icon: '🎯'
+  },
+  { 
+    name: 'Professional Development', 
+    description: 'Invest in your most valuable asset: yourself. These focused sessions help you develop the skills, mindset, and strategies needed to thrive in today\'s competitive landscape.',
+    details: 'Career, leadership, or skills development sessions tailored to your specific needs and goals.',
+    price: 100,
+    startingAt: true,
+    icon: '📈'
+  },
 ];
 
 const steps = ['Service', 'Date/Time', 'Contact', 'Review', 'Done'];
@@ -107,6 +142,19 @@ const Booking: React.FC = () => {
 
       <div className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
         <motion.h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-blue-700 dark:text-blue-300" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>Book a Service</motion.h1>
+        
+        {/* Pricing Notice */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-8">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-blue-800 dark:text-blue-200 text-sm font-medium">
+              All prices shown are <strong>starting rates</strong>. Final pricing depends on scope, duration, and customization requirements.
+            </p>
+          </div>
+        </div>
+
         <div className="flex justify-center mb-8 gap-2">
           {steps.map((s, i) => (
             <div key={s} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i <= step ? 'bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}`}>{i + 1}</div>
@@ -116,26 +164,37 @@ const Booking: React.FC = () => {
           {step === 0 && (
             <motion.div key="service" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
               <h2 className="text-xl font-semibold mb-4">Select a Service</h2>
-              <div className="grid grid-cols-1 gap-4 mb-6">
+              <div className="grid grid-cols-1 gap-6 mb-6">
                 {services.map((svc) => (
                   <motion.button
                     key={svc.name}
-                    className={`w-full p-5 rounded-lg border-2 transition-all duration-300 text-left ${selectedService?.name === svc.name ? 'border-blue-700 bg-blue-50 dark:bg-blue-900' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800'}`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className={`w-full p-6 rounded-lg border-2 transition-all duration-300 text-left ${selectedService?.name === svc.name ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600'}`}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
                     onClick={() => setSelectedService(svc)}
                   >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <div className="font-bold text-lg text-blue-700 dark:text-blue-300">{svc.name}</div>
-                        <div className="text-gray-600 dark:text-gray-400 text-sm">{svc.description}</div>
+                    <div className="flex items-start space-x-4">
+                      <div className="text-3xl">{svc.icon}</div>
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start mb-2">
+                          <h3 className="font-bold text-lg text-blue-700 dark:text-blue-300">{svc.name}</h3>
+                          <div className="text-right">
+                            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">${svc.price}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Starting at</div>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed">{svc.description}</p>
+                        <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded">
+                          {svc.details}
+                        </div>
                       </div>
-                      <div className="text-xl font-bold text-blue-700 dark:text-blue-300">${svc.price}</div>
                     </div>
                   </motion.button>
                 ))}
               </div>
-              <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded font-semibold mt-2 w-full disabled:opacity-50" disabled={!selectedService} onClick={() => setStep(1)}>Next</button>
+              <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold mt-2 w-full disabled:opacity-50 transition-colors" disabled={!selectedService} onClick={() => setStep(1)}>
+                {selectedService ? `Continue with ${selectedService.name}` : 'Select a Service to Continue'}
+              </button>
             </motion.div>
           )}
           {step === 1 && (
@@ -186,7 +245,7 @@ const Booking: React.FC = () => {
                 <div><strong>Name:</strong> {name}</div>
                 <div><strong>Email:</strong> {email}</div>
                 <div><strong>Phone:</strong> {phone}</div>
-                <div><strong>Price:</strong> ${selectedService?.price}</div>
+                <div><strong>Starting Price:</strong> ${selectedService?.price} <span className="text-sm text-gray-600 dark:text-gray-400">(final pricing to be determined)</span></div>
               </div>
               {error && <div className="text-red-600 dark:text-red-400 mb-2">{error}</div>}
               <div className="flex gap-2">
