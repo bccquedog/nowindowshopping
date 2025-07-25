@@ -62,125 +62,9 @@ import SlipperySlopesHub from './SlipperySlopesHub';
 import SeatAtTableHub from './SeatAtTableHub';
 import PeakedHSHub from './PeakedHSHub';
 import BlogPostFinessing101 from './BlogPostFinessing101';
-
-const LandingPage = () => (
-  <div className="min-h-screen font-sans">
-    {/* Hero Section */}
-    <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-12 pb-8">
-      <div className="container mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">No Window Shopping</h1>
-        <h2 className="text-xl md:text-2xl mb-4 font-medium">Professional Development & Business Growth</h2>
-        <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed mb-6">
-          Transform your mindset, elevate your skills, and seize every opportunity with our comprehensive professional development platform.
-        </p>
-        <Link 
-          to="/hub" 
-          className="bg-white text-gray-900 px-8 py-3 rounded-full text-base md:text-lg font-semibold hover:bg-gray-100 transition-colors inline-block shadow"
-        >
-          Enter Interactive Hub
-        </Link>
-      </div>
-    </section>
-
-    {/* Overview Section */}
-    <section className="py-8 md:py-12 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-8 text-gray-900">What We Offer</h2>
-          
-          <div className="grid md:grid-cols-3 gap-8 mb-8">
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">🎓</span>
-              </div>
-              <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-900">MGCU</h3>
-              <p className="text-gray-700 text-base md:text-lg">
-                Master Class Growth University - Our comprehensive learning platform for mindset transformation and business acumen development.
-              </p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">👥</span>
-              </div>
-              <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-900">CoachCare</h3>
-              <p className="text-gray-700 text-base md:text-lg">
-                Personalized one-on-one coaching sessions tailored to your specific needs and goals for sustainable success.
-              </p>
-            </div>
-            <div className="text-center p-6">
-              <div className="w-20 h-20 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <span className="text-3xl">🚀</span>
-              </div>
-              <h3 className="text-lg md:text-xl font-bold mb-2 text-gray-900">Professional Services</h3>
-              <p className="text-gray-700 text-base md:text-lg">
-                Strategic guidance and customized solutions for business growth, leadership development, and personal transformation.
-              </p>
-            </div>
-          </div>
-
-          {/* Services Overview */}
-          <div className="flex justify-center items-center mb-8">
-            <div className="bg-gray-50 p-6 md:p-10 rounded-lg border border-gray-200 w-full max-w-5xl">
-              <h3 className="text-xl md:text-2xl font-bold mb-6 text-center text-gray-900">Our Core Services</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-                <div>
-                  <h4 className="text-base md:text-lg font-bold mb-2 text-gray-900">Business & Entrepreneurship</h4>
-                  <ul className="space-y-1 text-gray-700 text-left inline-block text-sm md:text-base">
-                    <li>• Business Consulting & Strategy</li>
-                    <li>• Startup Coaching & Business Formation</li>
-                    <li>• Contracting & Procurement Advisory</li>
-                    <li>• Process Improvement & Business Scaling</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-base md:text-lg font-bold mb-2 text-gray-900">Leadership & Development</h4>
-                  <ul className="space-y-1 text-gray-700 text-left inline-block text-sm md:text-base">
-                    <li>• Executive & Leadership Coaching</li>
-                    <li>• Career Development & Job Readiness</li>
-                    <li>• Workplace Training & Corporate Workshops</li>
-                    <li>• Public Speaking & Communication Training</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-base md:text-lg font-bold mb-2 text-gray-900">Financial Literacy & Wealth Building</h4>
-                  <ul className="space-y-1 text-gray-700 text-left inline-block text-sm md:text-base">
-                    <li>• Personal Finance Coaching</li>
-                    <li>• Wealth-Building & Investment Education</li>
-                    <li>• Business Financial Planning</li>
-                    <li>• Smart Money Habits & Passive Income</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="text-base md:text-lg font-bold mb-2 text-gray-900">Personal Growth & Mindset</h4>
-                  <ul className="space-y-1 text-gray-700 text-left inline-block text-sm md:text-base">
-                    <li>• Mindset Coaching & Confidence Building</li>
-                    <li>• Productivity & Work-Life Balance</li>
-                    <li>• Networking & Relationship Building</li>
-                    <li>• Stress Management & Self-Care</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* CTA Section */}
-          <div className="text-center bg-gray-900 text-white p-6 md:p-8 rounded-lg mb-8">
-            <h3 className="text-xl md:text-2xl font-bold mb-2">Ready to Transform Your Future?</h3>
-            <p className="mb-4 text-base md:text-lg">
-              Join thousands of professionals who have already taken action and achieved breakthrough results with No Window Shopping.
-            </p>
-            <Link 
-              to="/hub" 
-              className="bg-white text-gray-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors inline-block shadow"
-            >
-              Explore Our Interactive Hub
-            </Link>
-          </div>
-        </div>
-      </div>
-    </section>
-  </div>
-);
+import About from './About';
+import PrivacyPolicy from './PrivacyPolicy';
+import TermsConditions from './TermsConditions';
 
 const InteractiveHub = () => (
   <div className="min-h-screen font-sans">
@@ -446,7 +330,7 @@ const AboutTheFounder = () => (
 const App = () => (
   <Router>
     <Routes>
-      <Route path="/" element={<LandingPage />} />
+      <Route path="/" element={<InteractiveHub />} />
       <Route path="/hub" element={<InteractiveHub />} />
       <Route path="/healthcheck" element={<HealthcheckScreen />} />
       <Route path="/feature-status" element={<FeatureStatusScreen />} />
@@ -514,6 +398,9 @@ const App = () => (
       <Route path="/blog/slippery-slopes" element={<SlipperySlopesHub />} />
       <Route path="/blog/seat-at-table" element={<SeatAtTableHub />} />
       <Route path="/blog/peaked-hs" element={<PeakedHSHub />} />
+      <Route path="/about-us" element={<About />} />
+      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+      <Route path="/terms-conditions" element={<TermsConditions />} />
       {/* Add other routes as needed */}
     </Routes>
   </Router>
