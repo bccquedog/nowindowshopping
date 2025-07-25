@@ -5,6 +5,7 @@ import { LoadingScreen } from './components/LoadingScreen';
 import { AdminPortal } from './components/AdminPortal';
 import { CoachPortal } from './components/CoachPortal';
 import { ClientPortal } from './components/ClientPortal';
+import { CoachCareLanding } from './components/CoachCareLanding';
 
 const CoachCareContent: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -13,10 +14,12 @@ const CoachCareContent: React.FC = () => {
     return <LoadingScreen />;
   }
 
+  // Show landing page if no user is logged in
   if (!user) {
-    return <LoginScreen />;
+    return <CoachCareLanding />;
   }
 
+  // Show appropriate portal based on user role
   switch (user.role) {
     case 'admin':
       return <AdminPortal />;
@@ -25,7 +28,7 @@ const CoachCareContent: React.FC = () => {
     case 'client':
       return <ClientPortal />;
     default:
-      return <LoginScreen />;
+      return <CoachCareLanding />;
   }
 };
 
