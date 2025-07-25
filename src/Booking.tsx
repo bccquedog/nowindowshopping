@@ -10,6 +10,54 @@ const db = getFirestore(app);
 
 const services = [
   { 
+    name: 'Brand Design', 
+    description: 'Create a powerful visual identity that tells your story and connects with your audience. From logos to complete brand systems, we craft designs that make lasting impressions.',
+    details: 'Logo design, brand identity, visual storytelling, style guides, and brand collateral for your business.',
+    price: 800,
+    startingAt: true,
+    icon: '🎨'
+  },
+  { 
+    name: 'Business Strategy', 
+    description: 'Navigate growth challenges with confidence. Our strategic consulting helps you identify opportunities, optimize operations, and build sustainable competitive advantages.',
+    details: 'Growth planning, market analysis, operational consulting, competitive positioning, and strategic roadmaps.',
+    price: 1200,
+    startingAt: true,
+    icon: '📊'
+  },
+  { 
+    name: 'Coaching', 
+    description: 'Break through barriers and unlock your potential with personalized coaching. Whether you\'re navigating career transitions, building leadership skills, or seeking personal growth, Brian provides the guidance you need.',
+    details: '1:1 or group coaching for professional or personal development. Flexible packages available to fit your journey.',
+    price: 100,
+    startingAt: true,
+    icon: '🎯'
+  },
+  { 
+    name: 'Content Creation', 
+    description: 'Engage your audience with compelling content that drives action. Our copywriting and multimedia content strategies help you connect, convert, and grow your business.',
+    details: 'Copywriting, blog posts, social media content, email campaigns, and multimedia content creation.',
+    price: 300,
+    startingAt: true,
+    icon: '✍️'
+  },
+  { 
+    name: 'Professional Development', 
+    description: 'Invest in your most valuable asset: yourself. These focused sessions help you develop the skills, mindset, and strategies needed to thrive in today\'s competitive landscape.',
+    details: 'Career, leadership, or skills development sessions tailored to your specific needs and goals.',
+    price: 100,
+    startingAt: true,
+    icon: '📈'
+  },
+  { 
+    name: 'Project Management', 
+    description: 'Keep your projects on track and deliver results on time. From kickoff to delivery, we provide the structure, oversight, and expertise to ensure project success.',
+    details: 'Project planning, execution oversight, risk management, stakeholder communication, and delivery coordination.',
+    price: 600,
+    startingAt: true,
+    icon: '📋'
+  },
+  { 
     name: 'Speaking Engagement', 
     description: 'Transform your event with a powerful keynote, engaging panel discussion, or interactive workshop. Brian brings his signature "No Window Shopping" energy to every stage, delivering actionable insights that inspire real change.',
     details: 'Includes prep call, custom content creation, and up to 60 minutes on stage. Perfect for conferences, corporate events, and leadership summits.',
@@ -26,54 +74,12 @@ const services = [
     icon: '✍️'
   },
   { 
-    name: 'Coaching', 
-    description: 'Break through barriers and unlock your potential with personalized coaching. Whether you\'re navigating career transitions, building leadership skills, or seeking personal growth, Brian provides the guidance you need.',
-    details: '1:1 or group coaching for professional or personal development. Flexible packages available to fit your journey.',
-    price: 100,
-    startingAt: true,
-    icon: '🎯'
-  },
-  { 
-    name: 'Professional Development', 
-    description: 'Invest in your most valuable asset: yourself. These focused sessions help you develop the skills, mindset, and strategies needed to thrive in today\'s competitive landscape.',
-    details: 'Career, leadership, or skills development sessions tailored to your specific needs and goals.',
-    price: 100,
-    startingAt: true,
-    icon: '📈'
-  },
-  // Creative Services
-  { 
-    name: 'Brand Design', 
-    description: 'Create a powerful visual identity that tells your story and connects with your audience. From logos to complete brand systems, we craft designs that make lasting impressions.',
-    details: 'Logo design, brand identity, visual storytelling, style guides, and brand collateral for your business.',
-    price: 800,
-    startingAt: true,
-    icon: '🎨'
-  },
-  { 
-    name: 'Content Creation', 
-    description: 'Engage your audience with compelling content that drives action. Our copywriting and multimedia content strategies help you connect, convert, and grow your business.',
-    details: 'Copywriting, blog posts, social media content, email campaigns, and multimedia content creation.',
-    price: 300,
-    startingAt: true,
-    icon: '✍️'
-  },
-  { 
     name: 'Web Development', 
     description: 'Build a digital presence that converts visitors into customers. Modern, responsive websites designed for impact, performance, and user experience.',
     details: 'Custom website development, responsive design, e-commerce solutions, and ongoing maintenance.',
     price: 1500,
     startingAt: true,
     icon: '💻'
-  },
-  // Consulting Services
-  { 
-    name: 'Business Strategy', 
-    description: 'Navigate growth challenges with confidence. Our strategic consulting helps you identify opportunities, optimize operations, and build sustainable competitive advantages.',
-    details: 'Growth planning, market analysis, operational consulting, competitive positioning, and strategic roadmaps.',
-    price: 1200,
-    startingAt: true,
-    icon: '📊'
   },
   { 
     name: 'Workshops & Training', 
@@ -82,14 +88,6 @@ const services = [
     price: 900,
     startingAt: true,
     icon: '👥'
-  },
-  { 
-    name: 'Project Management', 
-    description: 'Keep your projects on track and deliver results on time. From kickoff to delivery, we provide the structure, oversight, and expertise to ensure project success.',
-    details: 'Project planning, execution oversight, risk management, stakeholder communication, and delivery coordination.',
-    price: 600,
-    startingAt: true,
-    icon: '📋'
   },
 ];
 
