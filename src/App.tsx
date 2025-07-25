@@ -434,7 +434,6 @@ const AboutTheFounder = () => (
         <div className="mt-6">
           <h3 className="text-lg font-bold text-blue-600 mb-2">Get in Touch</h3>
           <div className="flex flex-col gap-1 text-base">
-            <span className="text-gray-800">Phone: <a href="tel:4108718392" className="text-pink-600 hover:underline">(410) 871-8392</a></span>
             <span className="text-gray-800">Email: <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-pink-600 hover:underline">NoWindowShoppingOnline@gmail.com</a></span>
             <span className="text-gray-800">Instagram: <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline">@DrProctorKOPV</a></span>
           </div>

@@ -31,7 +31,6 @@ const Settings: React.FC = () => {
     
     // Account Management
     email: 'user@example.com',
-    phone: '+1 (555) 123-4567',
     firstName: 'John',
     lastName: 'Doe',
     company: 'No Window Shopping'
@@ -358,16 +357,6 @@ const Settings: React.FC = () => {
           type="email"
           value={settings.email}
           onChange={(e) => handleSettingChange('account', 'email', e.target.value)}
-          className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone Number</label>
-        <input
-          type="tel"
-          value={settings.phone}
-          onChange={(e) => handleSettingChange('account', 'phone', e.target.value)}
           className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
         />
       </div>
