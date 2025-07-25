@@ -94,6 +94,7 @@ const Brians42nd: React.FC = () => {
                 <p className="text-lg font-semibold mb-2">🎉 Party Location:</p>
                 <p><strong>Château de la Proc</strong></p>
                 <p>8308 Aletta Pl, Severn, MD 21144</p>
+                <p className="mt-3 text-sm italic text-gray-300">🍷 Feel free to bring a bottle or a dish!</p>
                 <button 
                   onClick={addToCalendar}
                   className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold flex items-center gap-2"
