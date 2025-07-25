@@ -361,10 +361,23 @@ const HubCard = ({ title, description, to, icon }: { title: string; description:
 };
 
 const WebStoreMaintenance = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-pink-100">
-    <div className="bg-white rounded-2xl shadow-lg p-10 flex flex-col items-center">
-      <h1 className="text-2xl font-bold mb-2 text-pink-600">Web Store Under Maintenance</h1>
-      <p className="text-gray-700 text-lg">Our store is getting a glow-up! Please check back soon for new merch and digital goodies.</p>
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-pink-100 dark:from-gray-900 dark:to-pink-900 py-12 px-4">
+    {/* Back Button */}
+    <div className="w-full max-w-2xl mb-6">
+      <Link 
+        to="/hub" 
+        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Hub
+      </Link>
+    </div>
+
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-2 text-pink-600 dark:text-pink-400">Web Store Under Maintenance</h1>
+      <p className="text-gray-700 dark:text-gray-300 text-lg">Our store is getting a glow-up! Please check back soon for new merch and digital goodies.</p>
     </div>
   </div>
 );
@@ -386,8 +399,21 @@ const ContactPage = () => (
 );
 
 const AboutTheFounder = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100 py-12 px-4">
-    <div className="bg-white rounded-2xl shadow-lg p-10 flex flex-col md:flex-row items-center max-w-4xl w-full">
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100 dark:from-blue-900 dark:to-pink-900 py-12 px-4">
+    {/* Back Button */}
+    <div className="w-full max-w-4xl mb-6">
+      <Link 
+        to="/hub" 
+        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+      >
+        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Hub
+      </Link>
+    </div>
+
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col md:flex-row items-center max-w-4xl w-full">
       <img
         src="/assets/founder.png"
         alt="Brian Proctor, Founder"
