@@ -18,14 +18,6 @@ const services = [
     icon: '🎤'
   },
   { 
-    name: 'Training/Workshop', 
-    description: 'Elevate your team\'s performance with customized training that goes beyond theory. Brian\'s hands-on approach ensures your organization gains practical skills and strategies that stick.',
-    details: 'Custom training or workshop for your team or organization. Includes materials, Q&A sessions, and follow-up resources.',
-    price: 1800,
-    startingAt: true,
-    icon: '🏢'
-  },
-  { 
     name: 'Speech Writing', 
     description: 'Words have power. Let Brian craft a compelling speech that captures your voice and moves your audience. From boardroom presentations to keynote addresses, your message will resonate.',
     details: 'Custom-written speech (up to 20 minutes). Includes consultation, research, and 1 revision to ensure perfection.',
