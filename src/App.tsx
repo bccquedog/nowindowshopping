@@ -1,5 +1,23 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { 
+  FaUsers, 
+  FaLaptopCode, 
+  FaBookOpen, 
+  FaPenNib, 
+  FaScroll, 
+  FaUserTie, 
+  FaShoppingCart, 
+  FaPhone, 
+  FaCalendarAlt, 
+  FaBullseye, 
+  FaCog, 
+  FaDesktop, 
+  FaQuestionCircle, 
+  FaClock, 
+  FaBullhorn,
+  FaStore
+} from 'react-icons/fa';
 import FeatureStatusScreen from './FeatureStatusScreen';
 import HealthcheckScreen from './HealthcheckScreen';
 import BlogPost1 from './BlogPost1';
@@ -88,105 +106,105 @@ const InteractiveHub = () => (
               title="CoachCare"
               description="Professional Development CRM - Manage your coaching relationships and track your growth journey."
               to="/coachcare"
-              icon="👥"
+              icon={<FaUsers className="text-4xl" />}
             />
             {/* IT Services Card */}
             <HubCard
               title="IT Services"
               description="Technology solutions and digital transformation services for modern businesses."
               to="/it-services"
-              icon="💻"
+              icon={<FaLaptopCode className="text-4xl" />}
             />
             {/* MGCU Card */}
             <HubCard
               title="MGCU"
               description="Marcus Graham Connected Universe - Explore the literary world of your pen name."
               to="/mgcu"
-              icon="📚"
+              icon={<FaBookOpen className="text-4xl" />}
             />
             {/* NWS Blog Card */}
             <HubCard
               title="NWS Blog"
               description="Insights, tips, and stories on business, mindset, and personal development."
               to="/blog-hub"
-              icon="✍️"
+              icon={<FaPenNib className="text-4xl" />}
             />
             {/* Principles of NoWindowShopping Card */}
             <HubCard
               title="Principles of NoWindowShopping"
               description="Core philosophies and guiding principles for intentional living and success."
               to="/principles"
-              icon="📜"
+              icon={<FaScroll className="text-4xl" />}
             />
             {/* About Card */}
             <HubCard
               title="About the Founder"
               description="Learn more about Brian Proctor and the vision behind No Window Shopping."
               to="/about"
-              icon="👨‍💼"
+              icon={<FaUserTie className="text-4xl" />}
             />
             {/* Web Store Card */}
             <HubCard
               title="Web Store"
               description="Shop for resources, tools, and exclusive No Window Shopping merchandise."
               to="/webstore"
-              icon="🛒"
+              icon={<FaShoppingCart className="text-4xl" />}
             />
             {/* Contact Card */}
             <HubCard
               title="Contact"
               description="Get in touch with our team for personalized support and inquiries."
               to="/contact"
-              icon="📞"
+              icon={<FaPhone className="text-4xl" />}
             />
             {/* Booking Card */}
             <HubCard
               title="Booking"
               description="Schedule your coaching sessions and professional development consultations."
               to="/booking"
-              icon="📅"
+              icon={<FaCalendarAlt className="text-4xl" />}
             />
             {/* What We Offer Card */}
             <HubCard
               title="What We Offer"
               description="Comprehensive overview of all our services and professional development programs."
               to="/services"
-              icon="🎯"
+              icon={<FaBullseye className="text-4xl" />}
             />
             {/* Settings Card */}
             <HubCard
               title="Settings"
               description="Manage your app preferences and advanced settings."
               to="/settings"
-              icon="⚙️"
+              icon={<FaCog className="text-4xl" />}
             />
             {/* Software Card */}
             <HubCard
               title="Software"
               description="Explore our suite of professional software solutions for business, education, and personal development."
               to="/software"
-              icon="🖥️"
+              icon={<FaDesktop className="text-4xl" />}
             />
             {/* User Guide Card */}
             <HubCard
               title="User Guide"
               description="Interactive guide to master all features of the No Window Shopping platform."
               to="/guide"
-              icon="📖"
+              icon={<FaQuestionCircle className="text-4xl" />}
             />
             {/* Luminère Qualité Card */}
             <HubCard
               title="Luminère Qualité"
               description="Time Redefined."
               to="/lq"
-              icon="⌚"
+              icon={<FaClock className="text-4xl" />}
             />
             {/* ShoutOut Card */}
             <HubCard
               title="ShoutOut"
               description="Live venue messaging platform for real-time audience engagement and venue monetization."
               to="/shoutout"
-              icon="📢"
+              icon={<FaBullhorn className="text-4xl" />}
             />
           </div>
         </div>
@@ -196,7 +214,7 @@ const InteractiveHub = () => (
 );
 
 // Card component for the hub
-const HubCard = ({ title, description, to, icon }: { title: string; description: string; to: string; icon: string }) => {
+const HubCard = ({ title, description, to, icon }: { title: string; description: string; to: string; icon: React.ReactNode }) => {
   const isLQCard = title === "Luminère Qualité";
   
   return (
@@ -260,6 +278,7 @@ const WebStoreMaintenance = () => (
     </div>
 
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center">
+      <FaStore className="text-6xl mb-4 text-pink-600 dark:text-pink-400" />
       <h1 className="text-2xl font-bold mb-2 text-pink-600 dark:text-pink-400">Web Store Under Maintenance</h1>
       <p className="text-gray-700 dark:text-gray-300 text-lg">Our store is getting a glow-up! Please check back soon for new merch and digital goodies.</p>
     </div>
@@ -269,9 +288,9 @@ const WebStoreMaintenance = () => (
 const ContactPage = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100">
     <div className="bg-white rounded-2xl shadow-lg p-10 flex flex-col items-center">
-      <span className="text-5xl mb-4">📞</span>
+      <FaPhone className="text-5xl mb-4 text-blue-600" />
       <h1 className="text-2xl font-bold mb-2 text-blue-600">Contact Us</h1>
-      <p className="text-gray-700 text-lg mb-4">We’d love to hear from you! Reach out via email or Instagram:</p>
+      <p className="text-gray-700 text-lg mb-4">We'd love to hear from you! Reach out via email or Instagram:</p>
       <div className="flex flex-col gap-2 text-lg">
         <span className="font-semibold text-pink-600">Email:</span>
         <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-blue-700 underline">NoWindowShoppingOnline@gmail.com</a>
