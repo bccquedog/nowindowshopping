@@ -24,7 +24,7 @@ const TermsConditions: React.FC = () => {
             Terms & Conditions
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Last updated: {new Date().toLocaleDateString()}
+            Effective: July 28, 2025
           </p>
         </div>
 

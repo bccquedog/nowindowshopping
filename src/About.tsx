@@ -130,19 +130,33 @@ const About: React.FC = () => {
             <img
               src="/assets/founder.png"
               alt="Brian Proctor, Founder"
-              className="w-32 h-32 rounded-full object-cover mb-6 md:mb-0 md:mr-8 border-4 border-blue-200 shadow-lg"
+              className="w-40 h-40 rounded-full object-cover mb-6 md:mb-0 md:mr-8 border-4 border-blue-200 shadow-lg"
             />
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Meet Our Founder</h2>
+            <div className="flex-1">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Brian Proctor</h2>
+              <h3 className="text-xl font-semibold text-blue-600 dark:text-blue-400 mb-4">Founder, No Window Shopping</h3>
               <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
                 Brian Proctor is a business leader, training expert, and executive coach dedicated to empowering individuals and organizations. A Bethune-Cookman University graduate (Class of 2005) and Omega Psi Phi member, he specializes in professional development, leadership coaching, workforce training, and organizational growth.
               </p>
               <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
                 With expertise in Human Resources, executive coaching, and after-market specialization, Brian has a proven track record of enhancing leadership, improving performance, and driving career success. His hands-on experience spans corporate and blue-collar industries, providing a unique perspective on adaptability, resilience, and skill development.
               </p>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                As the founder of No Window Shopping Professional Services, Brian champions his "No Window Shopping" mantra, inspiring professionals to take action, invest in themselves, and seize every opportunity. Grounded in strong family and spiritual values, he is committed to helping others develop, lead, and succeed.
+              <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                As the founder of No Window Shopping Professional Services, Brian champions his "No Window Shopping" mantra, inspiring professionals to take action, invest in themselves, and seize every opportunity. Grounded in strong family and spiritual values, he is committed to helping others develop, lead, and succeed—because success isn't on display; it's claimed.
               </p>
+              
+              {/* Contact Information */}
+              <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                <h4 className="text-lg font-bold text-blue-600 dark:text-blue-400 mb-3">Get in Touch</h4>
+                <div className="flex flex-col gap-2 text-base">
+                  <span className="text-gray-700 dark:text-gray-300">
+                    Email: <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-blue-600 dark:text-blue-400 hover:underline">NoWindowShoppingOnline@gmail.com</a>
+                  </span>
+                  <span className="text-gray-700 dark:text-gray-300">
+                    Instagram: <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">@DrProctorKOPV</a>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>

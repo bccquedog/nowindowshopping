@@ -16,7 +16,9 @@ import {
   FaQuestionCircle, 
   FaClock, 
   FaBullhorn,
-  FaStore
+  FaStore,
+  FaEnvelope,
+  FaInstagram
 } from 'react-icons/fa';
 import FeatureStatusScreen from './FeatureStatusScreen';
 import HealthcheckScreen from './HealthcheckScreen';
@@ -210,6 +212,64 @@ const InteractiveHub = () => (
         </div>
       </div>
     </section>
+
+    {/* Footer Section */}
+    <footer className="bg-gray-900 text-white py-12">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Company Info */}
+            <div>
+              <h3 className="text-xl font-bold mb-4">NO WINDOW SHOPPING</h3>
+              <p className="text-gray-300 mb-4">
+                Empowering individuals and organizations to stop window shopping and start claiming success through professional development and transformative growth strategies.
+              </p>
+              <div className="flex space-x-4">
+                <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-gray-300 hover:text-white transition-colors">
+                  <FaEnvelope className="text-xl" />
+                </a>
+                <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
+                  <FaInstagram className="text-xl" />
+                </a>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About</Link></li>
+                <li><Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms-conditions" className="text-gray-300 hover:text-white transition-colors">Terms and Conditions</Link></li>
+              </ul>
+            </div>
+
+            {/* Contact Info */}
+            <div>
+              <h4 className="text-lg font-semibold mb-4">Get in Touch</h4>
+              <div className="space-y-2 text-gray-300">
+                <p>Ready to stop window shopping?</p>
+                <p>Let's discuss how we can help you achieve breakthrough success.</p>
+                <div className="mt-4">
+                  <a 
+                    href="mailto:NoWindowShoppingOnline@gmail.com" 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors inline-block"
+                  >
+                    Contact Us
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 No Window Shopping Professional Services. All rights reserved.</p>
+            <p className="mt-2 text-sm">Success isn't on display—it's claimed.</p>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
 );
 
@@ -301,51 +361,6 @@ const ContactPage = () => (
   </div>
 );
 
-const AboutTheFounder = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100 dark:from-blue-900 dark:to-pink-900 py-12 px-4">
-    {/* Back Button */}
-    <div className="w-full max-w-4xl mb-6">
-      <Link 
-        to="/hub" 
-        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-      >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Hub
-      </Link>
-    </div>
-
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col md:flex-row items-center max-w-4xl w-full">
-      <img
-        src="/assets/founder.png"
-        alt="Brian Proctor, Founder"
-        className="w-40 h-40 rounded-full object-cover mb-6 md:mb-0 md:mr-10 border-4 border-pink-200 shadow-md"
-      />
-      <div className="flex-1">
-        <h1 className="text-3xl font-extrabold mb-2 text-blue-700">Brian Proctor</h1>
-        <h2 className="text-xl font-semibold mb-4 text-pink-600">Founder, No Window Shopping</h2>
-        <p className="text-gray-700 mb-4">
-          Brian Proctor is a business leader, training expert, and executive coach dedicated to empowering individuals and organizations. A Bethune-Cookman University graduate (Class of 2005) and Omega Psi Phi member, he specializes in professional development, leadership coaching, workforce training, and organizational growth.
-        </p>
-        <p className="text-gray-700 mb-4">
-          With expertise in Human Resources, executive coaching, and after-market specialization, Brian has a proven track record of enhancing leadership, improving performance, and driving career success. His hands-on experience spans corporate and blue-collar industries, providing a unique perspective on adaptability, resilience, and skill development.
-        </p>
-        <p className="text-gray-700 mb-4">
-          As the founder of No Window Shopping Professional Services, Brian champions his “No Window Shopping” mantra, inspiring professionals to take action, invest in themselves, and seize every opportunity. Grounded in strong family and spiritual values, he is committed to helping others develop, lead, and succeed—because success isn’t on display; it’s claimed.
-        </p>
-        <div className="mt-6">
-          <h3 className="text-lg font-bold text-blue-600 mb-2">Get in Touch</h3>
-          <div className="flex flex-col gap-1 text-base">
-            <span className="text-gray-800">Email: <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-pink-600 hover:underline">NoWindowShoppingOnline@gmail.com</a></span>
-            <span className="text-gray-800">Instagram: <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-pink-600 hover:underline">@DrProctorKOPV</a></span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-);
-
 const App = () => (
   <Router>
     <Routes>
@@ -408,7 +423,7 @@ const App = () => (
       <Route path="/mgcu/discord" element={<MGCUDiscord />} />
       <Route path="/webstore" element={<WebStoreMaintenance />} />
       <Route path="/contact" element={<ContactPage />} />
-      <Route path="/about" element={<AboutTheFounder />} />
+      <Route path="/about" element={<About />} />
       <Route path="/it-services" element={<ITServices />} />
       <Route path="/services" element={<Services />} />
       <Route path="/settings" element={<Settings />} />

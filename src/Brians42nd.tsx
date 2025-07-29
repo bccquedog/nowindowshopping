@@ -42,20 +42,6 @@ const Brians42nd: React.FC = () => {
     }
   };
 
-  const addToCalendar = () => {
-    const eventTitle = "Brian's 42nd Birthday Bash";
-    const eventDescription = "First NFL Sunday + 90s Throwback Theme. Rep your team. Dress like it's '95.";
-    const eventLocation = "Château de la Proc, 8308 Aletta Pl, Severn, MD 21144";
-    const eventStart = "20240907T120000"; // September 7, 2024 at 12 PM
-    const eventEnd = "20240907T200000";   // September 7, 2024 at 8 PM
-    
-    // Google Calendar URL
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventTitle)}&dates=${eventStart}/${eventEnd}&details=${encodeURIComponent(eventDescription)}&location=${encodeURIComponent(eventLocation)}&sf=true&output=xml`;
-    
-    // Open in new tab
-    window.open(googleCalendarUrl, '_blank');
-  };
-
   if (!access) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white px-4">
@@ -76,31 +62,24 @@ const Brians42nd: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-black to-pink-600 text-white py-10 px-6">
       <div className="max-w-3xl mx-auto space-y-6">
-        <h1 className="text-4xl font-bold text-center">🕹️ Brian's 42nd Birthday Bash</h1>
+        <h1 className="text-4xl font-bold text-center">🕹️ Brian’s 42nd Birthday Bash</h1>
         <p className="text-center text-lg">Sunday, September 7 • 12 PM – 8 PM</p>
         <p className="text-center text-xl font-semibold">🏈 First NFL Sunday + 90s Throwback Theme</p>
-        <p className="text-center italic">Rep your team. Dress like it's '95.</p>
+        <p className="text-center italic">Rep your team. Dress like it’s ‘95.</p>
 
         <div className="bg-white/10 border-white/10 text-white rounded-xl shadow-lg">
           <div className="p-6">
             <h2 className="text-2xl font-bold mb-4">Will You Be There?</h2>
             <div className="flex space-x-2 mb-4">
-              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='yes'?'bg-green-600 border-green-400':'bg-white/10 border-white/20'} hover:bg-green-700`} onClick={() => handleRsvp('yes')}>Yes</button>
-              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='maybe'?'bg-yellow-500 border-yellow-300':'bg-white/10 border-white/20'} hover:bg-yellow-600`} onClick={() => handleRsvp('maybe')}>Maybe</button>
-              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='no'?'bg-gray-600 border-gray-400':'bg-white/10 border-white/20'} hover:bg-gray-700`} onClick={() => handleRsvp('no')}>No</button>
+              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='yes'?'bg-green-600 border-green-400':'bg-white/10 border-white/20'} hover:bg-green-700`} onClick={() => handleRsvp('yes')}>I'm OWT</button>
+              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='maybe'?'bg-yellow-500 border-yellow-300':'bg-white/10 border-white/20'} hover:bg-yellow-600`} onClick={() => handleRsvp('maybe')}>I'm Lukewarm</button>
+              <button className={`px-6 py-2 rounded font-bold border ${rsvp==='no'?'bg-gray-600 border-gray-400':'bg-white/10 border-white/20'} hover:bg-gray-700`} onClick={() => handleRsvp('no')}>I'm Cat</button>
             </div>
             {showLocation && (
               <div className="bg-white/10 p-4 rounded mb-4">
                 <p className="text-lg font-semibold mb-2">🎉 Party Location:</p>
                 <p><strong>Château de la Proc</strong></p>
                 <p>8308 Aletta Pl, Severn, MD 21144</p>
-                <p className="mt-3 text-sm italic text-gray-300">🍷 Feel free to bring a bottle or a dish!</p>
-                <button 
-                  onClick={addToCalendar}
-                  className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded font-semibold flex items-center gap-2"
-                >
-                  📅 Add to Calendar
-                </button>
               </div>
             )}
             {rsvp && !submitted && (
@@ -128,7 +107,7 @@ const Brians42nd: React.FC = () => {
           <p>🎁 First 20 RSVPs get a 90s Party Pack!</p>
         </div>
 
-        <p className="text-center italic pt-6">"It's my birthday, but <em>you're</em> getting the experience."</p>
+        <p className="text-center italic pt-6">“It’s my birthday, but <em>you’re</em> getting the experience.”</p>
       </div>
     </div>
   );
