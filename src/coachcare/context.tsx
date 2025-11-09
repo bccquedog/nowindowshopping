@@ -11,6 +11,12 @@ import {
   Note,
   Assessment,
   Invoice,
+  Notification,
+  Course,
+  Module,
+  Lesson,
+  Enrollment,
+  Progress,
   /* ClientFilters, */
   /* SessionFilters */
 } from './types';
@@ -32,6 +38,10 @@ const initialState: CoachCareState = {
   notes: [],
   assessments: [],
   invoices: [],
+  notifications: [],
+  courses: [],
+  enrollments: [],
+  progress: [],
   
   // UI State
   activeTab: 'dashboard',
@@ -52,6 +62,7 @@ const initialState: CoachCareState = {
   showEditNote: false,
   showAddCommunication: false,
   showEditCommunication: false,
+  showNotificationCenter: false,
   
   // Editing
   editingClient: null,
@@ -530,6 +541,9 @@ export const useCoachCare = (): CoachCareContextType => {
   }
   return context;
 };
+
+// Alias for backward compatibility
+export const useCoachCareContext = useCoachCare;
 
 // Helper hooks for specific functionality
 export const useAuth = () => {

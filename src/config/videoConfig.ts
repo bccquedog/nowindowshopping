@@ -1,10 +1,10 @@
 // Video Chat Configuration
-// Update these settings with your Daily.co account information
+// Production settings for Daily.co integration
 
 export const videoConfig = {
   // Daily.co Configuration
   daily: {
-    // Replace with your Daily.co domain
+    // Production Daily.co domain
     domain: 'nowindowshopping.daily.co',
     
     // API Key for creating rooms programmatically (optional)

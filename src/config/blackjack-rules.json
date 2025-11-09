@@ -1,0 +1,52 @@
+{
+  "id": "blackjack_lux_default",
+  "table": {
+    "maxSeats": 5,
+    "minBet": 5,
+    "maxBet": 1000,
+    "currency": "$"
+  },
+  "shoe": {
+    "numDecks": 6,
+    "penetrationPct": 0.75,
+    "shuffleOnStart": true,
+    "burnCards": 1,
+    "rng": "csprng_seeded"
+  },
+  "dealer": {
+    "standsOnSoft17": true,
+    "peekForBlackjack": true,
+    "blackjackPayout": "3:2"
+  },
+  "playerOptions": {
+    "doubleOn": "anyTwo",
+    "doubleAfterSplit": true,
+    "resplitAces": false,
+    "maxHandsAfterSplits": 4,
+    "hitSplitAces": false,
+    "lateSurrender": true,
+    "earlySurrender": false,
+    "insurance": true,
+    "evenMoney": true
+  },
+  "payouts": {
+    "blackjack": 1.5,
+    "win": 1.0,
+    "insurance": 2.0
+  },
+  "ui": {
+    "theme": "luxury_onyx_gold",
+    "showRunningCount": false,
+    "showTrueCount": false,
+    "showBasicStrategyHints": true
+  },
+  "coach": {
+    "enabledInCasual": true,
+    "enabledInRanked": false
+  }
+}
+
+
+
+
+

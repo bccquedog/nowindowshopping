@@ -1,0 +1,32 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow RSVP submissions for the birthday event
+    match /brians42nd-rsvp/{document} {
+      allow read, write: if true; // Allow anyone to read/write RSVPs for now
+    }
+    
+    // Allow booking submissions
+    match /bookings/{document} {
+      allow read, write: if true; // Allow anyone to read/write bookings for now
+    }
+    
+    // Allow LQ waitlist submissions
+    match /lq_waitlist/{document} {
+      allow read, write: if true; // Allow anyone to read/write waitlist entries for now
+    }
+    
+    // Allow comments
+    match /comments/{document} {
+      allow read, write: if true; // Allow anyone to read/write comments for now
+    }
+    
+    // Default rule - deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+
+

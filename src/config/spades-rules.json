@@ -1,0 +1,45 @@
+{
+  "id": "spades_nws",
+  "deck": {
+    "jokers": { "big": true, "little": true },
+    "remove": ["2D", "2H"],
+    "lowestCardNote": "2C is the lowest card"
+  },
+  "trump": {
+    "suit": "S",
+    "jokersAreTrump": true,
+    "order": ["BJ","LJ","2S","AS","KS","QS","JS","10S","9S","8S","7S","6S","5S","4S","3S"],
+    "leadRestriction": {
+      "spadesBroken": true,
+      "allowIfOnlyTrump": true
+    },
+    "playRestriction": {
+      "cannotPlaySpadeUnless": {
+        "voidInLedSuit": true,
+        "orSpadesAlreadyBroken": true
+      }
+    }
+  },
+  "bidding": {
+    "minBidPerPlayer": 0,
+    "blind": { "enabled": true, "minDeficit": 100, "successMultiplier": 2, "failPenaltyPerBook": -10 },
+    "tenPlus": { "enabled": true, "threshold": 10, "successFlat": 250, "failPenaltyPerBook": -10 }
+  },
+  "scoring": {
+    "mode": "noBags",
+    "makeBid": { "pointsPerBookOfBid": 10, "overbooksPoints": 0 },
+    "missBid": { "penaltyPerBidBook": -10 },
+    "gameTarget": 500,
+    "altTargets": [350, 500]
+  },
+  "reneging": {
+    "detect": true,
+    "penaltyMode": "forfeitTrickAndMinus30",
+    "penaltyPoints": -30
+  }
+}
+
+
+
+
+

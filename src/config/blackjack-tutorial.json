@@ -1,0 +1,59 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to BlackjackLux — elegant 21."
+  },
+  {
+    "type": "highlight",
+    "target": "betBar",
+    "text": "Place a bet to start."
+  },
+  {
+    "type": "waitFor",
+    "action": "placeBet"
+  },
+  {
+    "type": "scriptDeal",
+    "player": ["As", "8s"],
+    "dealerUp": "6d"
+  },
+  {
+    "type": "highlight",
+    "target": "coachHint",
+    "text": "Soft 19 vs 6 — Basic Strategy recommends DOUBLE."
+  },
+  {
+    "type": "forceAction",
+    "action": "double"
+  },
+  {
+    "type": "scriptDealerRunout",
+    "cards": ["9c"]
+  },
+  {
+    "type": "message",
+    "text": "Dealer stands on soft 17 here (S17). You win 2× your bet on a double."
+  },
+  {
+    "type": "scriptNewHand"
+  },
+  {
+    "type": "scriptDeal",
+    "player": ["8h", "8d"],
+    "dealerUp": "Tc"
+  },
+  {
+    "type": "highlight",
+    "target": "actionBar",
+    "text": "Pairs can be split if allowed. 8s vs 10 — Split to avoid a hard 16."
+  },
+  {
+    "type": "forceAction",
+    "action": "split"
+  }
+]
+
+
+
+
+

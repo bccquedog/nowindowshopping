@@ -1,0 +1,33 @@
+{
+  "id": "holdem_lux_default",
+  "variant": "NLHE",
+  "table": {
+    "maxSeats": 6,
+    "minSeatsToStart": 2,
+    "buyIn": { "min": 50, "max": 200, "currency": "$" },
+    "blinds": { "small": 1, "big": 2, "ante": 0 },
+    "straddle": { "enabled": false },
+    "timeBankSeconds": 20,
+    "rake": { "enabled": false }
+  },
+  "betting": {
+    "streetOrder": ["PREFLOP","FLOP","TURN","RIVER"],
+    "minRaiseRule": "previousRaiseSizeOrAllIn",
+    "allInSidePots": true,
+    "runItTwice": false
+  },
+  "ui": {
+    "theme": "luxury_onyx_gold",
+    "showMuckOption": true,
+    "showPercentEquityOnShowdown": true
+  },
+  "coach": {
+    "enabledInCasual": true,
+    "enabledInRanked": false
+  }
+}
+
+
+
+
+

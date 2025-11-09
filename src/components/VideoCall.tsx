@@ -13,8 +13,8 @@ const VideoCall: React.FC<VideoCallProps> = ({ roomUrl, onClose }) => {
   const videoRef = useRef<HTMLDivElement>(null);
   const callObjectRef = useRef<any>(null);
 
-  // For demo purposes, we'll create a room URL
-  const demoRoomUrl = roomUrl || 'https://your-domain.daily.co/demo-room';
+  // Production video call room URL
+  const demoRoomUrl = roomUrl || 'https://nowindowshopping.daily.co/production-room';
 
   const joinCall = async () => {
     if (!videoRef.current) return;

@@ -4,6 +4,8 @@ import VideoCall from '../../components/VideoCall';
 import VideoChat from '../../components/VideoChat';
 import VideoSessionManager from '../../components/VideoSessionManager';
 import LMSHub from './LMSHub';
+import NotificationBell from './NotificationBell';
+import NotificationCenter from './NotificationCenter';
 
 export const CoachPortal: React.FC = () => {
   const { user, logout } = useAuth();
@@ -331,6 +333,7 @@ export const CoachPortal: React.FC = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationBell />
               <span className="text-sm text-gray-700 dark:text-gray-300">
                 Welcome, {user?.name}
               </span>
@@ -425,6 +428,9 @@ export const CoachPortal: React.FC = () => {
           }}
         />
       )}
+
+      {/* Notification Center */}
+      <NotificationCenter />
     </div>
   );
 }; 

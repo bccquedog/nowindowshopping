@@ -124,37 +124,39 @@ const PrinciplesWeddingCrashing: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-blue-100 dark:from-pink-900 dark:via-yellow-900 dark:to-blue-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-yellow-50 to-blue-100 dark:from-pink-900 dark:via-yellow-900 dark:to-blue-900 py-8 sm:py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-pink-800 dark:text-yellow-200">Rules to Wedding Crashing</h1>
-        <p className="text-center text-lg mb-8 text-gray-700 dark:text-gray-300">All 110 rules from the "Wedding Crashers" bonus feature. Click a rule to expand. Search for keywords or rule numbers below.</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 text-pink-800 dark:text-yellow-200 px-2">Rules to Wedding Crashing</h1>
+        <p className="text-center text-base sm:text-lg mb-6 sm:mb-8 text-gray-700 dark:text-gray-300 px-2">All 110 rules from the "Wedding Crashers" bonus feature. Click a rule to expand. Search for keywords or rule numbers below.</p>
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search rules..."
-          className="w-full mb-6 px-4 py-2 rounded border border-pink-200 dark:border-yellow-900 focus:outline-none focus:ring-2 focus:ring-pink-400"
+          className="w-full mb-6 px-4 py-3 rounded border border-pink-200 dark:border-yellow-900 focus:outline-none focus:ring-2 focus:ring-pink-400 text-base"
         />
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filtered.map((r, i) => (
-            <div key={r.number} className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-pink-100 dark:border-yellow-900">
+            <div key={r.number} className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6 border border-pink-100 dark:border-yellow-900">
               <button
-                className="flex items-center w-full text-left focus:outline-none"
+                className="flex items-start sm:items-center w-full text-left focus:outline-none"
                 onClick={() => setOpen(open === i ? null : i)}
               >
-                <span className="text-xl font-bold text-pink-700 dark:text-yellow-200 mr-4">Rule #{r.number}</span>
-                <span className="truncate text-gray-800 dark:text-gray-100">{r.text.slice(0, 40)}{r.text.length > 40 ? '...' : ''}</span>
-                <span className="ml-auto text-gray-400">{open === i ? '−' : '+'}</span>
+                <span className="text-lg sm:text-xl font-bold text-pink-700 dark:text-yellow-200 mr-3 sm:mr-4 flex-shrink-0">Rule #{r.number}</span>
+                <span className="text-gray-800 dark:text-gray-100 text-sm sm:text-base leading-relaxed flex-1 min-w-0">
+                  {r.text.length > 60 ? `${r.text.slice(0, 60)}...` : r.text}
+                </span>
+                <span className="ml-2 sm:ml-auto text-gray-400 flex-shrink-0 text-lg">{open === i ? '−' : '+'}</span>
               </button>
               {open === i && (
-                <div className="mt-4 text-gray-700 dark:text-gray-200 text-base animate-fade-in">
+                <div className="mt-4 text-gray-700 dark:text-gray-200 text-sm sm:text-base leading-relaxed animate-fade-in">
                   {r.text}
                 </div>
               )}
             </div>
           ))}
         </div>
-        <div className="max-w-2xl mx-auto mt-12 px-4">
+        <div className="max-w-2xl mx-auto mt-8 sm:mt-12 px-4">
           <CommentsSection />
         </div>
       </div>

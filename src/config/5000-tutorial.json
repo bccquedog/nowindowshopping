@@ -1,0 +1,65 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to 5000 NWS - a unique rummy variant with custom house rules!"
+  },
+  {
+    "type": "highlight",
+    "target": "wildRankDisplay",
+    "text": "The first card dealt to each player determines the wild rank and extra cards to deal."
+  },
+  {
+    "type": "message",
+    "text": "Big Joker = 20 points, Little Joker = 15 points. Both are always wild."
+  },
+  {
+    "type": "scriptedMove",
+    "action": "dealFirstCards",
+    "cards": ["7S", "KH", "2D", "AC"]
+  },
+  {
+    "type": "highlight",
+    "target": "wildRank",
+    "text": "7♠ is the wild rank! This means all 7s and Jokers are wild, and each player gets 7 extra cards."
+  },
+  {
+    "type": "message",
+    "text": "Create melds of 3+ same rank (sets) or 3+ sequential same suit (runs)."
+  },
+  {
+    "type": "highlight",
+    "target": "handArea",
+    "text": "Select 3 cards of the same rank to create a set, or 3 sequential cards of the same suit for a run."
+  },
+  {
+    "type": "waitFor",
+    "action": "createMeld"
+  },
+  {
+    "type": "message",
+    "text": "Great! You can also add cards to existing melds (layoffs) and pick up from deep in the discard pile."
+  },
+  {
+    "type": "highlight",
+    "target": "discardPile",
+    "text": "To pick up deep from discard, you must take all cards above your target and immediately use it in a meld."
+  },
+  {
+    "type": "message",
+    "text": "The goal is to go out by playing all your cards. First to 5000 points wins!"
+  },
+  {
+    "type": "scriptedMove",
+    "action": "simulateGoOut",
+    "text": "Let's simulate going out to show scoring..."
+  },
+  {
+    "type": "message",
+    "text": "Numbers = face value, Faces = 10, Ace = 15, wild rank cards = 15, Jokers = 15-20 points."
+  }
+]
+
+
+
+
+

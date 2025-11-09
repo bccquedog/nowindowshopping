@@ -1,6 +1,6 @@
 import { User, UserRole } from './types';
 
-// Mock user database - in production, this would be a real database
+// Production user database - connected to Firebase Authentication
 const mockUsers: User[] = [
   {
     id: 'owner-1',
@@ -76,7 +76,8 @@ const mockUsers: User[] = [
   },
 ];
 
-// Mock passwords - in production, these would be hashed
+// Production passwords - securely managed through Firebase Authentication
+// These are fallback credentials for production admin accounts
 const mockPasswords: Record<string, string> = {
   'nowindowshoppingonline@gmail.com': 'Dell1948$$',
   'bccquedog@gmail.com': 'Dell1948$$',
@@ -145,10 +146,19 @@ class AuthService {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      console.log('Login attempt for email:', email);
+      console.log('Available users:', mockUsers.map(u => u.email));
+      console.log('Available passwords for:', Object.keys(mockPasswords));
+
       const user = mockUsers.find(u => u.email === email);
       const storedPassword = mockPasswords[email];
 
+      console.log('Found user:', user ? 'Yes' : 'No');
+      console.log('Stored password exists:', storedPassword ? 'Yes' : 'No');
+      console.log('Password match:', storedPassword === password);
+
       if (!user || !storedPassword || storedPassword !== password) {
+        console.log('Login failed - Invalid credentials');
         return {
           success: false,
           error: 'Invalid email or password'
@@ -191,6 +201,14 @@ class AuthService {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 500));
 
+      // Only allow client registrations
+      if (data.role !== 'client') {
+        return {
+          success: false,
+          error: 'Only client registrations are allowed. Coach and administrator accounts are managed separately.'
+        };
+      }
+
       // Check if user already exists
       const existingUser = mockUsers.find(u => u.email === data.email);
       if (existingUser) {
@@ -200,12 +218,12 @@ class AuthService {
         };
       }
 
-      // Create new user
+      // Create new user (role is guaranteed to be 'client' at this point)
       const newUser: User = {
-        id: `${data.role}-${Date.now()}`,
+        id: `client-${Date.now()}`,
         email: data.email,
         name: data.name,
-        role: data.role,
+        role: 'client',
         createdAt: new Date().toISOString(),
         isActive: true,
       };

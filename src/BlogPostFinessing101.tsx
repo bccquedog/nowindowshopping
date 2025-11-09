@@ -65,7 +65,7 @@ const BlogPostFinessing101: React.FC = () => (
         <div className="text-right text-gray-500 mt-8">— Brian</div>
       </div>
       <div className="mt-10">
-        <CommentsSection postId="finessing-101" />
+        <CommentsSection />
       </div>
     </div>
   </div>

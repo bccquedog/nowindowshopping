@@ -148,40 +148,68 @@ const blogs = [
     to: '/blog/conflicted',
     icon: '🤔',
     date: 'February 14, 2025'
+  },
+  {
+    title: 'NoWindowShopping Principles',
+    description: 'Engage with the principles in a hands-on, interactive way.',
+    to: '/blog/interactive-mantra',
+    icon: '🛒',
+    date: 'February 13, 2025'
+  },
+  {
+    title: 'Rules to Wedding Crashing',
+    description: 'All 110 rules of Wedding Crashing from the "Wedding Crashers" bonus feature.',
+    to: '/blog/wedding-crashing',
+    icon: '🎩',
+    date: 'February 12, 2025'
+  },
+  {
+    title: 'NoWindowShopping Parody Rules',
+    description: 'A serious, professional, but comedic take on the rules of NoWindowShopping.',
+    to: '/blog/parody-rules',
+    icon: '🤡',
+    date: 'February 11, 2025'
+  },
+  {
+    title: '29 Things Every Man Should Know',
+    description: 'Essential lessons for leadership, character, and legacy.',
+    to: '/blog/29-things-every-man-should-know',
+    icon: '🧑‍🔧',
+    date: 'February 10, 2025'
   }
 ];
 
 const BlogHub: React.FC = () => (
-  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-12 px-4">
+  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-8 sm:py-12 px-4">
     <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-12">
-        <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-white">NWS Blog</h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+      <div className="text-center mb-8 sm:mb-12">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white px-2">NWS Blog</h1>
+        <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2">
           Insights, tips, and stories on business, mindset, and personal development.
         </p>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {blogs.map((blog) => (
           <Link
             key={blog.title}
             to={blog.to}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
           >
-            <div className="text-4xl mb-4 text-center group-hover:scale-110 transition-transform duration-300">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-center group-hover:scale-110 transition-transform duration-300">
               {blog.icon}
             </div>
-            <h2 className="text-xl font-bold mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+            <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
               {blog.title}
             </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 leading-relaxed">
               {blog.description}
             </p>
             <div className="flex justify-between items-center">
               <span className="text-xs text-gray-500 dark:text-gray-400">
                 {blog.date}
               </span>
-              <span className="text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:underline">
+              <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium group-hover:underline">
                 Read More →
               </span>
             </div>

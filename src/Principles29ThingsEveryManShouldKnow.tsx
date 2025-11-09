@@ -44,37 +44,37 @@ const Principles29ThingsEveryManShouldKnow: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-blue-100 to-green-100 dark:from-gray-900 dark:via-blue-900 dark:to-green-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 via-blue-100 to-green-100 dark:from-gray-900 dark:via-blue-900 dark:to-green-900 py-8 sm:py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-8 text-blue-900 dark:text-green-200">29 Things Every Man Should Know</h1>
-        <p className="text-center text-lg mb-8 text-gray-700 dark:text-gray-300">Essential lessons for leadership, character, and legacy. Click a lesson to expand. Search for keywords or lesson numbers below.</p>
+        <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6 sm:mb-8 text-blue-900 dark:text-green-200 px-2">29 Things Every Man Should Know</h1>
+        <p className="text-center text-base sm:text-lg mb-6 sm:mb-8 text-gray-700 dark:text-gray-300 px-2">Essential lessons for leadership, character, and legacy. Click a lesson to expand. Search for keywords or lesson numbers below.</p>
         <input
           type="text"
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search lessons..."
-          className="w-full mb-6 px-4 py-2 rounded border border-blue-200 dark:border-green-900 focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className="w-full mb-6 px-4 py-3 rounded border border-blue-200 dark:border-green-900 focus:outline-none focus:ring-2 focus:ring-blue-400 text-base"
         />
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {filtered.map((l, i) => (
-            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow p-6 border border-blue-100 dark:border-green-900">
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow p-4 sm:p-6 border border-blue-100 dark:border-green-900">
               <button
-                className="flex items-center w-full text-left focus:outline-none"
+                className="flex items-start sm:items-center w-full text-left focus:outline-none"
                 onClick={() => setOpen(open === i ? null : i)}
               >
-                <span className="text-xl font-bold text-blue-700 dark:text-green-200 mr-4">Lesson #{i + 1}</span>
-                <span className="truncate text-gray-800 dark:text-gray-100 font-semibold">{l.title}</span>
-                <span className="ml-auto text-gray-400">{open === i ? '−' : '+'}</span>
+                <span className="text-lg sm:text-xl font-bold text-blue-700 dark:text-green-200 mr-3 sm:mr-4 flex-shrink-0">Lesson #{i + 1}</span>
+                <span className="text-gray-800 dark:text-gray-100 font-semibold text-sm sm:text-base leading-relaxed flex-1 min-w-0">{l.title}</span>
+                <span className="ml-2 sm:ml-auto text-gray-400 flex-shrink-0 text-lg">{open === i ? '−' : '+'}</span>
               </button>
               {open === i && (
-                <div className="mt-4 text-gray-700 dark:text-gray-200 text-base animate-fade-in">
+                <div className="mt-4 text-gray-700 dark:text-gray-200 text-sm sm:text-base leading-relaxed animate-fade-in">
                   {l.detail}
                 </div>
               )}
             </div>
           ))}
         </div>
-        <div className="max-w-2xl mx-auto mt-12 px-4">
+        <div className="max-w-2xl mx-auto mt-8 sm:mt-12 px-4">
           <CommentsSection />
         </div>
       </div>

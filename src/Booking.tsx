@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { firebaseConfig } from './firebaseConfig';
+import { 
+  FormField, 
+  FormContainer, 
+  FormButton, 
+  FormSection,
+  FormProgress,
+  validationRules 
+} from './components/FormComponents';
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
@@ -96,21 +104,96 @@ const steps = ['Service', 'Date/Time', 'Contact', 'Review', 'Done'];
 const Booking: React.FC = () => {
   const [step, setStep] = useState(0);
   const [selectedService, setSelectedService] = useState<any>(null);
-  const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
+  const [formData, setFormData] = useState({
+    date: '',
+    time: '',
+    name: '',
+    email: '',
+    phone: '',
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [confirmed, setConfirmed] = useState(false);
+  const [validationStates, setValidationStates] = useState<Record<string, any>>({});
+
+  // Refs for keyboard navigation
+  const dateRef = useRef<HTMLInputElement>(null);
+  const timeRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
+
+  // Auto-focus appropriate field when step changes
+  useEffect(() => {
+    const focusMap: Record<number, React.RefObject<HTMLInputElement | null>> = {
+      1: dateRef,
+      2: nameRef,
+    };
+    
+    const refToFocus = focusMap[step];
+    if (refToFocus?.current) {
+      setTimeout(() => refToFocus.current?.focus(), 100);
+    }
+  }, [step]);
+
+  // Handle form data changes
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setError(''); // Clear errors when user starts typing
+    
+    // Real-time validation for certain fields
+    if (field === 'email' || field === 'phone') {
+      const rules = field === 'email' ? validationRules.email : validationRules.phone;
+      const validationResult = validateField(value, rules);
+      setValidationStates(prev => ({
+        ...prev,
+        [field]: validationResult
+      }));
+    }
+  };
+
+  // Validation function
+  const validateField = (value: string, rules: any) => {
+    if (rules.required && !value.trim()) {
+      return {
+        isValid: false,
+        message: 'This field is required',
+        type: 'error'
+      };
+    }
+
+    if (value.trim() && rules.pattern && !rules.pattern.test(value)) {
+      return {
+        isValid: false,
+        message: 'Invalid format',
+        type: 'error'
+      };
+    }
+
+    if (rules.custom) {
+      const customError = rules.custom(value);
+      if (customError) {
+        return {
+          isValid: false,
+          message: customError,
+          type: 'error'
+        };
+      }
+    }
+
+    return {
+      isValid: true,
+      message: '',
+      type: 'success'
+    };
+  };
 
   // Calendar event generation
   const getEventTitle = () => `Booking: ${selectedService?.name}`;
   const getEventDescription = () => selectedService?.description || '';
   const getEventStart = () => {
-    if (!date || !time) return '';
-    return new Date(`${date}T${time}`);
+    if (!formData.date || !formData.time) return '';
+    return new Date(`${formData.date}T${formData.time}`);
   };
   const getEventEnd = () => {
     const start = getEventStart();
@@ -148,12 +231,12 @@ const Booking: React.FC = () => {
     setError('');
     try {
       await addDoc(collection(db, 'bookings'), {
-        name,
-        email,
-        phone,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
         service: selectedService?.name,
-        date,
-        time,
+        date: formData.date,
+        time: formData.time,
         createdAt: serverTimestamp(),
       });
       setConfirmed(true);
@@ -165,13 +248,36 @@ const Booking: React.FC = () => {
     }
   };
 
+  // Navigation functions
+  const nextStep = () => {
+    if (step < 3) {
+      setStep(step + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (step > 0) {
+      setStep(step - 1);
+    }
+  };
+
+  // Validation for current step
+  const canProceed = () => {
+    switch (step) {
+      case 0: return selectedService;
+      case 1: return formData.date && formData.time;
+      case 2: return formData.name && formData.email && formData.phone;
+      default: return true;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-pink-100 to-yellow-100 dark:from-blue-900 dark:via-pink-900 dark:to-yellow-900 py-16 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
       {/* Back Button */}
-      <div className="w-full max-w-2xl mb-6">
+      <div className="w-full max-w-4xl mx-auto mb-8">
         <Link 
           to="/hub" 
-          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+          className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-2"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -180,13 +286,46 @@ const Booking: React.FC = () => {
         </Link>
       </div>
 
-      <div className="max-w-2xl w-full bg-white dark:bg-gray-900 rounded-xl shadow-lg p-8 border border-gray-200 dark:border-gray-700">
-        <motion.h1 className="text-3xl md:text-4xl font-bold text-center mb-8 text-blue-700 dark:text-blue-300" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>Book a Service</motion.h1>
+      <div className="max-w-4xl mx-auto">
+        <motion.div 
+          className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-6 text-white">
+            <motion.h1 
+              className="text-3xl md:text-4xl font-bold text-center"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              Book a Service
+            </motion.h1>
+            <motion.p 
+              className="text-center mt-2 text-blue-100"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              Let's get started with your project
+            </motion.p>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="px-8 py-6 border-b border-gray-200 dark:border-gray-700">
+            <FormProgress
+              currentStep={step}
+              totalSteps={steps.length}
+              steps={steps}
+            />
+          </div>
         
         {/* Pricing Notice */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4 mb-8">
+          <div className="px-8 py-4 bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-700">
           <div className="flex items-center">
-            <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-blue-800 dark:text-blue-200 text-sm font-medium">
@@ -195,36 +334,44 @@ const Booking: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex justify-center mb-8 gap-2">
-          {steps.map((s, i) => (
-            <div key={s} className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${i <= step ? 'bg-blue-700 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-400'}`}>{i + 1}</div>
-          ))}
-        </div>
+          {/* Form Content */}
+          <div className="p-8">
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div key="service" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
-              <h2 className="text-xl font-semibold mb-4">Select a Service</h2>
-              <div className="grid grid-cols-1 gap-6 mb-6">
+                <motion.div 
+                  key="service" 
+                  initial={{ opacity: 0, x: 20 }} 
+                  animate={{ opacity: 1, x: 0 }} 
+                  exit={{ opacity: 0, x: -20 }} 
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Select a Service</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 {services.map((svc) => (
                   <motion.button
                     key={svc.name}
-                    className={`w-full p-6 rounded-lg border-2 transition-all duration-300 text-left ${selectedService?.name === svc.name ? 'border-blue-700 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600'}`}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
+                        className={`w-full p-6 rounded-xl border-2 transition-all duration-300 text-left hover:shadow-lg ${
+                          selectedService?.name === svc.name 
+                            ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20 shadow-lg' 
+                            : 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 hover:border-blue-300 dark:hover:border-blue-600'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedService(svc)}
+                        aria-pressed={selectedService?.name === svc.name}
                   >
                     <div className="flex items-start space-x-4">
-                      <div className="text-3xl">{svc.icon}</div>
+                          <div className="text-4xl">{svc.icon}</div>
                       <div className="flex-1">
-                        <div className="flex justify-between items-start mb-2">
-                          <h3 className="font-bold text-lg text-blue-700 dark:text-blue-300">{svc.name}</h3>
+                            <div className="flex justify-between items-start mb-3">
+                              <h3 className="font-bold text-lg text-gray-900 dark:text-white">{svc.name}</h3>
                           <div className="text-right">
-                            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">${svc.price}</div>
+                                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">${svc.price}</div>
                             <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Starting at</div>
                           </div>
                         </div>
                         <p className="text-gray-700 dark:text-gray-300 text-sm mb-3 leading-relaxed">{svc.description}</p>
-                        <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded">
+                            <div className="text-xs text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-2 rounded-lg">
                           {svc.details}
                         </div>
                       </div>
@@ -232,88 +379,272 @@ const Booking: React.FC = () => {
                   </motion.button>
                 ))}
               </div>
-              <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold mt-2 w-full disabled:opacity-50 transition-colors" disabled={!selectedService} onClick={() => setStep(1)}>
+                  <div className="flex justify-end">
+                    <FormButton
+                      variant="primary"
+                      size="lg"
+                      disabled={!selectedService}
+                      onClick={nextStep}
+                    >
                 {selectedService ? `Continue with ${selectedService.name}` : 'Select a Service to Continue'}
-              </button>
+                    </FormButton>
+                  </div>
             </motion.div>
           )}
+
           {step === 1 && (
-            <motion.div key="datetime" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
-              <h2 className="text-xl font-semibold mb-4">Choose Date & Time</h2>
-              <div className="mb-4">
-                <label className="block mb-2 font-medium">Date</label>
-                <input type="date" className="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" value={date} onChange={e => setDate(e.target.value)} required />
+                <motion.div 
+                  key="datetime" 
+                  initial={{ opacity: 0, x: 20 }} 
+                  animate={{ opacity: 1, x: 0 }} 
+                  exit={{ opacity: 0, x: -20 }} 
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Choose Date & Time</h2>
+                  <FormSection>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">Date</label>
+                        <input 
+                          ref={dateRef}
+                          type="date" 
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-colors" 
+                          value={formData.date} 
+                          onChange={e => handleInputChange('date', e.target.value)} 
+                          required 
+                          min={new Date().toISOString().split('T')[0]}
+                        />
+                      </div>
+                      <div>
+                        <label className="block mb-2 font-medium text-gray-700 dark:text-gray-300">Time</label>
+                        <input 
+                          ref={timeRef}
+                          type="time" 
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white transition-colors" 
+                          value={formData.time} 
+                          onChange={e => handleInputChange('time', e.target.value)} 
+                          required 
+                        />
               </div>
-              <div className="mb-6">
-                <label className="block mb-2 font-medium">Time</label>
-                <input type="time" className="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" value={time} onChange={e => setTime(e.target.value)} required />
               </div>
-              <div className="flex gap-2">
-                <button className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-2 rounded font-semibold" onClick={() => setStep(0)}>Back</button>
-                <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded font-semibold w-full disabled:opacity-50" disabled={!date || !time} onClick={() => setStep(2)}>Next</button>
+                  </FormSection>
+                  <div className="flex justify-between mt-8">
+                    <FormButton variant="outline" onClick={prevStep}>
+                      Back
+                    </FormButton>
+                    <FormButton variant="primary" disabled={!formData.date || !formData.time} onClick={nextStep}>
+                      Next
+                    </FormButton>
               </div>
             </motion.div>
           )}
+
           {step === 2 && (
-            <motion.div key="contact" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
-              <h2 className="text-xl font-semibold mb-4">Your Contact Info</h2>
-              <div className="mb-4">
-                <label className="block mb-2 font-medium">Name</label>
-                <input type="text" className="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" value={name} onChange={e => setName(e.target.value)} required />
-              </div>
-              <div className="mb-4">
-                <label className="block mb-2 font-medium">Email</label>
-                <input type="email" className="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" value={email} onChange={e => setEmail(e.target.value)} required />
-              </div>
-              <div className="mb-6">
-                <label className="block mb-2 font-medium">Phone</label>
-                <input type="tel" className="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 dark:bg-gray-800 dark:text-white" value={phone} onChange={e => setPhone(e.target.value)} required />
-              </div>
-              <div className="flex gap-2">
-                <button className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-2 rounded font-semibold" onClick={() => setStep(1)}>Back</button>
-                <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded font-semibold w-full disabled:opacity-50" disabled={!name || !email || !phone} onClick={() => setStep(3)}>Next</button>
+                <motion.div 
+                  key="contact" 
+                  initial={{ opacity: 0, x: 20 }} 
+                  animate={{ opacity: 1, x: 0 }} 
+                  exit={{ opacity: 0, x: -20 }} 
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Your Contact Information</h2>
+                  <FormSection>
+                    <FormField
+                      ref={nameRef}
+                      id="name"
+                      name="name"
+                      label="Full Name"
+                      type="text"
+                      value={formData.name}
+                      onChange={(value) => handleInputChange('name', value)}
+                      validation={validationRules.name}
+                      validationState={validationStates.name}
+                      autoComplete="name"
+                      required
+                      placeholder="Enter your full name"
+                      nextFieldId="email"
+                    />
+
+                    <FormField
+                      ref={emailRef}
+                      id="email"
+                      name="email"
+                      label="Email Address"
+                      type="email"
+                      value={formData.email}
+                      onChange={(value) => handleInputChange('email', value)}
+                      validation={validationRules.email}
+                      validationState={validationStates.email}
+                      autoComplete="email"
+                      required
+                      placeholder="Enter your email address"
+                      nextFieldId="phone"
+                      prevFieldId="name"
+                    />
+
+                    <FormField
+                      ref={phoneRef}
+                      id="phone"
+                      name="phone"
+                      label="Phone Number"
+                      type="tel"
+                      value={formData.phone}
+                      onChange={(value) => handleInputChange('phone', value)}
+                      validation={validationRules.phone}
+                      validationState={validationStates.phone}
+                      autoComplete="tel"
+                      required
+                      placeholder="Enter your phone number"
+                      prevFieldId="email"
+                    />
+                  </FormSection>
+                  <div className="flex justify-between mt-8">
+                    <FormButton variant="outline" onClick={prevStep}>
+                      Back
+                    </FormButton>
+                    <FormButton variant="primary" disabled={!formData.name || !formData.email || !formData.phone} onClick={nextStep}>
+                      Next
+                    </FormButton>
               </div>
             </motion.div>
           )}
+
           {step === 3 && (
-            <motion.div key="review" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
-              <h2 className="text-xl font-semibold mb-4">Review & Confirm</h2>
-              <div className="mb-4 p-4 rounded bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700">
-                <div><strong>Service:</strong> {selectedService?.name}</div>
-                <div><strong>Date:</strong> {date}</div>
-                <div><strong>Time:</strong> {time}</div>
-                <div><strong>Name:</strong> {name}</div>
-                <div><strong>Email:</strong> {email}</div>
-                <div><strong>Phone:</strong> {phone}</div>
-                <div><strong>Starting Price:</strong> ${selectedService?.price} <span className="text-sm text-gray-600 dark:text-gray-400">(final pricing to be determined)</span></div>
+                <motion.div 
+                  key="review" 
+                  initial={{ opacity: 0, x: 20 }} 
+                  animate={{ opacity: 1, x: 0 }} 
+                  exit={{ opacity: 0, x: -20 }} 
+                  transition={{ duration: 0.3 }}
+                >
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Review & Confirm</h2>
+                  <FormSection>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Service Details</h4>
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                            <p className="font-medium text-gray-900 dark:text-white">{selectedService?.name}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{selectedService?.description}</p>
+                            <p className="text-lg font-bold text-blue-600 dark:text-blue-400 mt-2">${selectedService?.price} starting</p>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Schedule</h4>
+                          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                            <p className="text-gray-900 dark:text-white">{formData.date}</p>
+                            <p className="text-gray-600 dark:text-gray-400">{formData.time}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Contact Information</h4>
+                        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+                          <p className="text-gray-900 dark:text-white">{formData.name}</p>
+                          <p className="text-gray-600 dark:text-gray-400">{formData.email}</p>
+                          <p className="text-gray-600 dark:text-gray-400">{formData.phone}</p>
+                        </div>
+                      </div>
               </div>
-              {error && <div className="text-red-600 dark:text-red-400 mb-2">{error}</div>}
-              <div className="flex gap-2">
-                <button className="bg-gray-300 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-6 py-2 rounded font-semibold" onClick={() => setStep(2)}>Back</button>
-                <button className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded font-semibold w-full disabled:opacity-50" disabled={submitting} onClick={handleSubmit}>{submitting ? 'Booking...' : 'Confirm Booking'}</button>
+                  </FormSection>
+                  
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg p-4 mt-4"
+                    >
+                      <p className="text-red-800 dark:text-red-200">{error}</p>
+                    </motion.div>
+                  )}
+                  
+                  <div className="flex justify-between mt-8">
+                    <FormButton variant="outline" onClick={prevStep}>
+                      Back
+                    </FormButton>
+                    <FormButton 
+                      variant="primary" 
+                      disabled={submitting} 
+                      loading={submitting}
+                      onClick={handleSubmit}
+                    >
+                      {submitting ? 'Booking...' : 'Confirm Booking'}
+                    </FormButton>
               </div>
             </motion.div>
           )}
+
           {step === 4 && confirmed && (
-            <motion.div key="done" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.5 }}>
-              <h2 className="text-xl font-semibold mb-4 text-green-700 dark:text-green-400">Booking Confirmed!</h2>
-              <div className="mb-4 p-4 rounded bg-green-50 dark:bg-green-900 border border-green-200 dark:border-green-700">
-                <div><strong>Service:</strong> {selectedService?.name}</div>
-                <div><strong>Date:</strong> {date}</div>
-                <div><strong>Time:</strong> {time}</div>
-                <div><strong>Name:</strong> {name}</div>
-                <div><strong>Email:</strong> {email}</div>
-                <div><strong>Phone:</strong> {phone}</div>
-                <div><strong>Price:</strong> ${selectedService?.price}</div>
+                <motion.div 
+                  key="done" 
+                  initial={{ opacity: 0, scale: 0.95 }} 
+                  animate={{ opacity: 1, scale: 1 }} 
+                  transition={{ duration: 0.5 }}
+                  className="text-center"
+                >
+                  <div className="mb-8">
+                    <div className="mx-auto w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
+                      <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-green-700 dark:text-green-400 mb-2">Booking Confirmed!</h2>
+                    <p className="text-gray-600 dark:text-gray-400">Thank you for booking with us! We look forward to serving you.</p>
+                  </div>
+
+                  <FormSection>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Service</h4>
+                          <p className="text-gray-600 dark:text-gray-400">{selectedService?.name}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Date & Time</h4>
+                          <p className="text-gray-600 dark:text-gray-400">{formData.date} at {formData.time}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Contact</h4>
+                          <p className="text-gray-600 dark:text-gray-400">{formData.name}</p>
+                          <p className="text-gray-600 dark:text-gray-400">{formData.email}</p>
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Price</h4>
+                          <p className="text-lg font-bold text-blue-600 dark:text-blue-400">${selectedService?.price} starting</p>
+                        </div>
+                      </div>
+                    </div>
+                  </FormSection>
+
+                  <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                    <FormButton
+                      variant="primary"
+                      onClick={() => window.open(getGoogleCalendarUrl(), '_blank')}
+                      className="flex-1"
+                    >
+                      Add to Google Calendar
+                    </FormButton>
+                    <FormButton
+                      variant="outline"
+                      onClick={downloadICS}
+                      className="flex-1"
+                    >
+                      Add to Outlook
+                    </FormButton>
               </div>
-              <div className="flex flex-col gap-3 items-center mt-6">
-                <a href={getGoogleCalendarUrl()} target="_blank" rel="noopener noreferrer" className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded font-semibold transition-colors w-full text-center">Add to Google Calendar</a>
-                <button onClick={downloadICS} className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-2 rounded font-semibold transition-colors w-full">Add to Outlook</button>
+
+                  <div className="mt-8">
+                    <Link to="/hub">
+                      <FormButton variant="ghost">
+                        Return to Hub
+                      </FormButton>
+                    </Link>
               </div>
-              <div className="mt-8 text-center text-gray-600 dark:text-gray-400">Thank you for booking with us! We look forward to serving you.</div>
             </motion.div>
           )}
         </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

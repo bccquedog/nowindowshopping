@@ -1,0 +1,87 @@
+{
+  "id": "5000_nws",
+  "gameName": "5000 NWS",
+  "description": "NWS House Rules variant with custom joker values and wild rank determination",
+  "deck": {
+    "includeJokers": true,
+    "bigJokerValue": 20,
+    "littleJokerValue": 15,
+    "jokersAreWild": true
+  },
+  "dealing": {
+    "firstCardFaceUp": true,
+    "wildRankDetermination": "firstPlayerCard",
+    "extraCardsBasedOnWildRank": true,
+    "extraCardValues": {
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "J": 10,
+      "Q": 10,
+      "K": 10,
+      "A": 11,
+      "LittleJoker": 15,
+      "BigJoker": 20
+    }
+  },
+  "scoring": {
+    "cardValues": {
+      "2": 2,
+      "3": 3,
+      "4": 4,
+      "5": 5,
+      "6": 6,
+      "7": 7,
+      "8": 8,
+      "9": 9,
+      "10": 10,
+      "J": 10,
+      "Q": 10,
+      "K": 10,
+      "A": 15,
+      "wildRankCards": 15,
+      "LittleJoker": 15,
+      "BigJoker": 20
+    },
+    "gameTarget": 5000,
+    "meldBonus": 0,
+    "goOutBonus": 0
+  },
+  "melds": {
+    "minCards": 3,
+    "types": ["set", "run"],
+    "setDefinition": "3+ cards of same rank",
+    "runDefinition": "3+ sequential cards of same suit",
+    "allowLayoffs": true,
+    "layoffRules": "add to any existing meld"
+  },
+  "discard": {
+    "deepPickupEnabled": true,
+    "deepPickupRules": "take all cards above selected card and immediately use in meld",
+    "discardRequired": false
+  },
+  "gameplay": {
+    "maxPlayers": 4,
+    "minPlayers": 2,
+    "roundEndCondition": "playerGoesOut",
+    "goOutCondition": "playAllCards",
+    "discardOptional": true
+  },
+  "ai": {
+    "difficultyLevels": ["Easy", "Standard", "Tough"],
+    "evaluationFactors": ["deadwood", "meldPotential", "discardSafety"],
+    "monteCarloSimulations": true,
+    "opponentInference": true
+  }
+}
+
+
+
+
+

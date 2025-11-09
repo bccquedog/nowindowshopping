@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 
 const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('general');
@@ -464,6 +465,7 @@ const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

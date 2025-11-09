@@ -1,212 +1,202 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { Analytics } from '@vercel/analytics/react';
+import { MultiplayerProvider } from './components/MultiplayerProvider';
 import { 
   FaUsers, 
-  FaLaptopCode, 
   FaBookOpen, 
   FaPenNib, 
   FaScroll, 
   FaUserTie, 
-  FaShoppingCart, 
+  FaCartShopping, 
   FaPhone, 
-  FaCalendarAlt, 
+  FaCalendar, 
   FaBullseye, 
-  FaCog, 
+  FaGear, 
   FaDesktop, 
-  FaQuestionCircle, 
+  FaCircleQuestion, 
   FaClock, 
   FaBullhorn,
   FaStore,
   FaEnvelope,
   FaInstagram
-} from 'react-icons/fa';
-import FeatureStatusScreen from './FeatureStatusScreen';
-import HealthcheckScreen from './HealthcheckScreen';
-import BlogPost1 from './BlogPost1';
-import BlogPost2 from './BlogPost2';
-import BlogPost3 from './BlogPost3';
-import BlogPostSideHustle from './BlogPostSideHustle';
-import BlogPostExpectations from './BlogPostExpectations';
-import BlogPostWorkLifeBalance from './BlogPostWorkLifeBalance';
-import BlogPostSeatAtTable1 from './BlogPostSeatAtTable1';
-import BlogPostSeatAtTable2 from './BlogPostSeatAtTable2';
-import BlogPostSeatAtTable3 from './BlogPostSeatAtTable3';
-import BlogPostSeatAtTable4 from './BlogPostSeatAtTable4';
-import BlogPostConflicted from './BlogPostConflicted';
-import BlogPostFriendship3 from './BlogPostFriendship3';
-import BlogPostFriendship4 from './BlogPostFriendship4';
-import BlogPostPeakedHS1 from './BlogPostPeakedHS1';
-import BlogPostPeakedHS2 from './BlogPostPeakedHS2';
-import BlogPostHaveNotNeed from './BlogPostHaveNotNeed';
-import BlogPostFinancialLiteracy from './BlogPostFinancialLiteracy';
-import UserGuide from './UserGuide';
-import LQ from './LQ';
-import AdminGuide from './AdminGuide';
-import { CoachCareApp } from './coachcare/CoachCareApp';
-import BlogPostNWSLaws from './BlogPostNWSLaws';
-import ShoutOut from './ShoutOut';
-import Booking from './Booking';
-import ClientManagement from './ClientManagement';
-import SessionManagement from './SessionManagement';
-import BlogPostSayNo from './BlogPostSayNo';
-import PrinciplesHub from './PrinciplesHub';
-import PrinciplesInteractiveMantra from './PrinciplesInteractiveMantra';
-import PrinciplesWeddingCrashing from './PrinciplesWeddingCrashing';
-import PrinciplesParodyRules from './PrinciplesParodyRules';
-import Principles29ThingsEveryManShouldKnow from './Principles29ThingsEveryManShouldKnow';
-import BlogHub from './BlogHub';
-import MGCUHub from './mgcu/MGCUHub';
-import MGCULibrary from './mgcu/MGCULibrary';
-import MGCUBook from './mgcu/MGCUBook';
-import MGCUChapter from './mgcu/MGCUChapter';
-import MGCUUniverse from './mgcu/MGCUUniverse';
-import MGCUCharacters from './mgcu/MGCUCharacters';
-import MGCUAbout from './mgcu/MGCUAbout';
-import MGCUSettings from './mgcu/MGCUSettings';
-import MGCUDiscord from './mgcu/MGCUDiscord';
-import BlogPostImpulsivelyStrategic from './BlogPostImpulsivelyStrategic';
-import BlogPostItGoesWhereItGoes from './BlogPostItGoesWhereItGoes';
-import BlogPostSlipperySlopes1 from './BlogPostSlipperySlopes1';
-import BlogPostSlipperySlopes2 from './BlogPostSlipperySlopes2';
-import BlogPostStopFlaking from './BlogPostStopFlaking';
-import ITServices from './ITServices';
-import Services from './Services';
-import Settings from './Settings';
-import Software from './Software';
-import EscapingToThe90sBlog from './components/EscapingToThe90sBlog';
-import BlogPostEscaping90s1 from './BlogPostEscaping90s1';
-import BlogPostEscaping90s2 from './BlogPostEscaping90s2';
-import BlogPostEscaping90s3 from './BlogPostEscaping90s3';
-import Brians42nd from './Brians42nd';
-import SlipperySlopesHub from './SlipperySlopesHub';
-import SeatAtTableHub from './SeatAtTableHub';
-import PeakedHSHub from './PeakedHSHub';
-import BlogPostFinessing101 from './BlogPostFinessing101';
-import About from './About';
-import PrivacyPolicy from './PrivacyPolicy';
-import TermsConditions from './TermsConditions';
+} from 'react-icons/fa6';
+
+// Icon wrapper to fix TypeScript issues with React 19
+const IconWrapper = ({ icon: Icon, className }: { icon: any; className?: string }) => {
+  return <Icon className={className} />;
+};
+
+// Lazy load all components to reduce bundle size
+const FeatureStatusScreen = React.lazy(() => import('./FeatureStatusScreen'));
+const HealthcheckScreen = React.lazy(() => import('./HealthcheckScreen'));
+const BlogPost1 = React.lazy(() => import('./BlogPost1'));
+const BlogPost2 = React.lazy(() => import('./BlogPost2'));
+const BlogPost3 = React.lazy(() => import('./BlogPost3'));
+const BlogPostSideHustle = React.lazy(() => import('./BlogPostSideHustle'));
+const BlogPostExpectations = React.lazy(() => import('./BlogPostExpectations'));
+const BlogPostWorkLifeBalance = React.lazy(() => import('./BlogPostWorkLifeBalance'));
+const BlogPostSeatAtTable1 = React.lazy(() => import('./BlogPostSeatAtTable1'));
+const BlogPostSeatAtTable2 = React.lazy(() => import('./BlogPostSeatAtTable2'));
+const BlogPostSeatAtTable3 = React.lazy(() => import('./BlogPostSeatAtTable3'));
+const BlogPostSeatAtTable4 = React.lazy(() => import('./BlogPostSeatAtTable4'));
+const BlogPostConflicted = React.lazy(() => import('./BlogPostConflicted'));
+const FriendshipSeriesHub = React.lazy(() => import('./FriendshipSeriesHub'));
+const BlogPostFriendship1 = React.lazy(() => import('./BlogPostFriendship1'));
+const BlogPostFriendship2 = React.lazy(() => import('./BlogPostFriendship2'));
+const BlogPostFriendship3 = React.lazy(() => import('./BlogPostFriendship3'));
+const BlogPostFriendship4 = React.lazy(() => import('./BlogPostFriendship4'));
+const BlogPostPeakedHS1 = React.lazy(() => import('./BlogPostPeakedHS1'));
+const BlogPostPeakedHS2 = React.lazy(() => import('./BlogPostPeakedHS2'));
+const BlogPostHaveNotNeed = React.lazy(() => import('./BlogPostHaveNotNeed'));
+const BlogPostFinancialLiteracy = React.lazy(() => import('./BlogPostFinancialLiteracy'));
+const UserGuide = React.lazy(() => import('./UserGuide'));
+const LQ = React.lazy(() => import('./LQ'));
+const AdminGuide = React.lazy(() => import('./AdminGuide'));
+// AdminDashboard temporarily disabled
+const CoachCareApp = React.lazy(() => import('./coachcare/CoachCareApp').then(module => ({ default: module.CoachCareApp })));
+const BlogPostNWSLaws = React.lazy(() => import('./BlogPostNWSLaws'));
+const ShoutOut = React.lazy(() => import('./ShoutOut'));
+const Booking = React.lazy(() => import('./Booking'));
+const ClientManagement = React.lazy(() => import('./ClientManagement'));
+const SessionManagement = React.lazy(() => import('./SessionManagement'));
+const BlogPostSayNo = React.lazy(() => import('./BlogPostSayNo'));
+const PrinciplesInteractiveMantra = React.lazy(() => import('./PrinciplesInteractiveMantra'));
+const PrinciplesWeddingCrashing = React.lazy(() => import('./PrinciplesWeddingCrashing'));
+const PrinciplesParodyRules = React.lazy(() => import('./PrinciplesParodyRules'));
+const Principles29ThingsEveryManShouldKnow = React.lazy(() => import('./Principles29ThingsEveryManShouldKnow'));
+const BlogHub = React.lazy(() => import('./BlogHub'));
+const MGCUHub = React.lazy(() => import('./mgcu/MGCUHub'));
+const MGCULibrary = React.lazy(() => import('./mgcu/MGCULibrary'));
+const MGCUBook = React.lazy(() => import('./mgcu/MGCUBook'));
+const MGCUChapter = React.lazy(() => import('./mgcu/MGCUChapter'));
+const MGCUUniverse = React.lazy(() => import('./mgcu/MGCUUniverse'));
+const MGCUCharacters = React.lazy(() => import('./mgcu/MGCUCharacters'));
+const MGCUAbout = React.lazy(() => import('./mgcu/MGCUAbout'));
+const MGCUSettings = React.lazy(() => import('./mgcu/MGCUSettings'));
+const MGCUDiscord = React.lazy(() => import('./mgcu/MGCUDiscord'));
+const BlogPostImpulsivelyStrategic = React.lazy(() => import('./BlogPostImpulsivelyStrategic'));
+const BlogPostItGoesWhereItGoes = React.lazy(() => import('./BlogPostItGoesWhereItGoes'));
+const BlogPostSlipperySlopes1 = React.lazy(() => import('./BlogPostSlipperySlopes1'));
+const BlogPostSlipperySlopes2 = React.lazy(() => import('./BlogPostSlipperySlopes2'));
+const BlogPostStopFlaking = React.lazy(() => import('./BlogPostStopFlaking'));
+const Services = React.lazy(() => import('./Services'));
+const Settings = React.lazy(() => import('./Settings'));
+const Applications = React.lazy(() => import('./Applications'));
+const EscapingToThe90sBlog = React.lazy(() => import('./components/EscapingToThe90sBlog'));
+const BlogPostEscaping90s1 = React.lazy(() => import('./BlogPostEscaping90s1'));
+const BlogPostEscaping90s2 = React.lazy(() => import('./BlogPostEscaping90s2'));
+const BlogPostEscaping90s3 = React.lazy(() => import('./BlogPostEscaping90s3'));
+const Brians42nd = React.lazy(() => import('./Brians42nd'));
+const SlipperySlopesHub = React.lazy(() => import('./SlipperySlopesHub'));
+const SeatAtTableHub = React.lazy(() => import('./SeatAtTableHub'));
+const PeakedHSHub = React.lazy(() => import('./PeakedHSHub'));
+const BlogPostFinessing101 = React.lazy(() => import('./BlogPostFinessing101'));
+const About = React.lazy(() => import('./About'));
+const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
+const TermsConditions = React.lazy(() => import('./TermsConditions'));
+const LandingPage = React.lazy(() => import('./LandingPage'));
+const BlackjackLux = React.lazy(() => import('./BlackjackLux'));
+const CheckersLux = React.lazy(() => import('./CheckersLux'));
+const Tycoon = React.lazy(() => import('./Tycoon'));
+const NWSSpades = React.lazy(() => import('./NWSSpades'));
+const FiveThousandNWS = React.lazy(() => import('./FiveThousandNWS'));
+const GameHub = React.lazy(() => import('./GameHub'));
+const MultiplayerLobby = React.lazy(() => import('./components/MultiplayerLobby'));
+
+// Loading component for Suspense fallback
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+  </div>
+);
 
 const InteractiveHub = () => (
   <div className="min-h-screen font-sans">
-    <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-12 pb-8 md:pt-16 md:pb-12">
+    <section className="bg-gradient-to-r from-gray-900 to-gray-800 text-white pt-8 sm:pt-12 pb-6 sm:pb-8 md:pt-16 md:pb-12">
       <div className="container mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-4">NO WINDOW SHOPPING</h1>
-        <h2 className="text-xl md:text-2xl mb-4 font-medium">Interactive Hub</h2>
-        <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed mb-6">
+                  <div className="flex justify-center mb-4 sm:mb-6">
+            <img 
+              src="/assets/logosandicons/logo.png" 
+              alt="No Window Shopping Logo" 
+              className="h-12 sm:h-16 md:h-20 object-contain"
+            />
+          </div>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 px-2">NO WINDOW SHOPPING</h1>
+        <h2 className="text-lg sm:text-xl md:text-2xl mb-3 sm:mb-4 font-medium">Interactive Hub</h2>
+        <p className="text-base sm:text-lg md:text-xl max-w-3xl mx-auto leading-relaxed mb-4 sm:mb-6 px-2">
           Welcome to your command center for professional development and business growth. Choose your path and take action.
         </p>
       </div>
     </section>
 
     {/* Card Grid Section */}
-    <section className="py-8 md:py-16 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <section className="py-6 sm:py-8 md:py-16 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {/* CoachCare Card */}
             <HubCard
               title="CoachCare"
               description="Professional Development CRM - Manage your coaching relationships and track your growth journey."
               to="/coachcare"
-              icon={<FaUsers className="text-4xl" />}
-            />
-            {/* IT Services Card */}
-            <HubCard
-              title="IT Services"
-              description="Technology solutions and digital transformation services for modern businesses."
-              to="/it-services"
-              icon={<FaLaptopCode className="text-4xl" />}
-            />
-            {/* MGCU Card */}
-            <HubCard
-              title="MGCU"
-              description="Marcus Graham Connected Universe - Explore the literary world of your pen name."
-              to="/mgcu"
-              icon={<FaBookOpen className="text-4xl" />}
-            />
-            {/* NWS Blog Card */}
-            <HubCard
-              title="NWS Blog"
-              description="Insights, tips, and stories on business, mindset, and personal development."
-              to="/blog-hub"
-              icon={<FaPenNib className="text-4xl" />}
-            />
-            {/* Principles of NoWindowShopping Card */}
-            <HubCard
-              title="Principles of NoWindowShopping"
-              description="Core philosophies and guiding principles for intentional living and success."
-              to="/principles"
-              icon={<FaScroll className="text-4xl" />}
+              icon={<IconWrapper icon={FaUsers} className="text-4xl" />}
             />
             {/* About Card */}
             <HubCard
               title="About the Founder"
               description="Learn more about Brian Proctor and the vision behind No Window Shopping."
               to="/about"
-              icon={<FaUserTie className="text-4xl" />}
+              icon={<IconWrapper icon={FaUserTie} className="text-4xl" />}
+            />
+            {/* NWS Blog Card */}
+            <HubCard
+              title="NWS Blog"
+              description="Insights, tips, and stories on business, mindset, and personal development."
+              to="/blog-hub"
+              icon={<IconWrapper icon={FaPenNib} className="text-4xl" />}
             />
             {/* Web Store Card */}
             <HubCard
               title="Web Store"
               description="Shop for resources, tools, and exclusive No Window Shopping merchandise."
               to="/webstore"
-              icon={<FaShoppingCart className="text-4xl" />}
-            />
-            {/* Contact Card */}
-            <HubCard
-              title="Contact"
-              description="Get in touch with our team for personalized support and inquiries."
-              to="/contact"
-              icon={<FaPhone className="text-4xl" />}
-            />
-            {/* Booking Card */}
-            <HubCard
-              title="Booking"
-              description="Schedule your coaching sessions and professional development consultations."
-              to="/booking"
-              icon={<FaCalendarAlt className="text-4xl" />}
+              icon={<IconWrapper icon={FaCartShopping} className="text-4xl" />}
             />
             {/* What We Offer Card */}
             <HubCard
               title="What We Offer"
               description="Comprehensive overview of all our services and professional development programs."
               to="/services"
-              icon={<FaBullseye className="text-4xl" />}
+              icon={<IconWrapper icon={FaBullseye} className="text-4xl" />}
             />
-            {/* Settings Card */}
+            {/* Applications Card */}
             <HubCard
-              title="Settings"
-              description="Manage your app preferences and advanced settings."
-              to="/settings"
-              icon={<FaCog className="text-4xl" />}
-            />
-            {/* Software Card */}
-            <HubCard
-              title="Software"
+              title="Applications"
               description="Explore our suite of professional software solutions for business, education, and personal development."
-              to="/software"
-              icon={<FaDesktop className="text-4xl" />}
+              to="/applications"
+              icon={<IconWrapper icon={FaDesktop} className="text-4xl" />}
             />
             {/* User Guide Card */}
             <HubCard
               title="User Guide"
               description="Interactive guide to master all features of the No Window Shopping platform."
               to="/guide"
-              icon={<FaQuestionCircle className="text-4xl" />}
+              icon={<IconWrapper icon={FaCircleQuestion} className="text-4xl" />}
             />
             {/* Luminère Qualité Card */}
             <HubCard
               title="Luminère Qualité"
               description="Time Redefined."
               to="/lq"
-              icon={<FaClock className="text-4xl" />}
+              icon={<IconWrapper icon={FaClock} className="text-4xl" />}
             />
             {/* ShoutOut Card */}
             <HubCard
               title="ShoutOut"
               description="Live venue messaging platform for real-time audience engagement and venue monetization."
               to="/shoutout"
-              icon={<FaBullhorn className="text-4xl" />}
+              icon={<IconWrapper icon={FaBullhorn} className="text-4xl" />}
             />
           </div>
         </div>
@@ -214,46 +204,59 @@ const InteractiveHub = () => (
     </section>
 
     {/* Footer Section */}
-    <footer className="bg-gray-900 text-white py-12">
+    <footer className="bg-gray-900 text-white py-8 sm:py-12">
       <div className="container mx-auto px-4 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
             {/* Company Info */}
             <div>
-              <h3 className="text-xl font-bold mb-4">NO WINDOW SHOPPING</h3>
-              <p className="text-gray-300 mb-4">
+              <div className="flex items-center mb-3 sm:mb-4">
+                <img 
+                  src="/assets/logosandicons/logo.png" 
+                  alt="No Window Shopping Logo" 
+                  className="h-6 sm:h-8 mr-2 sm:mr-3"
+                />
+                <h3 className="text-lg sm:text-xl font-bold">NO WINDOW SHOPPING</h3>
+              </div>
+              <p className="text-gray-300 mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed">
                 Empowering individuals and organizations to stop window shopping and start claiming success through professional development and transformative growth strategies.
               </p>
               <div className="flex space-x-4">
-                <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-gray-300 hover:text-white transition-colors">
-                  <FaEnvelope className="text-xl" />
+                <a href="mailto:NoWindowShoppingOnline@gmail.com" className="text-gray-300 hover:text-white transition-colors" title="Email">
+                  <IconWrapper icon={FaEnvelope} className="text-lg sm:text-xl" />
                 </a>
-                <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors">
-                  <FaInstagram className="text-xl" />
+                <a href="https://instagram.com/DrProctorKOPV" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-white transition-colors" title="Instagram">
+                  <IconWrapper icon={FaInstagram} className="text-lg sm:text-xl" />
                 </a>
+                <Link to="/settings" className="text-gray-300 hover:text-white transition-colors" title="Settings">
+                  <IconWrapper icon={FaGear} className="text-lg sm:text-xl" />
+                </Link>
+                <Link to="/admin" className="text-gray-300 hover:text-white transition-colors" title="Admin Dashboard">
+                  <IconWrapper icon={FaUserTie} className="text-lg sm:text-xl" />
+                </Link>
               </div>
             </div>
 
             {/* Quick Links */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-              <ul className="space-y-2">
-                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors">About</Link></li>
-                <li><Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors">Privacy Policy</Link></li>
-                <li><Link to="/terms-conditions" className="text-gray-300 hover:text-white transition-colors">Terms and Conditions</Link></li>
+              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Quick Links</h4>
+              <ul className="space-y-1 sm:space-y-2">
+                <li><Link to="/about" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">About</Link></li>
+                <li><Link to="/privacy-policy" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Privacy Policy</Link></li>
+                <li><Link to="/terms-conditions" className="text-gray-300 hover:text-white transition-colors text-sm sm:text-base">Terms and Conditions</Link></li>
               </ul>
             </div>
 
             {/* Contact Info */}
             <div>
-              <h4 className="text-lg font-semibold mb-4">Get in Touch</h4>
+              <h4 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Get in Touch</h4>
               <div className="space-y-2 text-gray-300">
-                <p>Ready to stop window shopping?</p>
-                <p>Let's discuss how we can help you achieve breakthrough success.</p>
-                <div className="mt-4">
+                <p className="text-sm sm:text-base">Ready to stop window shopping?</p>
+                <p className="text-sm sm:text-base">Let's discuss how we can help you achieve breakthrough success.</p>
+                <div className="mt-3 sm:mt-4">
                   <a 
                     href="mailto:NoWindowShoppingOnline@gmail.com" 
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors inline-block"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 rounded-lg font-semibold transition-colors inline-block text-sm sm:text-base"
                   >
                     Contact Us
                   </a>
@@ -263,9 +266,9 @@ const InteractiveHub = () => (
           </div>
 
           {/* Bottom Bar */}
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 No Window Shopping Professional Services. All rights reserved.</p>
-            <p className="mt-2 text-sm">Success isn't on display—it's claimed.</p>
+          <div className="border-t border-gray-800 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-gray-400">
+            <p className="text-sm sm:text-base">&copy; 2024 No Window Shopping Professional Services. All rights reserved.</p>
+            <p className="mt-2 text-xs sm:text-sm">Success isn't on display—it's claimed.</p>
           </div>
         </div>
       </div>
@@ -283,22 +286,22 @@ const HubCard = ({ title, description, to, icon }: { title: string; description:
         ? 'bg-black border-2 border-yellow-400 text-white hover:border-yellow-300 group hover:scale-105 hover:rotate-1 transition-all duration-500 shadow-2xl hover:shadow-yellow-400/20' 
         : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:scale-105'
       } 
-      rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col px-6 py-8 justify-between h-full group
+      rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col px-4 sm:px-6 py-4 sm:py-6 md:py-8 justify-between h-full group touch-manipulation
     `}>
       <div>
-        <div className={`text-4xl mb-4 text-center group-hover:scale-110 transition-transform duration-300 ${
+        <div className={`text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 text-center group-hover:scale-110 transition-transform duration-300 ${
           isLQCard ? 'text-yellow-400' : ''
         }`}>
           {icon}
         </div>
-        <h3 className={`text-xl font-bold mb-3 text-center ${
+        <h3 className={`text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 text-center leading-tight ${
           isLQCard 
             ? 'text-yellow-400 font-serif' 
             : 'text-gray-900 dark:text-white'
         }`}>
           {title}
         </h3>
-        <p className={`mb-6 text-sm leading-relaxed text-center ${
+        <p className={`mb-3 sm:mb-4 md:mb-6 text-xs sm:text-sm leading-relaxed text-center ${
           isLQCard 
             ? 'text-gray-300 font-serif' 
             : 'text-gray-700 dark:text-gray-300'
@@ -313,7 +316,7 @@ const HubCard = ({ title, description, to, icon }: { title: string; description:
             ? 'bg-yellow-400 text-black hover:bg-yellow-300 font-serif font-semibold' 
             : 'bg-gray-900 text-white hover:bg-gray-800 group-hover:bg-blue-600'
           } 
-          py-3 px-6 rounded-xl font-semibold transition-colors text-center
+          py-3 sm:py-2 md:py-3 px-4 sm:px-6 rounded-xl font-semibold transition-colors text-center text-sm sm:text-base touch-manipulation
         `}
       >
         {isLQCard ? 'Discover' : 'Explore'}
@@ -338,7 +341,7 @@ const WebStoreMaintenance = () => (
     </div>
 
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center">
-      <FaStore className="text-6xl mb-4 text-pink-600 dark:text-pink-400" />
+      <IconWrapper icon={FaStore} className="text-6xl mb-4 text-pink-600 dark:text-pink-400" />
       <h1 className="text-2xl font-bold mb-2 text-pink-600 dark:text-pink-400">Web Store Under Maintenance</h1>
       <p className="text-gray-700 dark:text-gray-300 text-lg">Our store is getting a glow-up! Please check back soon for new merch and digital goodies.</p>
     </div>
@@ -348,7 +351,7 @@ const WebStoreMaintenance = () => (
 const ContactPage = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100">
     <div className="bg-white rounded-2xl shadow-lg p-10 flex flex-col items-center">
-      <FaPhone className="text-5xl mb-4 text-blue-600" />
+      <IconWrapper icon={FaPhone} className="text-5xl mb-4 text-blue-600" />
       <h1 className="text-2xl font-bold mb-2 text-blue-600">Contact Us</h1>
       <p className="text-gray-700 text-lg mb-4">We'd love to hear from you! Reach out via email or Instagram:</p>
       <div className="flex flex-col gap-2 text-lg">
@@ -363,80 +366,103 @@ const ContactPage = () => (
 
 const App = () => (
   <Router>
-    <Routes>
-      <Route path="/" element={<InteractiveHub />} />
-      <Route path="/hub" element={<InteractiveHub />} />
-      <Route path="/healthcheck" element={<HealthcheckScreen />} />
-      <Route path="/feature-status" element={<FeatureStatusScreen />} />
-      <Route path="/blog/1" element={<BlogPost1 />} />
-      <Route path="/blog/2" element={<BlogPost2 />} />
-      <Route path="/blog/3" element={<BlogPost3 />} />
-      <Route path="/blog/side-hustle" element={<BlogPostSideHustle />} />
-      <Route path="/blog/expectations" element={<BlogPostExpectations />} />
-      <Route path="/blog/work-life-balance" element={<BlogPostWorkLifeBalance />} />
-      <Route path="/blog/seat-at-table-1" element={<BlogPostSeatAtTable1 />} />
-      <Route path="/blog/seat-at-table-2" element={<BlogPostSeatAtTable2 />} />
-      <Route path="/blog/seat-at-table-3" element={<BlogPostSeatAtTable3 />} />
-      <Route path="/blog/seat-at-table-4" element={<BlogPostSeatAtTable4 />} />
-      <Route path="/blog/conflicted" element={<BlogPostConflicted />} />
-      <Route path="/blog/friendship-3" element={<BlogPostFriendship3 />} />
-      <Route path="/blog/friendship-4" element={<BlogPostFriendship4 />} />
-      <Route path="/blog/peaked-hs-1" element={<BlogPostPeakedHS1 />} />
-      <Route path="/blog/peaked-hs-2" element={<BlogPostPeakedHS2 />} />
-      <Route path="/blog/have-not-need" element={<BlogPostHaveNotNeed />} />
-      <Route path="/blog/financial-literacy" element={<BlogPostFinancialLiteracy />} />
-      <Route path="/blog/say-no" element={<BlogPostSayNo />} />
-      <Route path="/blog/finessing-101" element={<BlogPostFinessing101 />} />
-      <Route path="/blog" element={<BlogHub />} />
-      <Route path="/blog/impulsively-strategic" element={<BlogPostImpulsivelyStrategic />} />
-      <Route path="/blog/it-goes-where-it-goes" element={<BlogPostItGoesWhereItGoes />} />
-      <Route path="/blog/slippery-slopes-1" element={<BlogPostSlipperySlopes1 />} />
-      <Route path="/blog/slippery-slopes-2" element={<BlogPostSlipperySlopes2 />} />
-      <Route path="/blog/stop-flaking" element={<BlogPostStopFlaking />} />
-      <Route path="/blog/escaping-to-the-90s" element={<EscapingToThe90sBlog />} />
-      <Route path="/blog/escaping-to-the-90s-1" element={<BlogPostEscaping90s1 />} />
-      <Route path="/blog/escaping-to-the-90s-2" element={<BlogPostEscaping90s2 />} />
-      <Route path="/blog/escaping-to-the-90s-3" element={<BlogPostEscaping90s3 />} />
-      <Route path="/principles" element={<PrinciplesHub />} />
-      <Route path="/principles/interactive-mantra" element={<PrinciplesInteractiveMantra />} />
-      <Route path="/principles/wedding-crashing" element={<PrinciplesWeddingCrashing />} />
-      <Route path="/principles/parody-rules" element={<PrinciplesParodyRules />} />
-      <Route path="/principles/29-things-every-man-should-know" element={<Principles29ThingsEveryManShouldKnow />} />
-      <Route path="/blog-hub" element={<BlogHub />} />
-      <Route path="/guide" element={<UserGuide />} />
-      <Route path="/lq" element={<LQ />} />
-      <Route path="/admin/guide" element={<AdminGuide />} />
-      <Route path="/coachcare/*" element={<CoachCareApp />} />
-      <Route path="/booking" element={<Booking />} />
-      <Route path="/blog/nws-laws" element={<BlogPostNWSLaws />} />
-      <Route path="/shoutout" element={<ShoutOut />} />
-      <Route path="/client-management" element={<ClientManagement />} />
-      <Route path="/session-management" element={<SessionManagement />} />
-      <Route path="/mgcu" element={<MGCUHub />} />
-      <Route path="/mgcu/library" element={<MGCULibrary />} />
-      <Route path="/mgcu/library/:book" element={<MGCUBook />} />
-      <Route path="/mgcu/library/:book/:chapter" element={<MGCUChapter />} />
-      <Route path="/mgcu/universe" element={<MGCUUniverse />} />
-      <Route path="/mgcu/characters" element={<MGCUCharacters />} />
-      <Route path="/mgcu/about" element={<MGCUAbout />} />
-      <Route path="/mgcu/settings" element={<MGCUSettings />} />
-      <Route path="/mgcu/discord" element={<MGCUDiscord />} />
-      <Route path="/webstore" element={<WebStoreMaintenance />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/it-services" element={<ITServices />} />
-      <Route path="/services" element={<Services />} />
-      <Route path="/settings" element={<Settings />} />
-      <Route path="/software" element={<Software />} />
-      <Route path="/brians42nd" element={<Brians42nd />} />
-      <Route path="/blog/slippery-slopes" element={<SlipperySlopesHub />} />
-      <Route path="/blog/seat-at-table" element={<SeatAtTableHub />} />
-      <Route path="/blog/peaked-hs" element={<PeakedHSHub />} />
-      <Route path="/about-us" element={<About />} />
-      <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-      <Route path="/terms-conditions" element={<TermsConditions />} />
-      {/* Add other routes as needed */}
-    </Routes>
+    <MultiplayerProvider>
+      <Suspense fallback={<LoadingSpinner />}>
+        <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/hub" element={<InteractiveHub />} />
+        <Route path="/healthcheck" element={<HealthcheckScreen />} />
+        <Route path="/feature-status" element={<FeatureStatusScreen />} />
+        <Route path="/blog/1" element={<BlogPost1 />} />
+        <Route path="/blog/2" element={<BlogPost2 />} />
+        <Route path="/blog/3" element={<BlogPost3 />} />
+        <Route path="/blog/side-hustle" element={<BlogPostSideHustle />} />
+        <Route path="/blog/expectations" element={<BlogPostExpectations />} />
+        <Route path="/blog/work-life-balance" element={<BlogPostWorkLifeBalance />} />
+        <Route path="/blog/seat-at-table-1" element={<BlogPostSeatAtTable1 />} />
+        <Route path="/blog/seat-at-table-2" element={<BlogPostSeatAtTable2 />} />
+        <Route path="/blog/seat-at-table-3" element={<BlogPostSeatAtTable3 />} />
+        <Route path="/blog/seat-at-table-4" element={<BlogPostSeatAtTable4 />} />
+        <Route path="/blog/conflicted" element={<BlogPostConflicted />} />
+        <Route path="/blog/friendship-1" element={<BlogPostFriendship1 />} />
+        <Route path="/blog/friendship-2" element={<BlogPostFriendship2 />} />
+        <Route path="/blog/friendship-3" element={<BlogPostFriendship3 />} />
+        <Route path="/blog/friendship-4" element={<BlogPostFriendship4 />} />
+        <Route path="/blog/peaked-hs-1" element={<BlogPostPeakedHS1 />} />
+        <Route path="/blog/peaked-hs-2" element={<BlogPostPeakedHS2 />} />
+        <Route path="/blog/have-not-need" element={<BlogPostHaveNotNeed />} />
+        <Route path="/blog/financial-literacy" element={<BlogPostFinancialLiteracy />} />
+        <Route path="/blog/say-no" element={<BlogPostSayNo />} />
+        <Route path="/blog/finessing-101" element={<BlogPostFinessing101 />} />
+        <Route path="/blog" element={<BlogHub />} />
+        <Route path="/blog/impulsively-strategic" element={<BlogPostImpulsivelyStrategic />} />
+        <Route path="/blog/it-goes-where-it-goes" element={<BlogPostItGoesWhereItGoes />} />
+        <Route path="/blog/slippery-slopes-1" element={<BlogPostSlipperySlopes1 />} />
+        <Route path="/blog/slippery-slopes-2" element={<BlogPostSlipperySlopes2 />} />
+        <Route path="/blog/stop-flaking" element={<BlogPostStopFlaking />} />
+        <Route path="/blog/escaping-to-the-90s" element={<EscapingToThe90sBlog />} />
+        <Route path="/blog/escaping-to-the-90s-1" element={<BlogPostEscaping90s1 />} />
+        <Route path="/blog/escaping-to-the-90s-2" element={<BlogPostEscaping90s2 />} />
+        <Route path="/blog/escaping-to-the-90s-3" element={<BlogPostEscaping90s3 />} />
+        <Route path="/blog/interactive-mantra" element={<PrinciplesInteractiveMantra />} />
+        <Route path="/blog/wedding-crashing" element={<PrinciplesWeddingCrashing />} />
+        <Route path="/blog/parody-rules" element={<PrinciplesParodyRules />} />
+        <Route path="/blog/29-things-every-man-should-know" element={<Principles29ThingsEveryManShouldKnow />} />
+        <Route path="/blog-hub" element={<BlogHub />} />
+        <Route path="/guide" element={<UserGuide />} />
+        <Route path="/lq" element={<LQ />} />
+        <Route path="/admin/guide" element={<AdminGuide />} />
+                        {/* AdminDashboard route temporarily disabled */}
+        <Route path="/coachcare/booking" element={<Booking />} />
+        <Route path="/coachcare/*" element={<CoachCareApp />} />
+        <Route path="/blog/nws-laws" element={<BlogPostNWSLaws />} />
+        <Route path="/shoutout" element={<ShoutOut />} />
+        <Route path="/client-management" element={<ClientManagement />} />
+        <Route path="/session-management" element={<SessionManagement />} />
+        <Route path="/mgcu" element={<MGCUHub />} />
+        <Route path="/mgcu/library" element={<MGCULibrary />} />
+        <Route path="/mgcu/library/:book" element={<MGCUBook />} />
+        <Route path="/mgcu/library/:book/:chapter" element={<MGCUChapter />} />
+        <Route path="/mgcu/universe" element={<MGCUUniverse />} />
+        <Route path="/mgcu/characters" element={<MGCUCharacters />} />
+        <Route path="/mgcu/about" element={<MGCUAbout />} />
+        <Route path="/mgcu/settings" element={<MGCUSettings />} />
+        <Route path="/mgcu/discord" element={<MGCUDiscord />} />
+        <Route path="/webstore" element={<WebStoreMaintenance />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/applications" element={<Applications />} />
+        <Route path="/brians42nd" element={<Brians42nd />} />
+        <Route path="/blog/slippery-slopes" element={<SlipperySlopesHub />} />
+        <Route path="/blog/seat-at-table" element={<SeatAtTableHub />} />
+        <Route path="/blog/peaked-hs" element={<PeakedHSHub />} />
+        <Route path="/blog/friendship" element={<FriendshipSeriesHub />} />
+        <Route path="/about-us" element={<About />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-conditions" element={<TermsConditions />} />
+                 <Route path="/blackjack" element={<BlackjackLux />} />
+         <Route path="/checkers" element={<CheckersLux />} />
+         <Route path="/tycoon" element={<Tycoon />} />
+        <Route path="/spades" element={<NWSSpades />} />
+        <Route path="/5000" element={<FiveThousandNWS />} />
+        <Route path="/games" element={<GameHub />} />
+        
+        {/* Multiplayer Routes */}
+        <Route path="/multiplayer/:gameType" element={
+          <MultiplayerLobby 
+            gameType={window.location.pathname.split('/')[2] || ''} 
+            onStartGame={() => {}} 
+            onBack={() => window.history.back()} 
+          />
+        } />
+        
+        {/* Add other routes as needed */}
+      </Routes>
+      <Analytics />
+    </Suspense>
+    </MultiplayerProvider>
   </Router>
 );
 

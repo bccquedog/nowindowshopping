@@ -151,6 +151,151 @@ export interface Assessment {
   updatedAt: string;
 }
 
+export interface Notification {
+  id: string;
+  userId: string;
+  type: 'session-reminder' | 'goal-deadline' | 'assessment-due' | 'payment-due' | 'system' | 'message' | 'achievement';
+  title: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'unread' | 'read' | 'dismissed';
+  actionUrl?: string;
+  actionText?: string;
+  metadata?: {
+    clientId?: string;
+    sessionId?: string;
+    goalId?: string;
+    assessmentId?: string;
+  };
+  createdAt: string;
+  readAt?: string;
+}
+
+export interface Course {
+  id: string;
+  title: string;
+  description: string;
+  category: 'leadership' | 'communication' | 'goal-setting' | 'time-management' | 'stress-management' | 'career-development' | 'personal-growth';
+  level: 'beginner' | 'intermediate' | 'advanced';
+  duration: number; // in minutes
+  modules: Module[];
+  prerequisites?: string[];
+  learningObjectives: string[];
+  thumbnail?: string;
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Module {
+  id: string;
+  courseId: string;
+  title: string;
+  description: string;
+  order: number;
+  duration: number; // in minutes
+  lessons: Lesson[];
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Lesson {
+  id: string;
+  moduleId: string;
+  title: string;
+  description: string;
+  order: number;
+  duration: number; // in minutes
+  type: 'video' | 'text' | 'quiz' | 'assignment' | 'discussion';
+  content: {
+    videoUrl?: string;
+    textContent?: string;
+    quiz?: Quiz;
+    assignment?: Assignment;
+  };
+  resources?: {
+    name: string;
+    url: string;
+    type: 'pdf' | 'video' | 'audio' | 'link';
+  }[];
+  isPublished: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Quiz {
+  id: string;
+  lessonId: string;
+  title: string;
+  questions: QuizQuestion[];
+  passingScore: number;
+  timeLimit?: number; // in minutes
+  attemptsAllowed: number;
+  createdAt: string;
+}
+
+export interface QuizQuestion {
+  id: string;
+  question: string;
+  type: 'multiple-choice' | 'true-false' | 'short-answer';
+  options?: string[];
+  correctAnswer: string | string[];
+  points: number;
+  explanation?: string;
+}
+
+export interface Assignment {
+  id: string;
+  lessonId: string;
+  title: string;
+  description: string;
+  dueDate?: string;
+  submissionType: 'text' | 'file' | 'link';
+  maxFileSize?: number; // in MB
+  allowedFileTypes?: string[];
+  rubric?: {
+    criteria: string;
+    points: number;
+  }[];
+}
+
+export interface Enrollment {
+  id: string;
+  userId: string;
+  courseId: string;
+  status: 'enrolled' | 'in-progress' | 'completed' | 'dropped';
+  progress: number; // 0-100
+  startDate: string;
+  completionDate?: string;
+  lastAccessed?: string;
+  certificates?: {
+    id: string;
+    name: string;
+    issuedDate: string;
+    url: string;
+  }[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Progress {
+  id: string;
+  userId: string;
+  courseId: string;
+  moduleId: string;
+  lessonId: string;
+  status: 'not-started' | 'in-progress' | 'completed';
+  completedAt?: string;
+  timeSpent: number; // in minutes
+  score?: number; // for quizzes
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+
+
 export interface Invoice {
   id: string;
   clientId: string;
@@ -188,6 +333,10 @@ export interface CoachCareState {
   notes: Note[];
   assessments: Assessment[];
   invoices: Invoice[];
+  notifications: Notification[];
+  courses: Course[];
+  enrollments: Enrollment[];
+  progress: Progress[];
   
   // UI State
   activeTab: string;
@@ -208,6 +357,7 @@ export interface CoachCareState {
   showEditNote: boolean;
   showAddCommunication: boolean;
   showEditCommunication: boolean;
+  showNotificationCenter: boolean;
   
   // Editing
   editingClient: Client | null;

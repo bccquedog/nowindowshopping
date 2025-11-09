@@ -1,0 +1,75 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to HoldemLux — elegant Texas Hold'em."
+  },
+  {
+    "type": "highlight",
+    "target": "positions",
+    "text": "Positions rotate each hand: Button, Small Blind, Big Blind."
+  },
+  {
+    "type": "scriptDeal",
+    "hero": "BTN",
+    "heroCards": ["As", "Qs"],
+    "opponents": [{"pos": "SB"}, {"pos": "BB"}]
+  },
+  {
+    "type": "highlight",
+    "target": "actionBar",
+    "text": "Preflop: choose your open size."
+  },
+  {
+    "type": "forceAction",
+    "action": "raise",
+    "size": 5
+  },
+  {
+    "type": "message",
+    "text": "Postflop has three streets: Flop, Turn, River."
+  },
+  {
+    "type": "scriptBoard",
+    "flop": ["Ah", "7c", "2d"]
+  },
+  {
+    "type": "highlight",
+    "target": "betPresets",
+    "text": "C-bet small on dry A-high boards."
+  },
+  {
+    "type": "forceAction",
+    "action": "bet",
+    "size": "33pct"
+  },
+  {
+    "type": "scriptBoard",
+    "turn": "9s"
+  },
+  {
+    "type": "message",
+    "text": "Control the pot with medium-strength hands."
+  },
+  {
+    "type": "forceAction",
+    "action": "check"
+  },
+  {
+    "type": "scriptBoard",
+    "river": "Qc"
+  },
+  {
+    "type": "forceAction",
+    "action": "bet",
+    "size": "66pct"
+  },
+  {
+    "type": "message",
+    "text": "Showdown: best 5-card hand wins. Splits when equal."
+  }
+]
+
+
+
+
+

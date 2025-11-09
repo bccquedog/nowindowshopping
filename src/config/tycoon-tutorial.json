@@ -1,0 +1,42 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to Tycoon — the elegant property trading game."
+  },
+  {
+    "type": "highlight",
+    "target": "ruleBadge",
+    "text": "House Rule: You cannot buy until you pass GO once without going to Jail."
+  },
+  {
+    "type": "message",
+    "text": "If you go to Jail before that first pass, buying stays locked for the first lap."
+  },
+  {
+    "type": "scriptDice",
+    "values": [3, 4]
+  },
+  {
+    "type": "highlight",
+    "target": "tilePanel",
+    "text": "This is a property. You cannot buy yet, so we'll trigger an auction."
+  },
+  {
+    "type": "waitFor",
+    "action": "auctionBidOrPass"
+  },
+  {
+    "type": "message",
+    "text": "Houses and hotels require complete ownership of a color set, and must be built evenly across properties."
+  },
+  {
+    "type": "highlight",
+    "target": "buildPanel",
+    "text": "When you own all Dark Blue, add houses evenly to Park Place and Boardwalk."
+  }
+]
+
+
+
+
+

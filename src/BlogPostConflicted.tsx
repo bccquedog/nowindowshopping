@@ -5,13 +5,13 @@ import CommentsSection from './components/CommentsSection';
 export default function BlogPostConflicted() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-200 via-gray-100 to-gray-300 dark:from-purple-900 dark:via-gray-900 dark:to-gray-800">
-      <div className="max-w-2xl mx-auto py-10 px-4 prose dark:prose-invert">
+      <div className="max-w-2xl mx-auto py-8 sm:py-10 px-4 prose dark:prose-invert">
         <div className="mb-6 text-center">
-          <h1 className="text-4xl font-bold mb-2">When You're Conflicted, Wait Until You Have to Pee</h1>
-          <div className="flex items-center justify-center gap-2 text-gray-500 text-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 leading-tight">When You're Conflicted, Wait Until You Have to Pee</h1>
+          <div className="flex items-center justify-center gap-2 text-gray-500 text-xs sm:text-sm">
             <span>By Brian Proctor</span>
             <span>•</span>
-            <Clock className="w-4 h-4 inline" />
+            <Clock className="w-3 h-3 sm:w-4 sm:h-4 inline" />
             <span>5 min read</span>
           </div>
         </div>
@@ -28,7 +28,7 @@ export default function BlogPostConflicted() {
         
         <hr />
         
-        <h2 className="flex items-center gap-2 text-2xl font-bold mt-8"><Brain className="w-6 h-6 text-purple-500" /> 1. The Body Doesn't Lie</h2>
+        <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold mt-8"><Brain className="w-5 h-5 sm:w-6 sm:h-6 text-purple-500" /> 1. The Body Doesn't Lie</h2>
         <p>When you have to use the bathroom, your body cuts through everything else—emails, notifications, overthinking, other people's opinions—and says:</p>
         <p><em>"This needs attention. Now."</em></p>
         
@@ -40,7 +40,7 @@ export default function BlogPostConflicted() {
         
         <hr />
         
-        <h2 className="flex items-center gap-2 text-2xl font-bold mt-8"><Target className="w-6 h-6 text-indigo-500" /> 2. Decisions Made Under Pressure Often Prioritize Escape, Not Alignment</h2>
+        <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold mt-8"><Target className="w-5 h-5 sm:w-6 sm:h-6 text-indigo-500" /> 2. Decisions Made Under Pressure Often Prioritize Escape, Not Alignment</h2>
         <p>When we're overwhelmed or conflicted, we usually want to just get it over with.</p>
         <p>We:</p>
         
@@ -59,7 +59,7 @@ export default function BlogPostConflicted() {
         
         <hr />
         
-        <h2 className="flex items-center gap-2 text-2xl font-bold mt-8"><Pause className="w-6 h-6 text-blue-500" /> 3. Stillness Isn't Stalling</h2>
+        <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold mt-8"><Pause className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500" /> 3. Stillness Isn't Stalling</h2>
         <p>Sometimes clarity doesn't come through thinking. It comes through pausing. Through not reacting. Through letting your nervous system settle so your intuition can finally be heard again.</p>
         
         <p>At No Window Shopping, we teach movement with intention.</p>
@@ -68,7 +68,7 @@ export default function BlogPostConflicted() {
         
         <hr />
         
-        <h2 className="flex items-center gap-2 text-2xl font-bold mt-8"><Zap className="w-6 h-6 text-yellow-500" /> 4. The NWS Way: Wait for the Internal Signal</h2>
+        <h2 className="flex items-center gap-2 text-xl sm:text-2xl font-bold mt-8"><Zap className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-500" /> 4. The NWS Way: Wait for the Internal Signal</h2>
         <p>The next time you're split between two choices, and the noise in your head is louder than your gut:</p>
         
         <ul>
@@ -87,7 +87,7 @@ export default function BlogPostConflicted() {
         <p><em>Translation: Wait until it's real. Then act.</em></p>
         
         <div className="mt-8 text-center">
-          <p className="text-2xl font-bold text-purple-900">— Brian</p>
+          <p className="text-xl sm:text-2xl font-bold text-purple-900">— Brian</p>
         </div>
       </div>
       <div className="max-w-2xl mx-auto mt-12 px-4">

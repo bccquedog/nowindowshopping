@@ -1,0 +1,58 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to CheckersLux — elegant checkers with smart AI."
+  },
+  {
+    "type": "highlight",
+    "target": "board",
+    "text": "Pieces move diagonally on dark squares."
+  },
+  {
+    "type": "scriptPosition",
+    "fen32": "W:W12,14,16,18:B21,23,25,27"
+  },
+  {
+    "type": "message",
+    "text": "Captures are mandatory. Let's make a capture."
+  },
+  {
+    "type": "forceMove",
+    "from": 12,
+    "to": 19,
+    "captures": [16]
+  },
+  {
+    "type": "message",
+    "text": "Multi-jumps continue if available."
+  },
+  {
+    "type": "forceMove",
+    "from": 19,
+    "to": 26,
+    "captures": [23]
+  },
+  {
+    "type": "message",
+    "text": "Reach the back rank to promote to king."
+  },
+  {
+    "type": "scriptPosition",
+    "fen32": "W:W10,12,14:B21,23,25"
+  },
+  {
+    "type": "forceMove",
+    "from": 10,
+    "to": 1,
+    "promote": true
+  },
+  {
+    "type": "message",
+    "text": "Kings move and capture diagonally both forward and back."
+  }
+]
+
+
+
+
+

@@ -1,0 +1,50 @@
+[
+  {
+    "type": "message",
+    "text": "Welcome to NWS Spades. Two jokers are added, 2♦ and 2♥ are removed, and 2♣ is the lowest card."
+  },
+  {
+    "type": "highlight",
+    "target": "trumpOrder",
+    "text": "Trump order: Big Joker > Little Joker > 2♠ > A♠ > K♠ … > 3♠."
+  },
+  {
+    "type": "message",
+    "text": "Spades cannot be led until they're broken, unless your hand is only trump."
+  },
+  {
+    "type": "highlight",
+    "target": "bidPanel",
+    "text": "Place your bid."
+  },
+  {
+    "type": "waitFor",
+    "action": "submitBid"
+  },
+  {
+    "type": "scriptedOpponentPlay",
+    "card": "7H"
+  },
+  {
+    "type": "highlight",
+    "target": "handHearts",
+    "text": "Follow suit: play a heart."
+  },
+  {
+    "type": "waitFor",
+    "action": "playCard"
+  },
+  {
+    "type": "message",
+    "text": "If you are void in the led suit, you may play a spade to cut. That will break spades for the rest of the game."
+  },
+  {
+    "type": "message",
+    "text": "Special rules: 10+ bid = 250 points. Blind bid (when down by 100+) = 2× score on success."
+  }
+]
+
+
+
+
+

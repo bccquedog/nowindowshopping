@@ -1,0 +1,50 @@
+{
+  "id": "checkers_lux_default",
+  "board": { 
+    "rows": 8, 
+    "cols": 8, 
+    "playableSquares": 32, 
+    "darkSquaresOnly": true 
+  },
+  "movement": {
+    "men": { 
+      "forwardDiagonals": true, 
+      "backwardDiagonals": false 
+    },
+    "kings": { 
+      "forwardDiagonals": true, 
+      "backwardDiagonals": true, 
+      "flying": false 
+    }
+  },
+  "captures": {
+    "mandatory": true,
+    "multipleJumps": true,
+    "maxCaptureRule": "any",
+    "kingPromotionDuringJumpContinues": true
+  },
+  "promotion": { 
+    "toKingOnBackRank": true 
+  },
+  "drawRules": {
+    "noCaptureMoveLimit": 50,
+    "threefoldRepetition": true
+  },
+  "start": { 
+    "sideToMove": "dark" 
+  },
+  "ui": {
+    "highlightMoves": true,
+    "showForcedCaptureBadge": true,
+    "theme": "luxury_onyx_gold"
+  },
+  "coach": {
+    "enabled": true,
+    "showBestMoveArrow": false
+  }
+}
+
+
+
+
+

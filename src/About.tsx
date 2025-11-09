@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 
 const About: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 py-8 sm:py-12 px-4">
       {/* Back Button */}
-      <div className="w-full max-w-6xl mx-auto mb-8">
+      <div className="w-full max-w-6xl mx-auto mb-6 sm:mb-8">
         <Link
           to="/hub"
           className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
@@ -19,56 +20,56 @@ const About: React.FC = () => {
 
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-2">
             About No Window Shopping
           </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2 leading-relaxed">
             Empowering individuals and organizations to stop window shopping and start claiming success through professional development, leadership coaching, and transformative growth strategies.
           </p>
         </div>
 
         {/* Mission & Vision */}
-        <div className="grid md:grid-cols-2 gap-12 mb-16">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-            <div className="text-4xl mb-4">🎯</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Mission</h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+        <div className="grid md:grid-cols-2 gap-8 sm:gap-12 mb-12 sm:mb-16">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🎯</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">Our Mission</h2>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
               To inspire and equip professionals with the mindset, skills, and strategies needed to break through barriers, seize opportunities, and achieve their full potential. We believe success isn't on display—it's claimed through action, persistence, and strategic investment in oneself.
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8">
-            <div className="text-4xl mb-4">🌟</div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Vision</h2>
-            <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🌟</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">Our Vision</h2>
+            <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
               To be the leading platform for professional transformation, where individuals and organizations discover that their greatest potential lies not in what they see, but in what they're willing to pursue, develop, and achieve through dedicated effort and strategic action.
             </p>
           </div>
         </div>
 
         {/* Core Values */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">Our Core Values</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 sm:mb-12 px-2">Our Core Values</h2>
+          <div className="grid md:grid-cols-3 gap-6 sm:gap-8">
             <div className="text-center">
-              <div className="text-5xl mb-4">💪</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Action Over Observation</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">💪</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Action Over Observation</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 We believe in doing rather than just watching. Success comes from taking calculated risks and making strategic moves.
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-4">🎓</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Continuous Learning</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🎓</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Continuous Learning</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 Growth is a lifelong journey. We commit to constant improvement and helping others do the same.
               </p>
             </div>
             <div className="text-center">
-              <div className="text-5xl mb-4">🤝</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Authentic Relationships</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+              <div className="text-4xl sm:text-5xl mb-3 sm:mb-4">🤝</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Authentic Relationships</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 We build genuine connections based on trust, transparency, and mutual respect.
               </p>
             </div>
@@ -76,27 +77,27 @@ const About: React.FC = () => {
         </div>
 
         {/* Services Overview */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">What We Offer</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <div className="text-3xl mb-4">🎤</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Speaking Engagements</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+        <div className="mb-12 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 sm:mb-12 px-2">What We Offer</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl mb-3 sm:mb-4">🎤</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Speaking Engagements</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 Transformative keynotes and workshops that inspire action and drive real change in organizations.
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <div className="text-3xl mb-4">🎯</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Executive Coaching</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl mb-3 sm:mb-4">🎯</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Executive Coaching</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 Personalized coaching for leaders and professionals seeking breakthrough performance and growth.
               </p>
             </div>
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
-              <div className="text-3xl mb-4">📈</div>
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">Professional Development</h3>
-              <p className="text-gray-600 dark:text-gray-300">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6">
+              <div className="text-2xl sm:text-3xl mb-3 sm:mb-4">📈</div>
+              <h3 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2 sm:mb-3">Professional Development</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm sm:text-base leading-relaxed">
                 Comprehensive training programs designed to enhance skills, leadership, and career advancement.
               </p>
             </div>
@@ -185,6 +186,7 @@ const About: React.FC = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

@@ -340,7 +340,7 @@ class DataService {
     }
   }
 
-  async addClient(clientData: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Client }> {
+  async addClient(clientData: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Client | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -366,7 +366,7 @@ class DataService {
     }
   }
 
-  async updateClient(clientId: string, updates: Partial<Client>): Promise<{ success: boolean; data: Client }> {
+  async updateClient(clientId: string, updates: Partial<Client>): Promise<{ success: boolean; data: Client | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -398,7 +398,7 @@ class DataService {
     }
   }
 
-  async deleteClient(clientId: string): Promise<{ success: boolean; data: void }> {
+  async deleteClient(clientId: string): Promise<{ success: boolean; data: void | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -465,7 +465,7 @@ class DataService {
     }
   }
 
-  async addSession(sessionData: Omit<Session, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Session }> {
+  async addSession(sessionData: Omit<Session, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Session | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -491,7 +491,7 @@ class DataService {
     }
   }
 
-  async updateSession(sessionId: string, updates: Partial<Session>): Promise<{ success: boolean; data: Session }> {
+  async updateSession(sessionId: string, updates: Partial<Session>): Promise<{ success: boolean; data: Session | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -523,7 +523,7 @@ class DataService {
     }
   }
 
-  async deleteSession(sessionId: string): Promise<{ success: boolean; data: void }> {
+  async deleteSession(sessionId: string): Promise<{ success: boolean; data: void | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -573,7 +573,7 @@ class DataService {
     }
   }
 
-  async addGoal(goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Goal }> {
+  async addGoal(goalData: Omit<Goal, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Goal | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -599,7 +599,7 @@ class DataService {
     }
   }
 
-  async updateGoalProgress(goalId: string, progress: number): Promise<{ success: boolean; data: Goal }> {
+  async updateGoalProgress(goalId: string, progress: number): Promise<{ success: boolean; data: Goal | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -633,7 +633,7 @@ class DataService {
     }
   }
 
-  async updateGoal(goalId: string, updates: Partial<Goal>): Promise<{ success: boolean; data: Goal }> {
+  async updateGoal(goalId: string, updates: Partial<Goal>): Promise<{ success: boolean; data: Goal | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -665,7 +665,7 @@ class DataService {
     }
   }
 
-  async deleteGoal(goalId: string): Promise<{ success: boolean; data: void }> {
+  async deleteGoal(goalId: string): Promise<{ success: boolean; data: void | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -715,7 +715,7 @@ class DataService {
     }
   }
 
-  async addCommunication(commData: Omit<Communication, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Communication }> {
+  async addCommunication(commData: Omit<Communication, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Communication | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -741,7 +741,7 @@ class DataService {
     }
   }
 
-  async updateCommunication(commId: string, updates: Partial<Communication>): Promise<{ success: boolean; data: Communication }> {
+  async updateCommunication(commId: string, updates: Partial<Communication>): Promise<{ success: boolean; data: Communication | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -773,7 +773,7 @@ class DataService {
     }
   }
 
-  async deleteCommunication(commId: string): Promise<{ success: boolean; data: void }> {
+  async deleteCommunication(commId: string): Promise<{ success: boolean; data: void | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -829,7 +829,7 @@ class DataService {
     }
   }
 
-  async addNote(noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Note }> {
+  async addNote(noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Note | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -855,7 +855,7 @@ class DataService {
     }
   }
 
-  async updateNote(noteId: string, updates: Partial<Note>): Promise<{ success: boolean; data: Note }> {
+  async updateNote(noteId: string, updates: Partial<Note>): Promise<{ success: boolean; data: Note | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -887,7 +887,7 @@ class DataService {
     }
   }
 
-  async deleteNote(noteId: string): Promise<{ success: boolean; data: void }> {
+  async deleteNote(noteId: string): Promise<{ success: boolean; data: void | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
 
@@ -927,7 +927,7 @@ class DataService {
     averageSessionPrice: number;
     clientSatisfactionScore: number;
     goalCompletionRate: number;
-  } }> {
+  } | null }> {
     try {
       await new Promise(resolve => setTimeout(resolve, 300));
 
