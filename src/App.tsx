@@ -4,13 +4,10 @@ import { Analytics } from '@vercel/analytics/react';
 import { MultiplayerProvider } from './components/MultiplayerProvider';
 import { 
   FaUsers, 
-  FaBookOpen, 
   FaPenNib, 
-  FaScroll, 
   FaUserTie, 
   FaCartShopping, 
   FaPhone, 
-  FaCalendar, 
   FaBullseye, 
   FaGear, 
   FaDesktop, 
