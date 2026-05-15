@@ -317,12 +317,13 @@ export const CoachCareProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   const loadInitialData = async () => {
     try {
-      const [clientsRes, sessionsRes, goalsRes, communicationsRes, notesRes] = await Promise.all([
+      const [clientsRes, sessionsRes, goalsRes, communicationsRes, notesRes, invoicesRes] = await Promise.all([
         dataService.getClients(),
         dataService.getSessions(),
         dataService.getGoals(),
         dataService.getCommunications(),
-        dataService.getNotes()
+        dataService.getNotes(),
+        dataService.getInvoices()
       ]);
 
       if (clientsRes.success) dispatch({ type: 'SET_CLIENTS', payload: clientsRes.data! });
@@ -330,6 +331,7 @@ export const CoachCareProvider: React.FC<{ children: ReactNode }> = ({ children 
       if (goalsRes.success) dispatch({ type: 'SET_GOALS', payload: goalsRes.data! });
       if (communicationsRes.success) dispatch({ type: 'SET_COMMUNICATIONS', payload: communicationsRes.data! });
       if (notesRes.success) dispatch({ type: 'SET_NOTES', payload: notesRes.data! });
+      if (invoicesRes.success) dispatch({ type: 'SET_INVOICES', payload: invoicesRes.data! });
     } catch (error) {
       console.error('Failed to load initial data:', error);
     }
@@ -500,11 +502,43 @@ export const CoachCareProvider: React.FC<{ children: ReactNode }> = ({ children 
     deleteAssessment: async () => {},
     submitAssessment: async () => {},
 
-    // Invoice Management (placeholder implementations)
-    addInvoice: async () => {},
-    updateInvoice: async () => {},
-    deleteInvoice: async () => {},
-    markInvoicePaid: async () => {},
+    // Invoice Management
+    addInvoice: async (invoiceData) => {
+      const response = await dataService.addInvoice(invoiceData);
+      if (response.success) {
+        const invoicesRes = await dataService.getInvoices();
+        if (invoicesRes.success) {
+          dispatch({ type: 'SET_INVOICES', payload: invoicesRes.data });
+        }
+      }
+    },
+    updateInvoice: async (invoiceId, invoiceData) => {
+      const response = await dataService.updateInvoice(invoiceId, invoiceData);
+      if (response.success) {
+        const invoicesRes = await dataService.getInvoices();
+        if (invoicesRes.success) {
+          dispatch({ type: 'SET_INVOICES', payload: invoicesRes.data });
+        }
+      }
+    },
+    deleteInvoice: async (invoiceId) => {
+      const response = await dataService.deleteInvoice(invoiceId);
+      if (response.success) {
+        const invoicesRes = await dataService.getInvoices();
+        if (invoicesRes.success) {
+          dispatch({ type: 'SET_INVOICES', payload: invoicesRes.data });
+        }
+      }
+    },
+    markInvoicePaid: async (invoiceId) => {
+      const response = await dataService.markInvoicePaid(invoiceId);
+      if (response.success) {
+        const invoicesRes = await dataService.getInvoices();
+        if (invoicesRes.success) {
+          dispatch({ type: 'SET_INVOICES', payload: invoicesRes.data });
+        }
+      }
+    },
 
     // UI Actions
     setActiveTab: (tab) => dispatch({ type: 'SET_ACTIVE_TAB', payload: tab }),
@@ -614,3 +648,14 @@ export const useNotes = () => {
     deleteNote: actions.deleteNote,
   };
 }; 
+
+export const useInvoices = () => {
+  const { state, actions } = useCoachCare();
+  return {
+    invoices: state.invoices,
+    addInvoice: actions.addInvoice,
+    updateInvoice: actions.updateInvoice,
+    deleteInvoice: actions.deleteInvoice,
+    markInvoicePaid: actions.markInvoicePaid,
+  };
+};

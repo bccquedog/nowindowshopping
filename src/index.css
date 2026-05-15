@@ -234,6 +234,75 @@ html {
     @apply bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400;
   }
 
+  /* Game UI System */
+  .game-shell {
+    @apply min-h-screen bg-gray-950 text-ivory;
+  }
+
+  .game-header {
+    @apply border-b border-white/10 bg-gray-950/95 px-4 py-4 shadow-sm backdrop-blur sm:px-6;
+  }
+
+  .game-header-inner {
+    @apply mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between;
+  }
+
+  .game-back-button {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-ivory transition-colors hover:border-blue-300/40 hover:bg-blue-500/15 hover:text-white;
+  }
+
+  .game-title {
+    @apply text-2xl font-bold text-white sm:text-3xl;
+  }
+
+  .game-subtitle {
+    @apply text-sm text-gray-400;
+  }
+
+  .game-icon-button {
+    @apply inline-flex h-11 w-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-ivory transition-colors hover:border-blue-300/40 hover:bg-blue-500/15 hover:text-white;
+  }
+
+  .game-panel {
+    @apply rounded-lg border border-white/10 bg-white/5 p-4 shadow-sm;
+  }
+
+  .game-panel-soft {
+    @apply rounded-lg border border-white/10 bg-black/20 p-4;
+  }
+
+  .game-stat-grid {
+    @apply grid grid-cols-2 gap-3 md:grid-cols-4;
+  }
+
+  .game-stat {
+    @apply rounded-lg border border-white/10 bg-black/20 p-3;
+  }
+
+  .game-stat-label {
+    @apply text-xs font-semibold uppercase text-gray-400;
+  }
+
+  .game-stat-value {
+    @apply mt-1 text-xl font-bold text-white;
+  }
+
+  .game-primary-action {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 font-bold text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .game-secondary-action {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-5 py-3 font-semibold text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .game-danger-action {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-lg bg-red-600 px-5 py-3 font-bold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .game-success-action {
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-lg bg-green-600 px-5 py-3 font-bold text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
   /* Enhanced Form Components */
   .form-group {
     @apply space-y-2;

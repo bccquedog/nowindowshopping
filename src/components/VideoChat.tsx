@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import DailyIframe from '@daily-co/daily-js';
+import { videoConfig } from '../config/videoConfig';
 
 interface VideoChatProps {
   roomUrl?: string;
@@ -56,7 +57,7 @@ const VideoChat: React.FC<VideoChatProps> = ({
   // Generate room URL if not provided
   const generateRoomUrl = () => {
     if (roomUrl) return roomUrl;
-    const baseUrl = 'https://your-domain.daily.co';
+    const baseUrl = `https://${videoConfig.daily.domain}`;
     const roomId = roomName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
     return `${baseUrl}/${roomId}`;
   };
@@ -128,16 +129,23 @@ const VideoChat: React.FC<VideoChatProps> = ({
     if (!callObjectRef.current) return;
 
     const participants = callObjectRef.current.participants();
+    const localSessionId = participants.local?.session_id;
     const participantsArray: Participant[] = [];
 
     Object.values(participants).forEach((participant: any) => {
+      // Use tracks API (recommended by Daily) with fallback to legacy audio/video
+      const audioState = participant.tracks?.audio?.state;
+      const videoState = participant.tracks?.video?.state;
+      const isAudioOn = audioState === 'playable' || audioState === 'sendable' || participant.audio === true;
+      const isVideoOn = videoState === 'playable' || videoState === 'sendable' || participant.video === true;
+
       participantsArray.push({
         id: participant.session_id,
         name: participant.user_name || 'Unknown',
-        role: participant.session_id === callObjectRef.current.participants().local.session_id ? 'coach' : 'client',
-        isLocal: participant.session_id === callObjectRef.current.participants().local.session_id,
-        audio: participant.audio,
-        video: participant.video,
+        role: participant.session_id === localSessionId ? 'coach' : 'client',
+        isLocal: participant.session_id === localSessionId,
+        audio: isAudioOn,
+        video: isVideoOn,
         speaking: participant.speaking || false,
       });
     });
@@ -187,8 +195,10 @@ const VideoChat: React.FC<VideoChatProps> = ({
   const leaveCall = () => {
     if (callObjectRef.current) {
       callObjectRef.current.leave();
+      // left-meeting event will trigger handleSessionEnd; avoid double-calling
+    } else {
+      handleSessionEnd();
     }
-    handleSessionEnd();
   };
 
   const sendChatMessage = () => {

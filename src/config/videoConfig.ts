@@ -1,5 +1,28 @@
 // Video Chat Configuration
 // Production settings for Daily.co integration
+// WebRTC settings from videochat implementation guide (LoveQuest architecture)
+
+/** Get ICE servers for WebRTC - STUN required, TURN recommended for restrictive networks */
+export function getWebRTCIceServers(): RTCIceServer[] {
+  const servers: RTCIceServer[] = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+  ];
+
+  const rawTurnUrls = process.env.REACT_APP_TURN_URLS || process.env.REACT_APP_TURN_URL;
+  const turnUsername = process.env.REACT_APP_TURN_USERNAME;
+  const turnCredential = process.env.REACT_APP_TURN_CREDENTIAL;
+
+  if (rawTurnUrls && turnUsername && turnCredential) {
+    const turnUrls = rawTurnUrls.split(',').map((u) => u.trim()).filter(Boolean);
+    if (turnUrls.length > 0) {
+      servers.push({ urls: turnUrls, username: turnUsername, credential: turnCredential });
+    }
+  }
+
+  return servers;
+}
 
 export const videoConfig = {
   // Daily.co Configuration
@@ -26,6 +49,7 @@ export const videoConfig = {
     coaching: 'https://nowindowshopping.daily.co/coaching-{sessionId}',
     group: 'https://nowindowshopping.daily.co/group-{sessionId}',
     client: 'https://nowindowshopping.daily.co/client-{sessionId}',
+    game: 'https://nowindowshopping.daily.co/game-{sessionId}',
   },
 
   // Session types
@@ -52,6 +76,22 @@ export const videoConfig = {
     showLeaveButton: true,
   },
 
+  // WebRTC (peer-to-peer, lower latency - from LoveQuest videochat implementation)
+  webrtc: {
+    /** Use WebRTC for 1:1/2-player calls when true; Daily.co for 3+ */
+    preferForTwoPlayer: true,
+    /** Reconnect grace period (ms) before ending on transient disconnect */
+    disconnectGraceMs: 5000,
+    /** Connection timeout (ms) before failing */
+    connectionTimeoutMs: 30000,
+    /** Video constraints - 720p for performance/quality balance */
+    videoConstraints: {
+      width: { ideal: 1280 },
+      height: { ideal: 720 },
+      frameRate: { ideal: 30 },
+    },
+  },
+
   // Error messages
   errorMessages: {
     connectionFailed: 'Failed to connect to video call. Please check your internet connection and try again.',
@@ -62,8 +102,8 @@ export const videoConfig = {
 };
 
 // Helper function to generate room URLs
-export const generateRoomUrl = (type: 'coaching' | 'group' | 'client', sessionId?: string) => {
-  const id = sessionId || Date.now().toString();
+export const generateRoomUrl = (type: 'coaching' | 'group' | 'client' | 'game', sessionId?: string) => {
+  const id = (sessionId || Date.now().toString()).replace(/[^a-zA-Z0-9_-]/g, '');
   const template = videoConfig.roomTemplates[type];
   return template.replace('{sessionId}', id);
 };

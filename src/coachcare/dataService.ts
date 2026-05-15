@@ -40,9 +40,9 @@ const initializeMockData = () => {
         },
         status: 'active',
         coachId: 'coach-1',
-        joinDate: '2024-01-15T00:00:00Z',
-        lastSession: '2024-01-15T00:00:00Z',
-        nextSession: '2024-01-22T00:00:00Z',
+        joinDate: '2026-03-15T00:00:00Z',
+        lastSession: '2026-04-15T00:00:00Z',
+        nextSession: '2026-05-06T00:00:00Z',
         totalRevenue: 2500,
         sessionsCompleted: 8,
         notes: 'Excellent progress on leadership development',
@@ -51,8 +51,8 @@ const initializeMockData = () => {
           sessionReminders: true,
           marketingEmails: false
         },
-        createdAt: '2024-01-15T00:00:00Z',
-        updatedAt: '2024-01-15T00:00:00Z'
+        createdAt: '2026-03-15T00:00:00Z',
+        updatedAt: '2026-04-15T00:00:00Z'
       },
       {
         id: 'client-2',
@@ -70,9 +70,9 @@ const initializeMockData = () => {
         },
         status: 'active',
         coachId: 'coach-1',
-        joinDate: '2024-01-20T00:00:00Z',
-        lastSession: '2024-01-12T00:00:00Z',
-        nextSession: '2024-01-19T00:00:00Z',
+        joinDate: '2026-03-20T00:00:00Z',
+        lastSession: '2026-04-18T00:00:00Z',
+        nextSession: '2026-05-08T00:00:00Z',
         totalRevenue: 1800,
         sessionsCompleted: 5,
         notes: 'Working on career transition',
@@ -81,8 +81,8 @@ const initializeMockData = () => {
           sessionReminders: true,
           marketingEmails: true
         },
-        createdAt: '2024-01-20T00:00:00Z',
-        updatedAt: '2024-01-20T00:00:00Z'
+        createdAt: '2026-03-20T00:00:00Z',
+        updatedAt: '2026-04-18T00:00:00Z'
       }
     ],
     sessions: [
@@ -92,7 +92,7 @@ const initializeMockData = () => {
         coachId: 'coach-1',
         title: 'Leadership Development Session',
         type: 'follow-up',
-        date: '2024-01-22T00:00:00Z',
+        date: '2026-05-06T00:00:00Z',
         startTime: '10:00',
         endTime: '11:00',
         duration: 60,
@@ -103,8 +103,8 @@ const initializeMockData = () => {
         notes: 'Focus on communication skills',
         goals: ['Improve public speaking', 'Build team leadership'],
         actionItems: ['Practice presentation skills', 'Schedule team meeting'],
-        createdAt: '2024-01-15T00:00:00Z',
-        updatedAt: '2024-01-15T00:00:00Z'
+        createdAt: '2026-04-15T00:00:00Z',
+        updatedAt: '2026-04-15T00:00:00Z'
       },
       {
         id: 'session-2',
@@ -112,7 +112,7 @@ const initializeMockData = () => {
         coachId: 'coach-1',
         title: 'Career Transition Planning',
         type: 'progress-review',
-        date: '2024-01-19T00:00:00Z',
+        date: '2026-05-08T00:00:00Z',
         startTime: '14:00',
         endTime: '15:00',
         duration: 60,
@@ -122,8 +122,8 @@ const initializeMockData = () => {
         notes: 'Review progress on job search',
         goals: ['Complete career transition', 'Network effectively'],
         actionItems: ['Update resume', 'Attend networking event'],
-        createdAt: '2024-01-12T00:00:00Z',
-        updatedAt: '2024-01-12T00:00:00Z'
+        createdAt: '2026-04-18T00:00:00Z',
+        updatedAt: '2026-04-18T00:00:00Z'
       }
     ],
     goals: [
@@ -133,7 +133,7 @@ const initializeMockData = () => {
         title: 'Improve Leadership Communication',
         description: 'Develop confident and effective communication skills for leading teams',
         category: 'skill-development',
-        targetDate: '2024-03-01T00:00:00Z',
+        targetDate: '2026-06-30T00:00:00Z',
         progress: 75,
         status: 'in-progress',
         milestones: [
@@ -141,17 +141,17 @@ const initializeMockData = () => {
             id: 'milestone-1',
             title: 'Complete assertiveness training',
             completed: true,
-            dueDate: '2024-01-15T00:00:00Z'
+            dueDate: '2026-04-15T00:00:00Z'
           },
           {
             id: 'milestone-2',
             title: 'Lead team meeting',
             completed: false,
-            dueDate: '2024-02-15T00:00:00Z'
+            dueDate: '2026-05-20T00:00:00Z'
           }
         ],
-        createdAt: '2024-01-15T00:00:00Z',
-        updatedAt: '2024-01-15T00:00:00Z'
+        createdAt: '2026-04-01T00:00:00Z',
+        updatedAt: '2026-04-15T00:00:00Z'
       },
       {
         id: 'goal-2',
@@ -159,7 +159,7 @@ const initializeMockData = () => {
         title: 'Complete Career Transition',
         description: 'Successfully transition from current role to new industry',
         category: 'career',
-        targetDate: '2024-04-15T00:00:00Z',
+        targetDate: '2026-07-31T00:00:00Z',
         progress: 40,
         status: 'in-progress',
         milestones: [
@@ -167,17 +167,17 @@ const initializeMockData = () => {
             id: 'milestone-3',
             title: 'Research target companies',
             completed: true,
-            dueDate: '2024-01-10T00:00:00Z'
+            dueDate: '2026-04-10T00:00:00Z'
           },
           {
             id: 'milestone-4',
             title: 'Update resume and cover letter',
             completed: false,
-            dueDate: '2024-02-01T00:00:00Z'
+            dueDate: '2026-05-15T00:00:00Z'
           }
         ],
-        createdAt: '2024-01-20T00:00:00Z',
-        updatedAt: '2024-01-20T00:00:00Z'
+        createdAt: '2026-04-05T00:00:00Z',
+        updatedAt: '2026-04-18T00:00:00Z'
       }
     ],
     communications: [
@@ -187,11 +187,11 @@ const initializeMockData = () => {
         coachId: 'coach-1',
         type: 'email',
         subject: 'Session Reminder',
-        content: 'Hi John, this is a reminder for tomorrow\'s session at 10:00 AM. We\'ll be focusing on your leadership communication skills.',
+        content: 'Hi John, this is a reminder for your upcoming session at 10:00 AM. We\'ll be focusing on your leadership communication skills.',
         direction: 'outbound',
         status: 'sent',
-        createdAt: '2024-01-21T00:00:00Z',
-        updatedAt: '2024-01-21T00:00:00Z'
+        createdAt: '2026-05-05T00:00:00Z',
+        updatedAt: '2026-05-05T00:00:00Z'
       },
       {
         id: 'comm-2',
@@ -202,8 +202,8 @@ const initializeMockData = () => {
         content: 'Discussed progress on career transition and next steps for networking.',
         direction: 'outbound',
         status: 'sent',
-        createdAt: '2024-01-18T00:00:00Z',
-        updatedAt: '2024-01-18T00:00:00Z'
+        createdAt: '2026-04-25T00:00:00Z',
+        updatedAt: '2026-04-25T00:00:00Z'
       }
     ],
     notes: [
@@ -217,8 +217,8 @@ const initializeMockData = () => {
         type: 'session-notes',
         priority: 'high',
         isPrivate: false,
-        createdAt: '2024-01-15T00:00:00Z',
-        updatedAt: '2024-01-15T00:00:00Z'
+        createdAt: '2026-04-15T00:00:00Z',
+        updatedAt: '2026-04-15T00:00:00Z'
       },
       {
         id: 'note-2',
@@ -230,8 +230,8 @@ const initializeMockData = () => {
         type: 'progress-notes',
         priority: 'medium',
         isPrivate: false,
-        createdAt: '2024-01-12T00:00:00Z',
-        updatedAt: '2024-01-12T00:00:00Z'
+        createdAt: '2026-04-18T00:00:00Z',
+        updatedAt: '2026-04-18T00:00:00Z'
       }
     ],
     assessments: [],
@@ -912,6 +912,124 @@ class DataService {
         data: null
       };
     }
+  }
+
+  // Invoice Management
+  async getInvoices(filters?: { status?: Invoice['status']; clientId?: string }): Promise<{ success: boolean; data: Invoice[] }> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      let filteredInvoices = this.getRoleBasedData(mockData.invoices);
+
+      if (filters?.status) {
+        filteredInvoices = filteredInvoices.filter(invoice => invoice.status === filters.status);
+      }
+      if (filters?.clientId) {
+        filteredInvoices = filteredInvoices.filter(invoice => invoice.clientId === filters.clientId);
+      }
+
+      return {
+        success: true,
+        data: filteredInvoices
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: []
+      };
+    }
+  }
+
+  async addInvoice(invoiceData: Omit<Invoice, 'id' | 'createdAt' | 'updatedAt'>): Promise<{ success: boolean; data: Invoice | null }> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const newInvoice: Invoice = {
+        ...invoiceData,
+        id: `invoice-${Date.now()}`,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      mockData.invoices.push(newInvoice);
+      this.notifySubscribers();
+
+      return {
+        success: true,
+        data: newInvoice
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null
+      };
+    }
+  }
+
+  async updateInvoice(invoiceId: string, updates: Partial<Invoice>): Promise<{ success: boolean; data: Invoice | null }> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const invoiceIndex = mockData.invoices.findIndex(invoice => invoice.id === invoiceId);
+      if (invoiceIndex === -1) {
+        return {
+          success: false,
+          data: null
+        };
+      }
+
+      mockData.invoices[invoiceIndex] = {
+        ...mockData.invoices[invoiceIndex],
+        ...updates,
+        updatedAt: new Date().toISOString()
+      };
+
+      this.notifySubscribers();
+
+      return {
+        success: true,
+        data: mockData.invoices[invoiceIndex]
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null
+      };
+    }
+  }
+
+  async deleteInvoice(invoiceId: string): Promise<{ success: boolean; data: void | null }> {
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const invoiceIndex = mockData.invoices.findIndex(invoice => invoice.id === invoiceId);
+      if (invoiceIndex === -1) {
+        return {
+          success: false,
+          data: null
+        };
+      }
+
+      mockData.invoices.splice(invoiceIndex, 1);
+      this.notifySubscribers();
+
+      return {
+        success: true,
+        data: undefined
+      };
+    } catch (error) {
+      return {
+        success: false,
+        data: null
+      };
+    }
+  }
+
+  async markInvoicePaid(invoiceId: string): Promise<{ success: boolean; data: Invoice | null }> {
+    return this.updateInvoice(invoiceId, {
+      status: 'paid',
+      paidDate: new Date().toISOString()
+    });
   }
 
   // Dashboard Stats

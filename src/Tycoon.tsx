@@ -1,21 +1,13 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { 
+import {
   FaArrowLeft,
   FaGear,
   FaLightbulb,
   FaDice,
   FaHouse,
-  FaHotel,
-  FaGavel,
-  FaArrowRightArrowLeft,
-  FaMoneyBillWave,
-  FaXmark,
-  FaCheck,
-  FaCircleInfo,
-  FaPlay,
-  FaPause
+  FaXmark
 } from 'react-icons/fa6';
 
 // Types
@@ -80,7 +72,6 @@ const BOARD_SIZE = 40;
 const JAIL_POSITION = 10;
 const GO_TO_JAIL_POSITION = 30;
 const GO_MONEY = 200;
-const JAIL_BAIL = 50;
 
 const PROPERTY_COLORS = {
   'Brown': '#8B4513',
@@ -114,8 +105,8 @@ const THEME = {
   blue: '#3B82F6'
 };
 
-// Game Logic
-const createBoard = (): BoardTile[] => {
+// Game Logic - exported for multiplayer initializers
+export const createBoard = (): BoardTile[] => {
   return [
     { id: 'go', name: 'GO', type: 'corner', position: 0 },
     { id: 'mediterranean', name: 'Mediterranean Avenue', type: 'property', position: 1, color: 'Brown', price: 60, rent: [2, 10, 30, 90, 160, 250], houseCost: 50 },
@@ -176,35 +167,32 @@ const canBuyProperty = (player: Player): boolean => {
   return player.passGoCount >= 1 && !player.jailedBeforeFirstPass;
 };
 
-const getMonopolyProperties = (properties: Property[], color: string): Property[] => {
-  return properties.filter(p => p.color === color);
-};
-
-const canBuildHouses = (properties: Property[], color: string): boolean => {
-  const monopolyProps = getMonopolyProperties(properties, color);
-  const allOwned = monopolyProps.every(p => p.owner === monopolyProps[0].owner);
-  const evenBuilding = monopolyProps.every(p => p.houses === monopolyProps[0].houses || p.houses === monopolyProps[0].houses + 1);
-  return allOwned && evenBuilding;
-};
-
 // AI Logic
 const getAIAction = (player: Player, gameState: GameState, difficulty: any): string => {
   const currentTile = getPropertyByPosition(gameState.properties, player.position);
-  
+
   if (!currentTile || currentTile.owner) return 'end-turn';
-  
+
   if (!canBuyProperty(player)) return 'end-turn';
-  
-  const random = Math.random();
-  if (random < difficulty.aggression) {
+
+  // AI decision based on aggression and risk tolerance
+  const propertyValue = currentTile.price;
+  const playerMoney = player.money;
+  const moneyRatio = playerMoney / propertyValue;
+
+  // Easy: Only buys if they have lots of money (low risk tolerance)
+  // Tough: Buys even if it leaves them with little money (high risk tolerance)
+  const riskThreshold = 1.5 - (difficulty.riskTolerance * 1.0); // Tough: 0.5, Easy: 1.3
+
+  if (moneyRatio > riskThreshold || Math.random() < difficulty.aggression) {
     return 'buy';
   }
-  
+
   return 'end-turn';
 };
 
 // Board Tile Component
-const BoardTile: React.FC<{
+const BoardSpace: React.FC<{
   tile: BoardTile;
   property?: Property;
   players: Player[];
@@ -237,7 +225,7 @@ const BoardTile: React.FC<{
       <div className="text-xs font-bold text-ivory mb-1">
         {tile.name}
       </div>
-      
+
       {property && (
         <div className="text-xs text-ivory/80">
           {property.owner && (
@@ -255,7 +243,7 @@ const BoardTile: React.FC<{
           )}
         </div>
       )}
-      
+
       {playersOnTile.length > 0 && (
         <div className="absolute -top-1 -right-1 flex space-x-1">
           {playersOnTile.map(player => (
@@ -271,65 +259,27 @@ const BoardTile: React.FC<{
   );
 };
 
-// Main Tycoon Component
-const Tycoon: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>({
+interface TycoonProps {
+  isMultiplayer?: boolean;
+  syncedGameState?: unknown;
+  onUpdateGameState?: (state: unknown) => void;
+  onBack?: () => void;
+  playerIndex?: number;
+  isSpectator?: boolean;
+}
+
+const getInitialTycoonState = (): GameState => {
+  const board = createBoard();
+  return {
     players: [
-      {
-        id: 'hero',
-        name: 'You',
-        position: 0,
-        money: 1500,
-        properties: [],
-        getOutOfJailCards: 0,
-        isInJail: false,
-        jailTurns: 0,
-        passGoCount: 0,
-        jailedBeforeFirstPass: false,
-        isAI: false,
-        color: THEME.champagne
-      },
-      {
-        id: 'ai1',
-        name: 'AI Player 1',
-        position: 0,
-        money: 1500,
-        properties: [],
-        getOutOfJailCards: 0,
-        isInJail: false,
-        jailTurns: 0,
-        passGoCount: 0,
-        jailedBeforeFirstPass: false,
-        isAI: true,
-        color: THEME.emerald
-      },
-      {
-        id: 'ai2',
-        name: 'AI Player 2',
-        position: 0,
-        money: 1500,
-        properties: [],
-        getOutOfJailCards: 0,
-        isInJail: false,
-        jailTurns: 0,
-        passGoCount: 0,
-        jailedBeforeFirstPass: false,
-        isAI: true,
-        color: THEME.blue
-      }
+      { id: 'hero', name: 'You', position: 0, money: 1500, properties: [], getOutOfJailCards: 0, isInJail: false, jailTurns: 0, passGoCount: 0, jailedBeforeFirstPass: false, isAI: false, color: THEME.champagne },
+      { id: 'ai1', name: 'AI Player 1', position: 0, money: 1500, properties: [], getOutOfJailCards: 0, isInJail: false, jailTurns: 0, passGoCount: 0, jailedBeforeFirstPass: false, isAI: true, color: THEME.emerald },
+      { id: 'ai2', name: 'AI Player 2', position: 0, money: 1500, properties: [], getOutOfJailCards: 0, isInJail: false, jailTurns: 0, passGoCount: 0, jailedBeforeFirstPass: false, isAI: true, color: THEME.blue }
     ],
     currentPlayer: 0,
-    properties: createBoard().filter(tile => tile.type === 'property').map(tile => ({
-      id: tile.id,
-      name: tile.name,
-      color: tile.color!,
-      price: tile.price!,
-      rent: tile.rent!,
-      houseCost: tile.houseCost!,
-      position: tile.position,
-      owner: null,
-      houses: 0,
-      isMortgaged: false
+    properties: board.filter((t: BoardTile) => t.type === 'property').map((tile) => ({
+      id: tile.id, name: tile.name, color: tile.color!, price: tile.price!, rent: tile.rent!, houseCost: tile.houseCost!,
+      position: tile.position, owner: null, houses: 0, isMortgaged: false
     })),
     gamePhase: 'rolling',
     dice: [0, 0],
@@ -338,11 +288,41 @@ const Tycoon: React.FC = () => {
     auctionBids: {},
     auctionTimer: 0,
     tradeProposal: null,
-    gameBoard: createBoard(),
+    gameBoard: board,
     chanceDeck: [],
     chestDeck: [],
     winner: null
-  });
+  };
+};
+
+// Main Tycoon Component
+const Tycoon: React.FC<TycoonProps> = ({
+  isMultiplayer = false,
+  syncedGameState,
+  onUpdateGameState,
+  onBack,
+  playerIndex = 0,
+  isSpectator = false
+}) => {
+  const [localState, setLocalState] = useState<GameState>(getInitialTycoonState);
+
+  const gameState = (isMultiplayer && syncedGameState ? syncedGameState : localState) as GameState;
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+  const setGameState = useCallback((updater: GameState | ((prev: GameState) => GameState)) => {
+    if (isMultiplayer && onUpdateGameState) {
+      const next = typeof updater === 'function' ? updater(gameStateRef.current) : updater;
+      onUpdateGameState(next);
+      return;
+    }
+
+    setLocalState(updater as React.SetStateAction<GameState>);
+  }, [isMultiplayer, onUpdateGameState]);
+
+  const isHeroTurn = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : (gameState.players[gameState.currentPlayer]?.id === 'hero');
+  const canInteract = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : true;
 
   const [aiDifficulty, setAiDifficulty] = useState(AI_DIFFICULTIES[1]);
   const [aiPlayerCount, setAiPlayerCount] = useState<number>(2); // 2 AI players by default
@@ -354,7 +334,7 @@ const Tycoon: React.FC = () => {
   const createAIPlayers = useCallback((count: number) => {
     const aiPlayers = [];
     const colors = [THEME.emerald, THEME.blue, THEME.gold, THEME.red];
-    
+
     for (let i = 0; i < count; i++) {
       aiPlayers.push({
         id: `ai${i + 1}`,
@@ -374,8 +354,9 @@ const Tycoon: React.FC = () => {
     return aiPlayers;
   }, []);
 
-  // Update game state when AI player count changes
+  // Update game state when AI player count changes (skip in multiplayer)
   useEffect(() => {
+    if (isMultiplayer) return;
     const aiPlayers = createAIPlayers(aiPlayerCount);
     setGameState(prev => ({
       ...prev,
@@ -384,13 +365,63 @@ const Tycoon: React.FC = () => {
         ...aiPlayers
       ]
     }));
-  }, [aiPlayerCount, createAIPlayers]);
+  }, [isMultiplayer, aiPlayerCount, createAIPlayers, setGameState]);
+
+  const resetGame = useCallback(() => {
+    const aiPlayers = createAIPlayers(aiPlayerCount);
+    const board = createBoard();
+    setGameState({
+      players: [
+        {
+          id: 'hero',
+          name: 'You',
+          position: 0,
+          money: 1500,
+          properties: [],
+          getOutOfJailCards: 0,
+          isInJail: false,
+          jailTurns: 0,
+          passGoCount: 0,
+          jailedBeforeFirstPass: false,
+          isAI: false,
+          color: THEME.champagne
+        },
+        ...aiPlayers
+      ],
+      currentPlayer: 0,
+      properties: board.filter((t: BoardTile) => t.type === 'property').map((tile) => ({
+        id: tile.id,
+        name: tile.name,
+        color: tile.color!,
+        price: tile.price!,
+        rent: tile.rent!,
+        houseCost: tile.houseCost!,
+        position: tile.position,
+        owner: null,
+        houses: 0,
+        isMortgaged: false
+      })),
+      gamePhase: 'rolling',
+      dice: [0, 0],
+      doublesCount: 0,
+      auctionProperty: null,
+      auctionBids: {},
+      auctionTimer: 0,
+      tradeProposal: null,
+      gameBoard: board,
+      chanceDeck: [],
+      chestDeck: [],
+      winner: null
+    });
+    setIsAITurn(false);
+  }, [aiPlayerCount, createAIPlayers, setGameState]);
 
   const currentPlayer = gameState.players[gameState.currentPlayer];
-  const isHeroTurn = currentPlayer?.id === 'hero';
 
   const rollDiceAction = useCallback(() => {
-    if (gameState.gamePhase !== 'rolling' || !isHeroTurn) return;
+    const activePlayer = gameState.players[gameState.currentPlayer];
+    const currentPlayerCanAct = activePlayer?.isAI || (isHeroTurn && canInteract);
+    if (gameState.gamePhase !== 'rolling' || !currentPlayerCanAct) return;
 
     const newDice = rollDice();
     const isDoublesRoll = isDoubles(newDice);
@@ -398,18 +429,19 @@ const Tycoon: React.FC = () => {
 
     setGameState(prev => {
       const newPlayers = [...prev.players];
-      const player = newPlayers[prev.currentPlayer];
-      
+      const player = { ...newPlayers[prev.currentPlayer] };
+      const oldPosition = player.position;
+
       // Move player
-      const newPosition = (player.position + newDice[0] + newDice[1]) % BOARD_SIZE;
+      const newPosition = (oldPosition + newDice[0] + newDice[1]) % BOARD_SIZE;
       player.position = newPosition;
-      
+
       // Check if passed GO
-      if (newPosition < player.position || (player.position > newPosition && newPosition < 10)) {
+      if (newPosition < oldPosition) {
         player.passGoCount++;
         player.money += GO_MONEY;
       }
-      
+
       // Check for Go To Jail
       if (newPosition === GO_TO_JAIL_POSITION) {
         player.position = JAIL_POSITION;
@@ -419,7 +451,7 @@ const Tycoon: React.FC = () => {
           player.jailedBeforeFirstPass = true;
         }
       }
-      
+
       // Check for three doubles
       if (newDoublesCount >= 3) {
         player.position = JAIL_POSITION;
@@ -430,6 +462,8 @@ const Tycoon: React.FC = () => {
         }
       }
 
+      newPlayers[prev.currentPlayer] = player;
+
       return {
         ...prev,
         players: newPlayers,
@@ -438,25 +472,30 @@ const Tycoon: React.FC = () => {
         gamePhase: 'buying'
       };
     });
-  }, [gameState.gamePhase, gameState.doublesCount, isHeroTurn]);
+  }, [gameState.gamePhase, gameState.players, gameState.currentPlayer, gameState.doublesCount, isHeroTurn, canInteract, setGameState]);
 
   const buyProperty = useCallback(() => {
-    if (gameState.gamePhase !== 'buying' || !isHeroTurn) return;
+    const activePlayer = gameState.players[gameState.currentPlayer];
+    const currentPlayerCanAct = activePlayer?.isAI || (isHeroTurn && canInteract);
+    if (gameState.gamePhase !== 'buying' || !currentPlayerCanAct || !activePlayer) return;
 
-    const currentTile = getPropertyByPosition(gameState.properties, currentPlayer.position);
-    if (!currentTile || currentTile.owner || !canBuyProperty(currentPlayer)) return;
+    const currentTile = getPropertyByPosition(gameState.properties, activePlayer.position);
+    if (!currentTile || currentTile.owner || !canBuyProperty(activePlayer)) return;
 
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const newProperties = [...prev.properties];
-      
-      const player = newPlayers[prev.currentPlayer];
-      const property = newProperties.find(p => p.id === currentTile.id);
-      
+
+      const player = { ...newPlayers[prev.currentPlayer] };
+      const propertyIndex = newProperties.findIndex(p => p.id === currentTile.id);
+      const property = propertyIndex >= 0 ? { ...newProperties[propertyIndex] } : null;
+
       if (property && player.money >= property.price) {
         player.money -= property.price;
-        player.properties.push(property.id);
+        player.properties = [...player.properties, property.id];
         property.owner = player.id;
+        newPlayers[prev.currentPlayer] = player;
+        newProperties[propertyIndex] = property;
       }
 
       return {
@@ -466,12 +505,13 @@ const Tycoon: React.FC = () => {
         gamePhase: 'rolling'
       };
     });
-  }, [gameState.gamePhase, currentPlayer, isHeroTurn]);
+  }, [gameState.gamePhase, gameState.players, gameState.currentPlayer, gameState.properties, isHeroTurn, canInteract, setGameState]);
 
   const endTurn = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
       let nextPlayer = (prev.currentPlayer + 1) % prev.players.length;
-      
+
       // Skip eliminated players
       while (prev.players[nextPlayer].money < 0 && nextPlayer !== prev.currentPlayer) {
         nextPlayer = (nextPlayer + 1) % prev.players.length;
@@ -485,38 +525,43 @@ const Tycoon: React.FC = () => {
         doublesCount: 0
       };
     });
-  }, []);
+  }, [isMultiplayer, canInteract, setGameState]);
 
-  // AI turn handling
+  // AI turn handling (skip in multiplayer - all players are human)
   useEffect(() => {
-    if (gameState.gamePhase === 'rolling' && currentPlayer?.isAI && !isAITurn) {
+    if (isMultiplayer || !currentPlayer?.isAI) return;
+
+    if (gameState.gamePhase === 'rolling') {
       setIsAITurn(true);
-      setTimeout(() => {
+      const timer = window.setTimeout(() => {
         rollDiceAction();
-        setTimeout(() => {
-          const aiAction = getAIAction(currentPlayer, gameState, aiDifficulty);
-          if (aiAction === 'buy') {
-            buyProperty();
-          }
-          setTimeout(() => {
-            endTurn();
-            setIsAITurn(false);
-          }, 1000);
-        }, 1000);
-      }, 1000);
+      }, 800);
+      return () => window.clearTimeout(timer);
     }
-  }, [gameState.gamePhase, currentPlayer, isAITurn, aiDifficulty, rollDiceAction, buyProperty, endTurn]);
+
+    if (gameState.gamePhase === 'buying') {
+      const timer = window.setTimeout(() => {
+        const aiAction = getAIAction(currentPlayer, gameState, aiDifficulty);
+        if (aiAction === 'buy') {
+          buyProperty();
+        }
+        endTurn();
+        setIsAITurn(false);
+      }, 800);
+      return () => window.clearTimeout(timer);
+    }
+  }, [isMultiplayer, gameState.gamePhase, gameState, currentPlayer, aiDifficulty, rollDiceAction, buyProperty, endTurn]);
 
   const renderBoard = () => {
     const boardTiles = [];
-    
+
     for (let i = 0; i < BOARD_SIZE; i++) {
       const tile = gameState.gameBoard.find(t => t.position === i);
       const property = gameState.properties.find(p => p.position === i);
-      
+
       if (tile) {
         boardTiles.push(
-          <BoardTile
+          <BoardSpace
             key={tile.id}
             tile={tile}
             property={property}
@@ -531,34 +576,46 @@ const Tycoon: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx to-onyxLight text-ivory">
+    <div className="game-shell">
       {/* Header */}
-      <div className="bg-onyxLight border-b border-champagne/20 p-4">
-        <div className="flex justify-between items-center">
+      <div className="game-header">
+        <div className="game-header-inner">
           <div className="flex items-center space-x-4">
-            <Link
-              to="/hub"
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
-            >
-              <FaArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-3xl font-bold text-champagne">Tycoon</h1>
+            {isMultiplayer && onBack ? (
+              <button
+                onClick={onBack}
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/hub"
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            <h1 className="text-3xl font-bold text-champagne">
+              Tycoon {isMultiplayer && '(Multiplayer)'}
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             {showHints && (
               <button
-                onClick={() => {/* TODO: Show hint */}}
-                className="p-2 rounded-lg bg-emerald text-white hover:bg-emeraldLight transition-colors"
+                onClick={() => {}}
+                className="game-icon-button bg-emerald text-white"
                 disabled={isAITurn}
+                title="Hints coming soon"
               >
                 <FaLightbulb className="w-5 h-5" />
               </button>
             )}
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
+              className="game-icon-button"
             >
-                              <FaGear className="w-5 h-5" />
+              <FaGear className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -566,8 +623,8 @@ const Tycoon: React.FC = () => {
 
       <div className="p-6">
         {/* Game Info */}
-        <div className="bg-onyxLight rounded-lg p-4 mb-6">
-          <div className="flex justify-between items-center">
+        <div className="game-panel mb-6">
+          <div className="game-stat-grid">
             <div>
               <h3 className="text-lg font-semibold text-champagne">Current Player</h3>
               <p className="text-2xl font-bold text-ivory capitalize">
@@ -592,7 +649,7 @@ const Tycoon: React.FC = () => {
         {/* Dice */}
         {gameState.dice[0] > 0 && (
           <div className="flex justify-center mb-6">
-            <div className="bg-onyxLight rounded-lg p-4">
+            <div className="game-panel">
               <h3 className="text-lg font-semibold text-champagne mb-2 text-center">Dice</h3>
               <div className="flex space-x-4">
                 {gameState.dice.map((die, index) => (
@@ -615,12 +672,12 @@ const Tycoon: React.FC = () => {
 
         {/* Action Controls */}
         {isHeroTurn && gameState.gamePhase === 'rolling' && (
-          <div className="bg-onyxLight rounded-lg p-6">
+          <div className="game-panel">
             <h3 className="text-lg font-semibold text-champagne mb-4">Your Turn</h3>
             <div className="flex justify-center">
               <button
                 onClick={rollDiceAction}
-                className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors flex items-center space-x-2"
+                className="game-primary-action"
               >
                 <FaDice className="w-5 h-5" />
                 <span>Roll Dice</span>
@@ -630,19 +687,19 @@ const Tycoon: React.FC = () => {
         )}
 
         {isHeroTurn && gameState.gamePhase === 'buying' && (
-          <div className="bg-onyxLight rounded-lg p-6">
+          <div className="game-panel">
             <h3 className="text-lg font-semibold text-champagne mb-4">Property Action</h3>
             <div className="flex justify-center space-x-4">
               <button
                 onClick={buyProperty}
-                className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                className="game-success-action"
                 disabled={!canBuyProperty(currentPlayer)}
               >
                 Buy Property
               </button>
               <button
                 onClick={endTurn}
-                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                className="game-secondary-action"
               >
                 End Turn
               </button>
@@ -665,7 +722,7 @@ const Tycoon: React.FC = () => {
         {/* Players */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {gameState.players.map((player, index) => (
-            <div key={player.id} className="bg-onyxLight rounded-lg p-4">
+            <div key={player.id} className="game-panel">
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`font-semibold ${player.id === 'hero' ? 'text-champagne' : 'text-ivory'}`}>
                   {player.name} {player.id === 'hero' && '(You)'}
@@ -689,8 +746,8 @@ const Tycoon: React.FC = () => {
         {/* Game Controls */}
         <div className="flex justify-center space-x-4 mb-6">
           <button
-            onClick={() => {/* TODO: New game */}}
-            className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors"
+            onClick={resetGame}
+            className="game-primary-action"
           >
             New Game
           </button>
@@ -723,7 +780,7 @@ const Tycoon: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   AI Difficulty
                 </label>
-                <select 
+                <select
                   value={aiDifficulty.name}
                   onChange={(e) => {
                     const difficulty = AI_DIFFICULTIES.find(d => d.name === e.target.value);
@@ -742,7 +799,7 @@ const Tycoon: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   Number of AI Players
                 </label>
-                <select 
+                <select
                   className="w-full bg-onyx text-ivory rounded-lg p-2 border border-champagne/20"
                   value={aiPlayerCount}
                   onChange={(e) => setAiPlayerCount(parseInt(e.target.value))}
@@ -757,9 +814,9 @@ const Tycoon: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   Show Hints
                 </label>
-                <input 
-                  type="checkbox" 
-                  checked={showHints} 
+                <input
+                  type="checkbox"
+                  checked={showHints}
                   onChange={(e) => setShowHints(e.target.checked)}
                   className="mr-2"
                 />

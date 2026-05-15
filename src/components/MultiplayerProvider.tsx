@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { getFirestore, doc, setDoc, onSnapshot, collection, addDoc, serverTimestamp, query, orderBy, limit, getDoc } from 'firebase/firestore';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
+import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection, addDoc, query, orderBy, limit, getDoc, serverTimestamp } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 import { firebaseConfig } from '../firebaseConfig';
+import { useRoomChat } from '../hooks/use-room-chat';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -21,7 +22,7 @@ interface Player {
 
 interface GameRoom {
   id: string;
-  gameType: 'blackjack' | 'checkers' | 'tycoon' | 'spades' | '5000';
+  gameType: 'blackjack' | 'checkers' | 'tycoon' | 'spades' | '5000' | 'holdem';
   players: Player[];
   maxPlayers: number;
   gameState: any;
@@ -34,6 +35,9 @@ interface GameRoom {
     aiDifficulty: string;
     timeLimit?: number;
     customRules?: any;
+    allowSpectators?: boolean;
+    maxSpectators?: number;
+    humanOnly?: boolean;
   };
 }
 
@@ -41,9 +45,14 @@ interface MultiplayerContextType {
   // Room Management
   currentRoom: GameRoom | null;
   availableRooms: GameRoom[];
+  viewingRooms: GameRoom[];
   createRoom: (gameType: string, settings: any) => Promise<string>;
   joinRoom: (roomId: string, password?: string) => Promise<boolean>;
+  joinAsSpectator: (roomId: string, password?: string) => Promise<boolean>;
+  startGame: (initialGameState: any) => Promise<void>;
   leaveRoom: () => void;
+  leaveSpectator: () => void;
+  isSpectator: boolean;
   
   // Player Management
   currentPlayer: Player | null;
@@ -57,13 +66,15 @@ interface MultiplayerContextType {
   // Chat
   messages: ChatMessage[];
   sendMessage: (message: string) => void;
+  sendSystemMessage: (message: string) => void;
   
   // Connection
   isConnected: boolean;
   connectionStatus: 'connecting' | 'connected' | 'disconnected' | 'error';
 }
 
-interface ChatMessage {
+/** Chat message shape for UI - maps from canonical MessageRecord */
+export interface ChatMessage {
   id: string;
   playerId: string;
   playerName: string;
@@ -86,14 +97,39 @@ interface MultiplayerProviderProps {
   children: React.ReactNode;
 }
 
+/** Map canonical MessageRecord to ChatMessage for UI compatibility */
+function toChatMessage(record: { id: string; senderId: string; senderName?: string; kind: string; content: string; createdAt: Date }): ChatMessage {
+  const type = record.kind === 'text' ? 'chat' : (record.kind as 'system' | 'game');
+  return {
+    id: record.id,
+    playerId: record.senderId,
+    playerName: record.senderName ?? 'Unknown',
+    message: record.content,
+    timestamp: record.createdAt,
+    type: type === 'chat' || type === 'system' || type === 'game' ? type : 'chat',
+  };
+}
+
 export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ children }) => {
   const [currentRoom, setCurrentRoom] = useState<GameRoom | null>(null);
   const [availableRooms, setAvailableRooms] = useState<GameRoom[]>([]);
+  const [viewingRooms, setViewingRooms] = useState<GameRoom[]>([]);
   const [currentPlayer, setCurrentPlayer] = useState<Player | null>(null);
   const [gameState, setGameState] = useState<any>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isConnected, setIsConnected] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('disconnected');
+  const [isSpectator, setIsSpectator] = useState(false);
+
+  const roomChat = useRoomChat({
+    roomId: currentRoom?.id ?? null,
+    sender: currentPlayer ? { id: currentPlayer.id, name: currentPlayer.name } : null,
+    messageLimit: 100,
+  });
+
+  const messages = useMemo(
+    () => roomChat.messages.map(toChatMessage),
+    [roomChat.messages]
+  );
 
   // Generate unique player ID
   const generatePlayerId = useCallback(() => {
@@ -128,29 +164,39 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
 
     const unsubscribe = onSnapshot(roomsQuery, (snapshot) => {
       const rooms: GameRoom[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        if (!data.isStarted && data.players.length < data.maxPlayers) {
-          rooms.push({
-            id: doc.id,
-            gameType: data.gameType || 'blackjack',
-            players: data.players || [],
-            maxPlayers: data.maxPlayers || 4,
-            gameState: data.gameState || {},
-            isStarted: data.isStarted || false,
-            isPrivate: data.isPrivate || false,
-            password: data.password,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date(),
-            settings: data.settings || {
-              aiDifficulty: 'Standard',
-              timeLimit: undefined,
-              customRules: undefined
-            }
-          });
+      const viewing: GameRoom[] = [];
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        const room: GameRoom = {
+          id: docSnap.id,
+          gameType: data.gameType || 'blackjack',
+          players: data.players || [],
+          maxPlayers: data.maxPlayers || 4,
+          gameState: data.gameState || {},
+          isStarted: data.isStarted || false,
+          isPrivate: data.isPrivate || false,
+          password: data.password,
+          createdAt: data.createdAt?.toDate() || new Date(),
+          updatedAt: data.updatedAt?.toDate() || new Date(),
+          settings: data.settings || {
+            aiDifficulty: 'Standard',
+            timeLimit: null,
+            customRules: null,
+            allowSpectators: true,
+            maxSpectators: 20,
+            humanOnly: true
+          }
+        };
+        if (!data.deleted) {
+          if (!data.isStarted && data.players.length < data.maxPlayers) {
+            rooms.push(room);
+          } else if (data.isStarted && (data.settings?.allowSpectators !== false)) {
+            viewing.push(room);
+          }
         }
       });
       setAvailableRooms(rooms);
+      setViewingRooms(viewing);
     });
 
     return () => unsubscribe();
@@ -177,45 +223,25 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
           updatedAt: data.updatedAt?.toDate() || new Date(),
           settings: data.settings || {
             aiDifficulty: 'Standard',
-            timeLimit: undefined,
-            customRules: undefined
+            timeLimit: null,
+            customRules: null,
+            allowSpectators: true,
+            maxSpectators: 20,
+            humanOnly: true
           }
         });
         setGameState(data.gameState);
+        if (currentPlayer) {
+          const syncedPlayer = (data.players || []).find((p: Player) => p.id === currentPlayer.id);
+          if (syncedPlayer) {
+            setCurrentPlayer(prev => prev ? { ...prev, ...syncedPlayer } : prev);
+          }
+        }
       }
     });
 
     return () => unsubscribe();
-  }, [currentRoom?.id]);
-
-  // Listen for chat messages
-  useEffect(() => {
-    if (!currentRoom) return;
-
-    const messagesQuery = query(
-      collection(db, 'gameRooms', currentRoom.id, 'messages'),
-      orderBy('timestamp', 'desc'),
-      limit(100)
-    );
-
-    const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-      const newMessages: ChatMessage[] = [];
-      snapshot.forEach((doc) => {
-        const data = doc.data();
-        newMessages.push({
-          id: doc.id,
-          playerId: data.playerId || '',
-          playerName: data.playerName || 'Unknown',
-          message: data.message || '',
-          timestamp: data.timestamp?.toDate() || new Date(),
-          type: data.type || 'chat'
-        });
-      });
-      setMessages(newMessages.reverse());
-    });
-
-    return () => unsubscribe();
-  }, [currentRoom?.id]);
+  }, [currentRoom?.id, currentPlayer]);
 
   // Create a new room
   const createRoom = useCallback(async (gameType: string, settings: any): Promise<string> => {
@@ -234,18 +260,22 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       gameState: null,
       isStarted: false,
       isPrivate: settings.isPrivate || false,
-      password: settings.password,
+      password: settings.password ?? null,
       createdAt: new Date(),
       updatedAt: new Date(),
       settings: {
         aiDifficulty: settings.aiDifficulty || 'Standard',
-        timeLimit: settings.timeLimit,
-        customRules: settings.customRules
+        timeLimit: settings.timeLimit ?? null,
+        customRules: settings.customRules ?? null,
+        allowSpectators: settings.allowSpectators !== false,
+        maxSpectators: settings.maxSpectators ?? 20,
+        humanOnly: settings.humanOnly !== false
       }
     };
 
     await setDoc(doc(db, 'gameRooms', roomId), room);
     setCurrentRoom(room);
+    setCurrentPlayer(prev => prev ? { ...prev, isHost: true, isReady: true } : prev);
     setIsConnected(true);
     setConnectionStatus('connected');
 
@@ -269,19 +299,19 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       throw new Error('Incorrect password');
     }
 
-    if (roomData.players.length >= roomData.maxPlayers) {
-      throw new Error('Room is full');
-    }
-
     if (roomData.isStarted) {
       throw new Error('Game already started');
     }
 
-    // Add player to room
-    const updatedPlayers = [...roomData.players, {
-      ...currentPlayer,
-      isReady: false
-    }];
+    const existingPlayer = roomData.players.find((p: Player) => p.id === currentPlayer.id);
+    if (!existingPlayer && roomData.players.length >= roomData.maxPlayers) {
+      throw new Error('Room is full');
+    }
+    const updatedPlayers = existingPlayer
+      ? roomData.players.map((p: Player) =>
+          p.id === currentPlayer.id ? { ...p, ...currentPlayer, isOnline: true } : p
+        )
+      : [...roomData.players, { ...currentPlayer, isReady: false }];
 
     await setDoc(roomRef, {
       ...roomData,
@@ -294,15 +324,103 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       players: updatedPlayers,
       updatedAt: new Date()
     });
+    setCurrentPlayer(prev => prev ? { ...prev, isHost: !!existingPlayer?.isHost, isReady: !!existingPlayer?.isReady } : prev);
     setIsConnected(true);
     setConnectionStatus('connected');
 
     return true;
   }, [currentPlayer]);
 
+  // Join as spectator (watch in-progress game)
+  const joinAsSpectator = useCallback(async (roomId: string, password?: string): Promise<boolean> => {
+    if (!currentPlayer) throw new Error('Player not initialized');
+
+    const roomRef = doc(db, 'gameRooms', roomId);
+    const roomDoc = await getDoc(roomRef);
+
+    if (!roomDoc.exists()) {
+      throw new Error('Room not found');
+    }
+
+    const roomData = roomDoc.data();
+    if (roomData.deleted) throw new Error('Room not found');
+
+    if (roomData.isPrivate && roomData.password !== password) {
+      throw new Error('Incorrect password');
+    }
+
+    if (!roomData.isStarted) {
+      throw new Error('Game has not started yet. Join as a player instead.');
+    }
+
+    if (roomData.settings?.allowSpectators === false) {
+      throw new Error('This room does not allow spectators');
+    }
+
+    const room: GameRoom = {
+      id: roomDoc.id,
+      gameType: roomData.gameType || 'blackjack',
+      players: roomData.players || [],
+      maxPlayers: roomData.maxPlayers || 4,
+      gameState: roomData.gameState || {},
+      isStarted: true,
+      isPrivate: roomData.isPrivate || false,
+      password: roomData.password,
+      createdAt: roomData.createdAt?.toDate() || new Date(),
+      updatedAt: roomData.updatedAt?.toDate() || new Date(),
+      settings: roomData.settings || {
+        aiDifficulty: 'Standard',
+        timeLimit: null,
+        customRules: null,
+        allowSpectators: true,
+        maxSpectators: 20,
+        humanOnly: true
+      }
+    };
+
+    setCurrentRoom(room);
+    setGameState(roomData.gameState);
+    setIsSpectator(true);
+    setIsConnected(true);
+    setConnectionStatus('connected');
+
+    return true;
+  }, [currentPlayer]);
+
+  // Start game (host only) - marks room as started and sets initial game state
+  const startGame = useCallback(async (initialGameState: any) => {
+    if (!currentRoom || !currentPlayer || isSpectator) return;
+    const roomPlayer = currentRoom.players.find((p) => p.id === currentPlayer.id);
+    if (!roomPlayer?.isHost) return;
+
+    const roomRef = doc(db, 'gameRooms', currentRoom.id);
+    await updateDoc(roomRef, {
+      isStarted: true,
+      gameState: initialGameState,
+      updatedAt: new Date()
+    });
+
+    roomChat.sendSystemMessage('Game started!');
+    setCurrentRoom((prev) => prev ? { ...prev, isStarted: true, gameState: initialGameState } : null);
+    setGameState(initialGameState);
+  }, [currentRoom, currentPlayer, isSpectator, roomChat]);
+
+  // Leave spectator mode
+  const leaveSpectator = useCallback(() => {
+    setCurrentRoom(null);
+    setGameState(null);
+    setIsSpectator(false);
+    setIsConnected(false);
+    setConnectionStatus('disconnected');
+  }, []);
+
   // Leave current room
   const leaveRoom = useCallback(async () => {
     if (!currentRoom || !currentPlayer) return;
+    if (isSpectator) {
+      leaveSpectator();
+      return;
+    }
 
     const roomRef = doc(db, 'gameRooms', currentRoom.id);
     const updatedPlayers = currentRoom.players.filter(p => p.id !== currentPlayer.id);
@@ -311,20 +429,22 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       // Delete room if empty
       await setDoc(roomRef, { deleted: true });
     } else {
+      const hasHost = updatedPlayers.some(p => p.isHost);
+      const playersWithHost = hasHost
+        ? updatedPlayers
+        : updatedPlayers.map((p, index) => ({ ...p, isHost: index === 0 }));
       // Update room
-      await setDoc(roomRef, {
-        ...currentRoom,
-        players: updatedPlayers,
+      await updateDoc(roomRef, {
+        players: playersWithHost,
         updatedAt: new Date()
       });
     }
 
     setCurrentRoom(null);
     setGameState(null);
-    setMessages([]);
     setIsConnected(false);
     setConnectionStatus('disconnected');
-  }, [currentRoom, currentPlayer]);
+  }, [currentRoom, currentPlayer, isSpectator, leaveSpectator]);
 
   // Update player status
   const updatePlayerStatus = useCallback(async (status: Partial<Player>) => {
@@ -335,8 +455,7 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       p.id === currentPlayer.id ? { ...p, ...status } : p
     );
 
-    await setDoc(roomRef, {
-      ...currentRoom,
+    await updateDoc(roomRef, {
       players: updatedPlayers,
       updatedAt: new Date()
     });
@@ -346,19 +465,18 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
 
   // Update game state
   const updateGameState = useCallback(async (newState: any) => {
-    if (!currentRoom) return;
+    if (!currentRoom || isSpectator) return;
 
     const roomRef = doc(db, 'gameRooms', currentRoom.id);
-    await setDoc(roomRef, {
-      ...currentRoom,
+    await updateDoc(roomRef, {
       gameState: newState,
       updatedAt: new Date()
     });
-  }, [currentRoom]);
+  }, [currentRoom, isSpectator]);
 
   // Send game action
   const sendGameAction = useCallback(async (action: string, data: any) => {
-    if (!currentRoom || !currentPlayer) return;
+    if (!currentRoom || !currentPlayer || isSpectator) return;
 
     await addDoc(collection(db, 'gameRooms', currentRoom.id, 'actions'), {
       playerId: currentPlayer.id,
@@ -367,27 +485,35 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       data,
       timestamp: serverTimestamp()
     });
-  }, [currentRoom, currentPlayer]);
+  }, [currentRoom, currentPlayer, isSpectator]);
 
-  // Send chat message
+  // Send chat message (delegates to messaging layer)
   const sendMessage = useCallback(async (message: string) => {
-    if (!currentRoom || !currentPlayer) return;
+    const result = await roomChat.sendMessage(message, 'text');
+    if (!result.success && result.error) {
+      console.warn('[MultiplayerProvider] sendMessage failed:', result.error);
+    }
+  }, [roomChat]);
 
-    await addDoc(collection(db, 'gameRooms', currentRoom.id, 'messages'), {
-      playerId: currentPlayer.id,
-      playerName: currentPlayer.name,
-      message,
-      timestamp: serverTimestamp(),
-      type: 'chat'
-    });
-  }, [currentRoom, currentPlayer]);
+  const sendSystemMessage = useCallback(async (message: string) => {
+    if (!currentRoom) return;
+    const result = await roomChat.sendSystemMessage(message);
+    if (!result.success && result.error) {
+      console.warn('[MultiplayerProvider] sendSystemMessage failed:', result.error);
+    }
+  }, [roomChat, currentRoom]);
 
   const value: MultiplayerContextType = {
     currentRoom,
     availableRooms,
+    viewingRooms,
     createRoom,
     joinRoom,
+    joinAsSpectator,
+    startGame,
     leaveRoom,
+    leaveSpectator,
+    isSpectator,
     currentPlayer,
     updatePlayerStatus,
     gameState,
@@ -395,6 +521,7 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
     sendGameAction,
     messages,
     sendMessage,
+    sendSystemMessage,
     isConnected,
     connectionStatus
   };

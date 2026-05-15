@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -7,7 +7,9 @@ import {
   FaCrown,
   FaHouse,
   FaCircleQuestion,
-  FaUsers
+  FaUsers,
+  FaUser,
+  FaLayerGroup
 } from 'react-icons/fa6';
 
 interface GameCard {
@@ -16,14 +18,12 @@ interface GameCard {
   description: string;
   route: string;
   icon: React.ReactNode;
-  color: string;
-  gradient: string;
+  accent: string;
   features: string[];
 }
 
 const GameHub: React.FC = () => {
   const navigate = useNavigate();
-  const [selectedGame, setSelectedGame] = useState<string | null>(null);
   
   const games: GameCard[] = [
     {
@@ -32,8 +32,7 @@ const GameHub: React.FC = () => {
       description: 'Elegant 21 with basic strategy coach and luxury felt',
       route: '/blackjack',
       icon: <FaDice className="text-4xl" />,
-      color: 'from-emerald-600 to-emerald-800',
-      gradient: 'from-emerald-500/20 to-emerald-700/20',
+      accent: 'text-emerald-700 bg-emerald-50 border-emerald-100',
       features: ['Basic Strategy Coach', 'Multi-seat Tables', 'Luxury Theme', 'AI Dealer']
     },
     {
@@ -42,8 +41,7 @@ const GameHub: React.FC = () => {
       description: 'Premium checkers with strong AI and elegant board',
       route: '/checkers',
       icon: <FaCrown className="text-4xl" />,
-      color: 'from-purple-600 to-purple-800',
-      gradient: 'from-purple-500/20 to-purple-700/20',
+      accent: 'text-indigo-700 bg-indigo-50 border-indigo-100',
       features: ['Strong AI', 'Multiple Difficulties', 'Elegant Design', 'Tutorial System']
     },
     {
@@ -52,8 +50,7 @@ const GameHub: React.FC = () => {
       description: 'Luxury property trading with custom house rules',
       route: '/tycoon',
       icon: <FaHouse className="text-4xl" />,
-      color: 'from-blue-600 to-blue-800',
-      gradient: 'from-blue-500/20 to-blue-700/20',
+      accent: 'text-sky-700 bg-sky-50 border-sky-100',
       features: ['Custom House Rules', 'Property Trading', 'AI Opponents', 'Strategic Depth']
     },
     {
@@ -62,8 +59,7 @@ const GameHub: React.FC = () => {
       description: 'Joker-Joker-Deuce variant with custom house rules',
       route: '/spades',
       icon: <FaCircleQuestion className="text-4xl" />,
-      color: 'from-red-600 to-red-800',
-      gradient: 'from-red-500/20 to-red-700/20',
+      accent: 'text-rose-700 bg-rose-50 border-rose-100',
       features: ['Custom Deck', 'House Rules', 'Team Play', 'Strategic Bidding']
     },
     {
@@ -72,79 +68,82 @@ const GameHub: React.FC = () => {
       description: 'NWS House Rules rummy with custom joker values',
       route: '/5000',
       icon: <FaCircleQuestion className="text-4xl" />,
-      color: 'from-orange-600 to-orange-800',
-      gradient: 'from-orange-500/20 to-orange-700/20',
+      accent: 'text-amber-700 bg-amber-50 border-amber-100',
       features: ['Custom Joker Values', 'Wild Rank Rules', 'Deep Discard', 'AI Opponents']
+    },
+    {
+      id: 'holdem',
+      title: 'HoldemLux',
+      description: 'Elegant Texas Hold\'em with adaptive AI and luxury table',
+      route: '/holdem',
+      icon: <FaCircleQuestion className="text-4xl" />,
+      accent: 'text-stone-700 bg-stone-50 border-stone-200',
+      features: ['Adaptive AI', 'Position-Aware', 'Luxury Theme', 'Multiplayer Ready']
     }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx to-onyxLight text-ivory">
-      {/* Header */}
-      <div className="bg-onyxLight border-b border-champagne/20 p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
+      <div className="border-b border-gray-200 bg-white/95 px-4 py-4 shadow-sm backdrop-blur sm:px-6">
+        <div className="game-header-inner">
+          <div className="flex items-center gap-4">
             <Link
               to="/hub"
-              className="p-3 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
+              className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
             >
-              <FaArrowLeft className="w-6 h-6" />
+              <FaArrowLeft className="h-5 w-5" />
             </Link>
             <div>
-              <h1 className="text-4xl font-bold text-champagne">Game Hub</h1>
-              <p className="text-ivory/80">Premium luxury games with elegant design</p>
+              <h1 className="text-2xl font-bold text-gray-950 sm:text-3xl">Game Hub</h1>
+              <p className="text-sm text-gray-600">Table games, cards, and strategy boards in one simple place.</p>
             </div>
+          </div>
+          <div className="hidden items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600 sm:flex">
+            <FaLayerGroup className="text-blue-600" />
+            {games.length} playable rooms
           </div>
         </div>
       </div>
 
-      {/* Games Grid */}
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="px-4 py-6 sm:px-6">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {games.map((game, index) => (
               <motion.div
                 key={game.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ scale: 1.02, y: -5 }}
+                whileHover={{ y: -3 }}
                 className="group"
               >
-                <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br ${game.color} p-8 h-80 transition-all duration-300 group-hover:shadow-2xl`}>
-                  {/* Background Pattern */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} opacity-50`} />
-                  
-                  {/* Content */}
-                  <div className="relative z-10 h-full flex flex-col justify-between">
-                    {/* Header */}
+                <div className="h-full min-h-[300px] rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 group-hover:border-blue-200 group-hover:shadow-md">
+                  <div className="flex h-full flex-col justify-between gap-5">
                     <div className="flex items-center justify-between">
-                      <div className="text-white">
+                      <div className={`rounded-lg border p-3 ${game.accent}`}>
                         {game.icon}
                       </div>
-                      <div className="text-white/80 text-sm font-medium">
-                        Premium
+                      <div className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-1 text-xs font-semibold uppercase text-gray-500">
+                        Play
                       </div>
                     </div>
 
-                    {/* Title and Description */}
-                    <div className="space-y-3">
-                      <h3 className="text-2xl font-bold text-white">{game.title}</h3>
-                      <p className="text-white/90 text-sm leading-relaxed">
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-bold text-gray-950">{game.title}</h3>
+                      <p className="text-sm leading-relaxed text-gray-600">
                         {game.description}
                       </p>
                     </div>
 
-                    {/* Features */}
                     <div className="space-y-2">
-                      <div className="text-white/70 text-xs font-medium uppercase tracking-wide">
+                      <div className="text-xs font-semibold uppercase text-gray-500">
                         Features
                       </div>
                       <div className="flex flex-wrap gap-2">
                         {game.features.map((feature, featureIndex) => (
                           <span
                             key={featureIndex}
-                            className="px-2 py-1 bg-white/20 rounded-full text-xs text-white/90 backdrop-blur-sm"
+                            className="rounded-lg border border-gray-200 bg-gray-50 px-2 py-1 text-xs text-gray-600"
                           >
                             {feature}
                           </span>
@@ -152,57 +151,41 @@ const GameHub: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Play Options */}
-                    <div className="space-y-3">
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => navigate(game.route)}
-                          className="flex-1 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition-colors flex items-center justify-center space-x-2"
-                        >
-                          <span className="text-sm">👤</span>
-                          <span className="text-sm font-medium">Single Player</span>
-                        </button>
-                        <button
-                          onClick={() => navigate(`/multiplayer/${game.id}`)}
-                          className="flex-1 px-4 py-2 bg-emerald/80 text-white rounded-lg hover:bg-emerald transition-colors flex items-center justify-center space-x-2"
-                        >
-                          <FaUsers className="w-4 h-4" />
-                          <span className="text-sm font-medium">Multiplayer</span>
-                        </button>
-                      </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        onClick={() => navigate(game.route)}
+                        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                      >
+                        <FaUser className="h-4 w-4" />
+                        Solo
+                      </button>
+                      <button
+                        onClick={() => navigate(`/multiplayer/${game.id}`)}
+                        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg bg-gray-900 px-3 py-2 text-sm font-bold text-white transition-colors hover:bg-blue-700"
+                      >
+                        <FaUsers className="h-4 w-4" />
+                        Group
+                      </button>
                     </div>
                   </div>
-
-                  {/* Hover Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
               </motion.div>
             ))}
           </div>
 
-          {/* Footer Info */}
-          <div className="mt-16 text-center">
-            <div className="bg-onyxLight rounded-2xl p-8 max-w-4xl mx-auto">
-              <h2 className="text-2xl font-bold text-champagne mb-4">Luxury Gaming Experience</h2>
-              <p className="text-ivory/80 mb-6 leading-relaxed">
-                Each game features our signature onyx and champagne luxury theme, 
-                sophisticated AI opponents, and professional-grade gameplay mechanics. 
-                Whether you're a casual player or a strategic mastermind, our games 
-                offer the perfect blend of elegance and entertainment.
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                <div className="text-center">
-                  <div className="text-champagne font-semibold mb-2">Premium Design</div>
-                  <div className="text-ivory/70">Elegant onyx and champagne theme</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-champagne font-semibold mb-2">Smart AI</div>
-                  <div className="text-ivory/70">Adaptive difficulty levels</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-champagne font-semibold mb-2">Professional Quality</div>
-                  <div className="text-ivory/70">Smooth animations and polished UI</div>
-                </div>
+          <div className="game-panel mt-8">
+            <div className="grid grid-cols-1 gap-4 text-sm md:grid-cols-3">
+              <div>
+                <div className="game-stat-label">Theme</div>
+                <div className="mt-1 text-gray-600">Clean cards, calmer color, and easier scanning.</div>
+              </div>
+              <div>
+                <div className="game-stat-label">Modes</div>
+                <div className="mt-1 text-gray-600">Solo play and multiplayer entries stay one click away.</div>
+              </div>
+              <div>
+                <div className="game-stat-label">Pace</div>
+                <div className="mt-1 text-gray-600">Cards, stats, and actions are grouped for faster scanning.</div>
               </div>
             </div>
           </div>

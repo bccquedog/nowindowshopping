@@ -1,17 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { 
-  FaPlay, 
-  FaPause, 
-  FaRotateRight, 
-  FaGear, 
-  FaLightbulb, 
-  FaCircleInfo,
+import {
+  FaGear,
+  FaLightbulb,
   FaXmark,
-  FaCheck,
-  FaMinus,
-  FaPlus,
   FaArrowLeft
 } from 'react-icons/fa6';
 
@@ -113,20 +106,6 @@ const AI_DIFFICULTIES: AIDifficulty[] = [
   }
 ];
 
-// Luxury Theme Colors
-const THEME = {
-  onyx: '#0F1115',
-  onyxLight: '#14161B',
-  champagne: '#D9C38C',
-  champagneLight: '#E6D4A3',
-  ivory: '#F7F4EE',
-  emerald: '#0F3D3E',
-  emeraldLight: '#1A5A5B',
-  gold: '#B8860B',
-  red: '#DC2626',
-  green: '#059669'
-};
-
 // Basic Strategy Matrix (simplified)
 type StrategyTable = Record<string, Record<string, string>>;
 
@@ -168,7 +147,7 @@ const createDeck = (): Card[] => {
       if (rank === 'A') value = 11;
       else if (['K', 'Q', 'J'].includes(rank)) value = 10;
       else value = parseInt(rank);
-      
+
       deck.push({ suit, rank, value });
     });
   });
@@ -187,7 +166,7 @@ const shuffleDeck = (deck: Card[]): Card[] => {
 const calculateHandValue = (cards: Card[]): { total: number; isSoft: boolean } => {
   let total = 0;
   let aces = 0;
-  
+
   cards.forEach(card => {
     if (card.rank === 'A') {
       aces++;
@@ -196,24 +175,24 @@ const calculateHandValue = (cards: Card[]): { total: number; isSoft: boolean } =
       total += card.value;
     }
   });
-  
+
   while (total > 21 && aces > 0) {
     total -= 10;
     aces--;
   }
-  
+
   return { total, isSoft: aces > 0 && total <= 21 };
 };
 
 const getBasicStrategyAdvice = (playerCards: Card[], dealerUpCard: Card): string => {
   const { total, isSoft } = calculateHandValue(playerCards);
-  
+
   if (total < 8) return 'Hit';
   if (total > 17) return 'Stand';
-  
+
   const dealerRank = ['J', 'Q', 'K'].includes(dealerUpCard.rank) ? '10' : dealerUpCard.rank;
   const strategy = isSoft ? BASIC_STRATEGY.soft : BASIC_STRATEGY.hard;
-  
+
   const totalStr = total.toString() as keyof typeof strategy;
   if (strategy[totalStr] && strategy[totalStr][dealerRank as keyof typeof strategy[typeof totalStr]]) {
     const action = strategy[totalStr][dealerRank as keyof typeof strategy[typeof totalStr]];
@@ -224,8 +203,27 @@ const getBasicStrategyAdvice = (playerCards: Card[], dealerUpCard: Card): string
       default: return 'Hit';
     }
   }
-  
+
   return 'Hit';
+};
+
+const advanceBlackjackTurn = (
+  prev: GameState,
+  players: Player[],
+  updates: Partial<GameState> = {}
+): GameState => {
+  const activePlayer = players[prev.currentPlayer];
+
+  if (activePlayer && prev.currentHand < activePlayer.hands.length - 1) {
+    return { ...prev, ...updates, players, currentHand: prev.currentHand + 1 };
+  }
+
+  const nextPlayer = prev.currentPlayer + 1;
+  if (nextPlayer < players.length) {
+    return { ...prev, ...updates, players, currentPlayer: nextPlayer, currentHand: 0 };
+  }
+
+  return { ...prev, ...updates, players, gamePhase: 'dealerTurn' };
 };
 
 
@@ -249,12 +247,12 @@ const CardComponent: React.FC<{ card: Card; className?: string }> = ({ card, cla
   if (card.isHidden) {
     return (
       <motion.div
-        className={`w-16 h-24 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg border-2 border-champagne shadow-lg ${className}`}
-        whileHover={{ scale: 1.05 }}
+        className={`w-16 h-24 sm:w-20 sm:h-28 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-xl border border-champagne/50 shadow-[0_10px_30px_rgba(0,0,0,0.45)] ${className}`}
+        whileHover={{ scale: 1.04, y: -2 }}
         transition={{ duration: 0.2 }}
       >
-        <div className="w-full h-full bg-gradient-to-br from-gray-700 to-gray-800 rounded-md flex items-center justify-center">
-          <div className="text-champagne text-2xl font-bold">?</div>
+        <div className="w-full h-full bg-[radial-gradient(circle_at_30%_20%,rgba(217,195,140,0.22),transparent_55%)] rounded-[10px] flex items-center justify-center">
+          <div className="text-champagne text-2xl font-bold tracking-widest">NWS</div>
         </div>
       </motion.div>
     );
@@ -262,18 +260,18 @@ const CardComponent: React.FC<{ card: Card; className?: string }> = ({ card, cla
 
   return (
     <motion.div
-      className={`w-16 h-24 bg-white rounded-lg border-2 border-gray-300 shadow-lg ${className}`}
-      whileHover={{ scale: 1.05 }}
+      className={`w-16 h-24 sm:w-20 sm:h-28 bg-gradient-to-b from-white to-slate-50 rounded-xl border border-slate-300 shadow-[0_10px_24px_rgba(0,0,0,0.35)] ${className}`}
+      whileHover={{ scale: 1.04, y: -2 }}
       transition={{ duration: 0.2 }}
     >
-      <div className="w-full h-full p-1 flex flex-col justify-between">
-        <div className={`text-xs font-bold ${getSuitColor(card.suit)}`}>
+      <div className="w-full h-full p-2 flex flex-col justify-between">
+        <div className={`text-xs sm:text-sm font-bold ${getSuitColor(card.suit)}`}>
           {card.rank}
         </div>
-        <div className={`text-lg font-bold ${getSuitColor(card.suit)}`}>
+        <div className={`text-xl sm:text-2xl font-bold text-center ${getSuitColor(card.suit)}`}>
           {getSuitSymbol(card.suit)}
         </div>
-        <div className={`text-xs font-bold ${getSuitColor(card.suit)} rotate-180`}>
+        <div className={`text-xs sm:text-sm font-bold ${getSuitColor(card.suit)} rotate-180 text-right`}>
           {card.rank}
         </div>
       </div>
@@ -282,10 +280,10 @@ const CardComponent: React.FC<{ card: Card; className?: string }> = ({ card, cla
 };
 
 // Chip Component
-const ChipComponent: React.FC<{ value: number; onClick?: () => void; selected?: boolean }> = ({ 
-  value, 
-  onClick, 
-  selected = false 
+const ChipComponent: React.FC<{ value: number; onClick?: () => void; selected?: boolean }> = ({
+  value,
+  onClick,
+  selected = false
 }) => {
   const getChipColor = (value: number) => {
     switch (value) {
@@ -300,11 +298,11 @@ const ChipComponent: React.FC<{ value: number; onClick?: () => void; selected?: 
 
   return (
     <motion.button
-      className={`w-12 h-12 rounded-full ${getChipColor(value)} border-2 border-white shadow-lg flex items-center justify-center text-white font-bold text-sm ${
-        selected ? 'ring-4 ring-champagne' : ''
+      className={`w-14 h-14 rounded-full ${getChipColor(value)} border-4 border-white/80 shadow-[0_8px_18px_rgba(0,0,0,0.35)] flex items-center justify-center text-white font-extrabold text-xs tracking-wide ${
+        selected ? 'ring-4 ring-champagne scale-105' : 'opacity-90'
       }`}
       onClick={onClick}
-      whileHover={{ scale: 1.1 }}
+      whileHover={{ scale: 1.08, y: -2 }}
       whileTap={{ scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
@@ -313,13 +311,29 @@ const ChipComponent: React.FC<{ value: number; onClick?: () => void; selected?: 
   );
 };
 
+interface BlackjackLuxProps {
+  isMultiplayer?: boolean;
+  syncedGameState?: unknown;
+  onUpdateGameState?: (state: unknown) => void;
+  onBack?: () => void;
+  playerIndex?: number;
+  isSpectator?: boolean;
+}
+
 // Main Blackjack Component
-const BlackjackLux: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>({
+const BlackjackLux: React.FC<BlackjackLuxProps> = ({
+  isMultiplayer = false,
+  syncedGameState,
+  onUpdateGameState,
+  onBack,
+  playerIndex = 0,
+  isSpectator = false
+}) => {
+  const [localState, setLocalState] = useState<GameState>({
     players: [
       {
-        id: '1',
-        name: 'Player 1',
+        id: 'hero',
+        name: 'You',
         hands: [],
         bankroll: 1000,
         currentBet: 0,
@@ -336,6 +350,24 @@ const BlackjackLux: React.FC = () => {
     roundNumber: 1,
     shoePenetration: 0
   });
+
+  const gameState = (isMultiplayer && syncedGameState ? syncedGameState : localState) as GameState;
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+  const setGameState = useCallback((updater: GameState | ((prev: GameState) => GameState)) => {
+    if (isMultiplayer && onUpdateGameState) {
+      const next = typeof updater === 'function' ? updater(gameStateRef.current) : updater;
+      onUpdateGameState(next);
+      return;
+    }
+
+    setLocalState(updater as React.SetStateAction<GameState>);
+  }, [isMultiplayer, onUpdateGameState]);
+
+  const isHeroTurn = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : (gameState.players[gameState.currentPlayer]?.id === 'hero');
+  const canInteract = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : true;
 
   const [rules] = useState<GameRules>({
     numDecks: 6,
@@ -362,7 +394,7 @@ const BlackjackLux: React.FC = () => {
     const baseBet = Math.max(rules.minBet, Math.floor(player.bankroll * 0.05));
     const variation = (Math.random() - 0.5) * 2 * difficulty.betVariation;
     const adjustedBet = Math.floor(baseBet * (1 + variation));
-    
+
     return Math.min(
       Math.max(adjustedBet, rules.minBet),
       Math.min(rules.maxBet, player.bankroll)
@@ -370,30 +402,27 @@ const BlackjackLux: React.FC = () => {
   }, [rules.minBet, rules.maxBet]);
 
   const getAIAction = useCallback((player: Player, hand: Hand, dealerUpCard: Card, difficulty: AIDifficulty): 'hit' | 'stand' | 'double' | 'split' | 'surrender' => {
-    const { total, isSoft } = calculateHandValue(hand.cards);
-    const dealerRank = ['J', 'Q', 'K'].includes(dealerUpCard.rank) ? '10' : dealerUpCard.rank;
-    
     // Get basic strategy advice
     const basicAdvice = getBasicStrategyAdvice(hand.cards, dealerUpCard);
-    
+
     // AI makes mistakes based on difficulty
     const shouldFollowStrategy = Math.random() < difficulty.basicStrategyAccuracy;
-    
+
     if (!shouldFollowStrategy) {
       // AI makes a random mistake
       const actions: ('hit' | 'stand' | 'double' | 'split' | 'surrender')[] = ['hit', 'stand'];
       if (hand.cards.length === 2 && player.bankroll >= hand.bet) actions.push('double');
       if (hand.cards.length === 2 && hand.cards[0].rank === hand.cards[1].rank && player.bankroll >= hand.bet) actions.push('split');
       if (hand.cards.length === 2 && rules.lateSurrender) actions.push('surrender');
-      
+
       return actions[Math.floor(Math.random() * actions.length)];
     }
-    
+
     // Follow basic strategy
     switch (basicAdvice) {
       case 'Hit': return 'hit';
       case 'Stand': return 'stand';
-      case 'Double Down': 
+      case 'Double Down':
         return (hand.cards.length === 2 && player.bankroll >= hand.bet) ? 'double' : 'hit';
       default: return 'hit';
     }
@@ -418,35 +447,38 @@ const BlackjackLux: React.FC = () => {
 
   // Initialize shoe and AI players
   useEffect(() => {
+    if (isMultiplayer) return;
     const deck = createDeck();
     const shoe = shuffleDeck([...deck, ...deck, ...deck, ...deck, ...deck, ...deck]);
     const aiPlayers = createAIPlayers(aiPlayerCount);
-    setGameState(prev => ({ 
-      ...prev, 
+    setGameState(prev => ({
+      ...prev,
       shoe,
       players: [
         prev.players[0], // Human player
         ...aiPlayers
       ]
     }));
-  }, [aiPlayerCount, createAIPlayers]);
+  }, [isMultiplayer, aiPlayerCount, createAIPlayers, setGameState]);
 
   // Game Actions
   const placeBet = useCallback((amount: number) => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
-      
+
       if (player.bankroll >= amount && player.currentBet + amount <= rules.maxBet) {
         player.currentBet += amount;
         player.bankroll -= amount;
       }
-      
+
       return { ...prev, players: newPlayers };
     });
-  }, [rules.maxBet]);
+  }, [isMultiplayer, canInteract, rules.maxBet, setGameState]);
 
   const clearBet = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
@@ -454,24 +486,22 @@ const BlackjackLux: React.FC = () => {
       player.currentBet = 0;
       return { ...prev, players: newPlayers };
     });
-  }, []);
+  }, [isMultiplayer, canInteract, setGameState]);
 
   const dealCards = useCallback(() => {
-    if (gameState.players[0].currentBet === 0) return;
+    if (gameState.players[0].currentBet === 0 || (isMultiplayer && !canInteract)) return;
 
     setGameState(prev => {
       const newShoe = [...prev.shoe];
       const newPlayers = [...prev.players];
-      
+
       // AI players place bets
-      newPlayers.slice(1).forEach(aiPlayer => {
+      newPlayers.filter(p => p.isAI).forEach(aiPlayer => {
         const bet = getAIBet(aiPlayer, aiDifficulty);
         aiPlayer.currentBet = bet;
         aiPlayer.bankroll -= bet;
       });
-      
-      const player = newPlayers[0];
-      
+
       // Deal initial cards to all players
       newPlayers.forEach(player => {
         const playerCards = [newShoe.pop()!, newShoe.pop()!];
@@ -483,114 +513,124 @@ const BlackjackLux: React.FC = () => {
           isSplit: false
         }];
       });
-      
+
       // Deal dealer cards
       const dealerCards = [newShoe.pop()!, newShoe.pop()!];
       dealerCards[1].isHidden = true;
-      
+
       const newDealer = {
         cards: dealerCards,
         upCard: dealerCards[0]
       };
-      
+
       return {
         ...prev,
         shoe: newShoe,
         players: newPlayers,
         dealer: newDealer,
+        currentPlayer: 0,
+        currentHand: 0,
         gamePhase: 'playerTurn'
       };
     });
-  }, [gameState.players, gameState.shoe, getAIBet, aiDifficulty]);
+  }, [gameState.players, isMultiplayer, canInteract, getAIBet, aiDifficulty, setGameState]);
 
   const hit = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
+      if (prev.currentPlayer !== 0) return prev;
       const newShoe = [...prev.shoe];
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
       const hand = player.hands[prev.currentHand];
-      
+
       if (hand && !hand.isSurrendered) {
         hand.cards.push(newShoe.pop()!);
-        
+
         const { total } = calculateHandValue(hand.cards);
         if (total > 21) {
           // Bust - move to next hand or dealer
           if (prev.currentHand < player.hands.length - 1) {
             return { ...prev, currentHand: prev.currentHand + 1, shoe: newShoe, players: newPlayers };
           } else {
-            return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+            return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
           }
         }
       }
-      
+
       return { ...prev, shoe: newShoe, players: newPlayers };
     });
-  }, [gameState.shoe, gameState.currentHand]);
+  }, [isMultiplayer, canInteract, setGameState]);
 
   const stand = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
+      if (prev.currentPlayer !== 0) return prev;
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
-      
+
       if (prev.currentHand < player.hands.length - 1) {
         return { ...prev, currentHand: prev.currentHand + 1, players: newPlayers };
       } else {
-        return { ...prev, gamePhase: 'dealerTurn', players: newPlayers };
+        return advanceBlackjackTurn(prev, newPlayers);
       }
     });
-  }, [gameState.currentHand]);
+  }, [isMultiplayer, canInteract, setGameState]);
 
   const doubleDown = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
+      if (prev.currentPlayer !== 0) return prev;
       const newShoe = [...prev.shoe];
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
       const hand = player.hands[prev.currentHand];
-      
+
       if (hand && player.bankroll >= hand.bet) {
         player.bankroll -= hand.bet;
         hand.bet *= 2;
         hand.isDoubled = true;
         hand.cards.push(newShoe.pop()!);
-        
+
         const { total } = calculateHandValue(hand.cards);
         if (total > 21) {
           // Bust - move to dealer
-          return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+          return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
         } else {
           // Stand after double
           if (prev.currentHand < player.hands.length - 1) {
             return { ...prev, currentHand: prev.currentHand + 1, shoe: newShoe, players: newPlayers };
           } else {
-            return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+            return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
           }
         }
       }
-      
+
       return { ...prev, shoe: newShoe, players: newPlayers };
     });
-  }, [gameState.shoe, gameState.currentHand]);
+  }, [isMultiplayer, canInteract, setGameState]);
 
   const split = useCallback(() => {
+    if (isMultiplayer && !canInteract) return;
     setGameState(prev => {
+      if (prev.currentPlayer !== 0) return prev;
       const newShoe = [...prev.shoe];
       const newPlayers = [...prev.players];
       const player = newPlayers[0];
       const currentHand = player.hands[prev.currentHand];
-      
-      if (currentHand && 
-          currentHand.cards.length === 2 && 
-          currentHand.cards[0].rank === currentHand.cards[1].rank && 
+
+      if (currentHand &&
+          currentHand.cards.length === 2 &&
+          currentHand.cards[0].rank === currentHand.cards[1].rank &&
           player.bankroll >= currentHand.bet) {
-        
+
         // Deduct the additional bet for the split
         player.bankroll -= currentHand.bet;
-        
+
         // Create two new hands from the split
         const card1 = currentHand.cards[0];
         const card2 = currentHand.cards[1];
-        
+
         // First hand gets the first card + a new card
         const newHand1: Hand = {
           cards: [card1, newShoe.pop()!],
@@ -600,7 +640,7 @@ const BlackjackLux: React.FC = () => {
           isSplit: true,
           splitFrom: prev.currentHand
         };
-        
+
         // Second hand gets the second card + a new card
         const newHand2: Hand = {
           cards: [card2, newShoe.pop()!],
@@ -610,133 +650,132 @@ const BlackjackLux: React.FC = () => {
           isSplit: true,
           splitFrom: prev.currentHand
         };
-        
+
         // Replace the current hand with the two split hands
         const newHands = [...player.hands];
         newHands.splice(prev.currentHand, 1, newHand1, newHand2);
         player.hands = newHands;
-        
+
         // Check if either hand is a natural blackjack (Ace + 10)
         const hand1Value = calculateHandValue(newHand1.cards);
         const hand2Value = calculateHandValue(newHand2.cards);
-        
+
         // If both hands are blackjack, move to dealer turn
         if (hand1Value.total === 21 && hand2Value.total === 21) {
-          return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+          return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
         }
-        
+
         // If first hand is blackjack, move to second hand
         if (hand1Value.total === 21) {
           return { ...prev, currentHand: prev.currentHand + 1, shoe: newShoe, players: newPlayers };
         }
-        
+
         // Otherwise, stay on first hand
         return { ...prev, shoe: newShoe, players: newPlayers };
       }
-      
+
       return { ...prev, shoe: newShoe, players: newPlayers };
     });
-  }, [gameState.shoe, gameState.currentHand]);
+  }, [isMultiplayer, canInteract, setGameState]);
 
   const dealerPlay = useCallback(() => {
     setGameState(prev => {
       const newShoe = [...prev.shoe];
       const newDealer = { ...prev.dealer };
-      
+
       // Reveal hole card
       newDealer.cards[1].isHidden = false;
-      
+
       let dealerTotal = calculateHandValue(newDealer.cards).total;
-      
+
       while (dealerTotal < 17 || (dealerTotal === 17 && calculateHandValue(newDealer.cards).isSoft && !rules.standsOnSoft17)) {
         newDealer.cards.push(newShoe.pop()!);
         dealerTotal = calculateHandValue(newDealer.cards).total;
       }
-      
+
       return { ...prev, dealer: newDealer, gamePhase: 'settling', shoe: newShoe };
     });
-  }, [rules.standsOnSoft17]);
+  }, [rules.standsOnSoft17, setGameState]);
 
   const settleRound = useCallback(() => {
     setGameState(prev => {
-      const newPlayers = [...prev.players];
-      const player = newPlayers[0];
+      const newPlayers = prev.players.map(player => ({
+        ...player,
+        hands: player.hands.map(hand => ({ ...hand, cards: [...hand.cards] }))
+      }));
       const dealerTotal = calculateHandValue(prev.dealer.cards).total;
-      let totalWinnings = 0;
       let resultMessage = '';
-      
-      player.hands.forEach((hand, index) => {
-        const playerTotal = calculateHandValue(hand.cards).total;
-        let winnings = 0;
-        
-        // Check for natural blackjack (Ace + 10, first two cards only)
-        const isNaturalBlackjack = hand.cards.length === 2 && 
-          playerTotal === 21 && 
-          (hand.cards[0].rank === 'A' || hand.cards[1].rank === 'A') &&
-          (['10', 'J', 'Q', 'K'].includes(hand.cards[0].rank) || ['10', 'J', 'Q', 'K'].includes(hand.cards[1].rank));
-        
-        if (hand.isSurrendered) {
-          winnings = hand.bet / 2;
-          resultMessage += `Hand ${index + 1}: Surrendered (${winnings})\n`;
-        } else if (playerTotal > 21) {
-          // Player bust
-          winnings = 0;
-          resultMessage += `Hand ${index + 1}: Bust (-${hand.bet})\n`;
-        } else if (isNaturalBlackjack && dealerTotal !== 21) {
-          // Natural blackjack pays 3:2
-          winnings = hand.bet + (hand.bet * rules.blackjackPayout);
-          resultMessage += `Hand ${index + 1}: Blackjack! (+${hand.bet * rules.blackjackPayout})\n`;
-        } else if (isNaturalBlackjack && dealerTotal === 21) {
-          // Both have blackjack - push
-          winnings = hand.bet;
-          resultMessage += `Hand ${index + 1}: Blackjack Push (0)\n`;
-        } else if (dealerTotal > 21) {
-          // Dealer bust
-          winnings = hand.bet * 2;
-          resultMessage += `Hand ${index + 1}: Dealer Bust (+${hand.bet})\n`;
-        } else if (playerTotal > dealerTotal) {
-          // Player wins
-          winnings = hand.bet * 2;
-          resultMessage += `Hand ${index + 1}: Win (+${hand.bet})\n`;
-        } else if (playerTotal === dealerTotal) {
-          // Push
-          winnings = hand.bet;
-          resultMessage += `Hand ${index + 1}: Push (0)\n`;
-        } else {
-          // Dealer wins
-          winnings = 0;
-          resultMessage += `Hand ${index + 1}: Lose (-${hand.bet})\n`;
-        }
-        
-        totalWinnings += winnings;
-        player.bankroll += winnings;
+
+      newPlayers.forEach(player => {
+        player.hands.forEach((hand, index) => {
+          const playerTotal = calculateHandValue(hand.cards).total;
+          let winnings = 0;
+
+          const isNaturalBlackjack = hand.cards.length === 2 &&
+            playerTotal === 21 &&
+            (hand.cards[0].rank === 'A' || hand.cards[1].rank === 'A') &&
+            (['10', 'J', 'Q', 'K'].includes(hand.cards[0].rank) || ['10', 'J', 'Q', 'K'].includes(hand.cards[1].rank));
+
+          if (hand.isSurrendered) {
+            winnings = hand.bet / 2;
+            resultMessage += `${player.name} hand ${index + 1}: Surrendered (+${winnings})\n`;
+          } else if (playerTotal > 21) {
+            winnings = 0;
+            resultMessage += `${player.name} hand ${index + 1}: Bust (-${hand.bet})\n`;
+          } else if (isNaturalBlackjack && dealerTotal !== 21) {
+            winnings = hand.bet + (hand.bet * rules.blackjackPayout);
+            resultMessage += `${player.name} hand ${index + 1}: Blackjack (+${hand.bet * rules.blackjackPayout})\n`;
+          } else if (isNaturalBlackjack && dealerTotal === 21) {
+            winnings = hand.bet;
+            resultMessage += `${player.name} hand ${index + 1}: Blackjack push\n`;
+          } else if (dealerTotal > 21) {
+            winnings = hand.bet * 2;
+            resultMessage += `${player.name} hand ${index + 1}: Dealer bust (+${hand.bet})\n`;
+          } else if (playerTotal > dealerTotal) {
+            winnings = hand.bet * 2;
+            resultMessage += `${player.name} hand ${index + 1}: Win (+${hand.bet})\n`;
+          } else if (playerTotal === dealerTotal) {
+            winnings = hand.bet;
+            resultMessage += `${player.name} hand ${index + 1}: Push\n`;
+          } else {
+            winnings = 0;
+            resultMessage += `${player.name} hand ${index + 1}: Lose (-${hand.bet})\n`;
+          }
+
+          player.bankroll += winnings;
+        });
       });
-      
+
       // Set result message
       setLastResult(resultMessage.trim());
-      
+
       // Move cards to discard tray
       const newDiscardTray = [...prev.discardTray];
-      player.hands.forEach(hand => {
-        newDiscardTray.push(...hand.cards);
+      newPlayers.forEach(player => {
+        player.hands.forEach(hand => {
+          newDiscardTray.push(...hand.cards);
+        });
       });
       newDiscardTray.push(...prev.dealer.cards);
-      
+
       // Reset for next round
-      player.hands = [];
-      player.currentBet = 0;
-      
+      newPlayers.forEach(player => {
+        player.hands = [];
+        player.currentBet = 0;
+      });
+
       return {
         ...prev,
         players: newPlayers,
         discardTray: newDiscardTray,
         dealer: { cards: [], upCard: null },
+        currentPlayer: 0,
         currentHand: 0,
         gamePhase: 'betting',
         roundNumber: prev.roundNumber + 1
       };
     });
-  }, []);
+  }, [rules.blackjackPayout, setGameState]);
 
   // Auto-play dealer when phase changes
   useEffect(() => {
@@ -747,29 +786,29 @@ const BlackjackLux: React.FC = () => {
     }
   }, [gameState.gamePhase, dealerPlay, settleRound]);
 
-  // Handle AI turns
+  // Handle AI turns (single-player or multiplayer with AI players)
   useEffect(() => {
     if (gameState.gamePhase === 'playerTurn' && gameState.dealer.upCard) {
       const currentPlayer = gameState.players[gameState.currentPlayer];
-      
+
       if (currentPlayer && currentPlayer.isAI) {
         const hand = currentPlayer.hands[gameState.currentHand];
         if (hand && gameState.dealer.upCard) {
-          setTimeout(() => {
+          const timer = window.setTimeout(() => {
             const action = getAIAction(currentPlayer, hand, gameState.dealer.upCard!, aiDifficulty);
-            
+
             // Handle AI actions directly without calling human player functions
             setGameState(prev => {
               const newShoe = [...prev.shoe];
               const newPlayers = [...prev.players];
               const aiPlayer = newPlayers[prev.currentPlayer];
               const aiHand = aiPlayer.hands[prev.currentHand];
-              
+
               switch (action) {
                 case 'hit':
                   if (aiHand && !aiHand.isSurrendered) {
                     aiHand.cards.push(newShoe.pop()!);
-                    
+
                     const { total } = calculateHandValue(aiHand.cards);
                     if (total > 21) {
                       // Bust - move to next hand or next player
@@ -778,86 +817,101 @@ const BlackjackLux: React.FC = () => {
                       } else if (prev.currentPlayer < newPlayers.length - 1) {
                         return { ...prev, currentPlayer: prev.currentPlayer + 1, currentHand: 0, shoe: newShoe, players: newPlayers };
                       } else {
-                        return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+                        return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
                       }
                     }
                   }
                   return { ...prev, shoe: newShoe, players: newPlayers };
-                  
+
+                case 'split':
                 case 'stand':
                   if (prev.currentHand < aiPlayer.hands.length - 1) {
                     return { ...prev, currentHand: prev.currentHand + 1, players: newPlayers };
                   } else if (prev.currentPlayer < newPlayers.length - 1) {
                     return { ...prev, currentPlayer: prev.currentPlayer + 1, currentHand: 0, players: newPlayers };
                   } else {
-                    return { ...prev, gamePhase: 'dealerTurn', players: newPlayers };
+                    return advanceBlackjackTurn(prev, newPlayers);
                   }
-                  
+
                 case 'double':
                   if (aiHand && aiPlayer.bankroll >= aiHand.bet) {
                     aiPlayer.bankroll -= aiHand.bet;
                     aiHand.bet *= 2;
                     aiHand.isDoubled = true;
                     aiHand.cards.push(newShoe.pop()!);
-                    
+
                     const { total } = calculateHandValue(aiHand.cards);
                     if (total > 21) {
                       // Bust - move to next player
                       if (prev.currentPlayer < newPlayers.length - 1) {
                         return { ...prev, currentPlayer: prev.currentPlayer + 1, currentHand: 0, shoe: newShoe, players: newPlayers };
                       } else {
-                        return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+                        return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
                       }
                     } else {
                       // Stand after double
                       if (prev.currentPlayer < newPlayers.length - 1) {
                         return { ...prev, currentPlayer: prev.currentPlayer + 1, currentHand: 0, shoe: newShoe, players: newPlayers };
                       } else {
-                        return { ...prev, gamePhase: 'dealerTurn', shoe: newShoe, players: newPlayers };
+                        return advanceBlackjackTurn(prev, newPlayers, { shoe: newShoe });
                       }
                     }
                   }
                   return { ...prev, shoe: newShoe, players: newPlayers };
-                  
+
                 case 'surrender':
                   if (aiHand && aiHand.cards.length === 2) {
                     aiHand.isSurrendered = true;
                     if (prev.currentPlayer < newPlayers.length - 1) {
                       return { ...prev, currentPlayer: prev.currentPlayer + 1, currentHand: 0, players: newPlayers };
                     } else {
-                      return { ...prev, gamePhase: 'dealerTurn', players: newPlayers };
+                      return advanceBlackjackTurn(prev, newPlayers);
                     }
                   }
                   return { ...prev, players: newPlayers };
-                  
+
                 default:
                   return { ...prev, players: newPlayers };
               }
             });
           }, aiDifficulty.decisionSpeed);
+          return () => window.clearTimeout(timer);
         }
       }
     }
-  }, [gameState.gamePhase, gameState.currentPlayer, gameState.currentHand, gameState.players, gameState.dealer.upCard, getAIAction, aiDifficulty]);
+  }, [gameState.gamePhase, gameState.currentPlayer, gameState.currentHand, gameState.players, gameState.dealer.upCard, getAIAction, aiDifficulty, setGameState]);
 
-  const currentHand = gameState.players[0]?.hands[gameState.currentHand];
+  const activePlayer = gameState.players[gameState.currentPlayer];
+  const isHumanPlayerTurn = gameState.gamePhase === 'playerTurn' && gameState.currentPlayer === 0 && !activePlayer?.isAI;
+  const currentHand = isHumanPlayerTurn ? gameState.players[0]?.hands[gameState.currentHand] : undefined;
   const dealerUpCard = gameState.dealer.upCard;
-  const basicStrategyAdvice = currentHand && dealerUpCard ? 
+  const basicStrategyAdvice = currentHand && dealerUpCard ?
     getBasicStrategyAdvice(currentHand.cards, dealerUpCard) : '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx to-onyxLight text-ivory">
+    <div className="game-shell">
       {/* Header */}
-      <div className="bg-onyxLight border-b border-champagne/20 p-4">
-        <div className="flex justify-between items-center">
+      <div className="game-header">
+        <div className="game-header-inner">
           <div className="flex items-center space-x-4">
-            <Link
-              to="/hub"
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
-            >
-              <FaArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-3xl font-bold text-champagne">BlackjackLux</h1>
+            {isMultiplayer && onBack ? (
+              <button
+                onClick={onBack}
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/hub"
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            <h1 className="text-3xl font-bold text-champagne">
+              BlackjackLux {isMultiplayer && '(Multiplayer)'}
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             <button
@@ -870,45 +924,47 @@ const BlackjackLux: React.FC = () => {
             </button>
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
+              className="game-icon-button"
             >
-                              <FaGear className="w-5 h-5" />
+              <FaGear className="w-5 h-5" />
             </button>
           </div>
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {/* Game Table */}
-        <div className="relative bg-gradient-to-b from-emerald to-emeraldLight rounded-2xl p-8 mb-6 shadow-2xl">
+        <div className="relative bg-gradient-to-b from-emerald to-emeraldLight rounded-3xl p-4 sm:p-8 mb-6 shadow-2xl border border-champagne/25 overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.12),transparent_45%)] pointer-events-none" />
           {/* Dealer Area */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-champagne mb-4">Dealer</h2>
-            <div className="flex items-center space-x-4">
+          <div className="mb-8 bg-onyx/30 rounded-2xl p-4 border border-white/10">
+            <h2 className="text-xl font-semibold text-champagne mb-4 uppercase tracking-wide">Dealer</h2>
+            <div className="flex flex-wrap items-center gap-3">
               {gameState.dealer.cards.map((card, index) => (
                 <CardComponent key={index} card={card} />
               ))}
             </div>
             {gameState.dealer.cards.length > 0 && (
-              <div className="mt-2 text-sm text-ivory/80">
+              <div className="mt-3 text-sm text-ivory/80">
                 Total: {calculateHandValue(gameState.dealer.cards).total}
               </div>
             )}
           </div>
 
           {/* AI Players Area */}
-          {gameState.players.slice(1).map((player, playerIndex) => (
-            <div key={player.id} className="mb-6">
-              <h3 className="text-lg font-semibold text-champagne mb-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+          {gameState.players.slice(1).map((player) => (
+            <div key={player.id} className="bg-onyx/30 rounded-2xl p-4 border border-white/10">
+              <h3 className="text-base font-semibold text-champagne mb-3">
                 {player.name} (AI - {aiDifficulty.name})
               </h3>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-wrap items-center gap-2">
                   {player.hands[0]?.cards.map((card, index) => (
                     <CardComponent key={index} card={card} />
                   ))}
                 </div>
-                <div className="text-right">
+                <div className="text-right text-xs sm:text-sm">
                   <div className="text-sm text-ivory/80">
                     Bankroll: ${player.bankroll}
                   </div>
@@ -924,19 +980,27 @@ const BlackjackLux: React.FC = () => {
               </div>
             </div>
           ))}
+          </div>
 
           {/* Player Area */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-champagne mb-4">Player</h2>
+          <div className="mb-8 bg-onyx/40 rounded-2xl p-4 border border-champagne/30">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-champagne uppercase tracking-wide">Player</h2>
+              <span className={`text-xs px-3 py-1 rounded-full border ${
+                canInteract ? 'bg-emerald/30 border-emerald-300/40 text-emerald-100' : 'bg-onyx/50 border-ivory/20 text-ivory/70'
+              }`}>
+                {isMultiplayer ? (isHeroTurn ? 'Your Turn' : 'Waiting') : 'Single Player'}
+              </span>
+            </div>
             {gameState.players[0].hands.length > 0 && (
               <div className="space-y-4">
                 {gameState.players[0].hands.map((hand, handIndex) => (
-                  <div 
-                    key={handIndex} 
-                    className={`p-4 rounded-lg border-2 ${
-                      handIndex === gameState.currentHand 
-                        ? 'border-champagne bg-champagne/10' 
-                        : 'border-transparent bg-transparent'
+                  <div
+                    key={handIndex}
+                    className={`p-4 rounded-xl border ${
+                      handIndex === gameState.currentHand
+                        ? 'border-champagne bg-champagne/10 shadow-[0_0_0_1px_rgba(217,195,140,0.35)]'
+                        : 'border-white/10 bg-onyx/20'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
@@ -949,7 +1013,7 @@ const BlackjackLux: React.FC = () => {
                         Bet: ${hand.bet}
                       </div>
                     </div>
-                    <div className="flex items-center space-x-4 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 mb-2">
                       {hand.cards.map((card, index) => (
                         <CardComponent key={index} card={card} />
                       ))}
@@ -971,18 +1035,22 @@ const BlackjackLux: React.FC = () => {
 
           {/* Game Controls */}
                      {gameState.gamePhase === 'betting' && (
-             <div className="text-center">
+             <div className="text-center bg-onyx/35 rounded-2xl p-4 border border-white/10">
                <p className="text-ivory/80 mb-4">Place your bet to start</p>
-               <div className="flex justify-center space-x-4 mb-4">
+               <div className="flex flex-wrap justify-center gap-3 mb-4">
                  {CHIP_VALUES.map(value => (
                    <ChipComponent
                      key={value}
                      value={value}
-                     onClick={() => placeBet(value)}
+                     selected={selectedChip === value}
+                     onClick={() => {
+                       setSelectedChip(value);
+                       placeBet(value);
+                     }}
                    />
                  ))}
                </div>
-               <div className="flex justify-center space-x-4">
+               <div className="flex flex-wrap justify-center gap-3">
                  {gameState.players[0].currentBet > 0 && (
                    <>
                      <button
@@ -993,7 +1061,7 @@ const BlackjackLux: React.FC = () => {
                      </button>
                      <button
                        onClick={dealCards}
-                       className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors"
+                       className="game-primary-action"
                      >
                        Deal Cards
                      </button>
@@ -1003,34 +1071,34 @@ const BlackjackLux: React.FC = () => {
              </div>
            )}
 
-                     {gameState.gamePhase === 'playerTurn' && currentHand && (
-             <div className="flex justify-center space-x-4">
+           {gameState.gamePhase === 'playerTurn' && currentHand && (
+            <div className="flex flex-wrap justify-center gap-3 bg-onyx/35 rounded-2xl p-4 border border-white/10">
                <button
                  onClick={hit}
-                 className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                className="px-6 py-3 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 transition-colors"
                >
                  Hit
                </button>
                <button
                  onClick={stand}
-                 className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+                className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
                >
                  Stand
                </button>
                {currentHand.cards.length === 2 && gameState.players[0].bankroll >= currentHand.bet && (
                  <button
                    onClick={doubleDown}
-                   className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors"
                  >
                    Double
                  </button>
                )}
-               {currentHand.cards.length === 2 && 
-                currentHand.cards[0].rank === currentHand.cards[1].rank && 
+               {currentHand.cards.length === 2 &&
+                currentHand.cards[0].rank === currentHand.cards[1].rank &&
                 gameState.players[0].bankroll >= currentHand.bet && (
                  <button
                    onClick={split}
-                   className="px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition-colors"
+                  className="px-6 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-colors"
                  >
                    Split
                  </button>
@@ -1052,8 +1120,8 @@ const BlackjackLux: React.FC = () => {
         </div>
 
                  {/* Player Info */}
-         <div className="bg-onyxLight rounded-lg p-4 mb-6">
-           <div className="flex justify-between items-center">
+         <div className="bg-onyxLight rounded-2xl p-4 mb-6 border border-white/10">
+           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
              <div>
                <h3 className="text-lg font-semibold text-champagne">Bankroll</h3>
                <p className="text-2xl font-bold text-ivory">${gameState.players[0].bankroll}</p>
@@ -1071,7 +1139,7 @@ const BlackjackLux: React.FC = () => {
 
          {/* Last Result */}
          {lastResult && (
-           <div className="bg-onyxLight rounded-lg p-4 mb-6">
+          <div className="bg-onyxLight rounded-2xl p-4 mb-6 border border-white/10">
              <h3 className="text-lg font-semibold text-champagne mb-2">Last Round Results</h3>
              <div className="bg-onyx rounded-lg p-3">
                <pre className="text-sm text-ivory whitespace-pre-wrap">{lastResult}</pre>
@@ -1080,11 +1148,11 @@ const BlackjackLux: React.FC = () => {
          )}
 
         {/* Shoe Info */}
-        <div className="bg-onyxLight rounded-lg p-4">
+        <div className="bg-onyxLight rounded-2xl p-4 border border-white/10">
           <h3 className="text-lg font-semibold text-champagne mb-2">Shoe</h3>
           <div className="flex items-center space-x-4">
             <div className="flex-1 bg-gray-700 rounded-full h-2">
-              <div 
+              <div
                 className="bg-champagne h-2 rounded-full transition-all duration-300"
                 style={{ width: `${(gameState.shoe.length / (52 * rules.numDecks)) * 100}%` }}
               />
@@ -1135,7 +1203,7 @@ const BlackjackLux: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   AI Difficulty
                 </label>
-                <select 
+                <select
                   className="w-full bg-onyx text-ivory rounded-lg p-2 border border-champagne/20"
                   value={aiDifficulty.name}
                   onChange={(e) => {
@@ -1154,7 +1222,7 @@ const BlackjackLux: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   Number of AI Players
                 </label>
-                <select 
+                <select
                   className="w-full bg-onyx text-ivory rounded-lg p-2 border border-champagne/20"
                   value={aiPlayerCount}
                   onChange={(e) => setAiPlayerCount(parseInt(e.target.value))}

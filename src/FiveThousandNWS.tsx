@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { 
+import {
   FaArrowLeft,
   FaGear,
   FaCircleQuestion,
@@ -51,14 +51,6 @@ interface GameState {
   gameWinner: string | null;
 }
 
-interface TutorialStep {
-  type: 'message' | 'highlight' | 'waitFor' | 'scriptedMove';
-  text?: string;
-  target?: string;
-  action?: string;
-  cards?: Card[];
-}
-
 // Constants
 const SUITS = ['spades', 'hearts', 'diamonds', 'clubs'] as const;
 const RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'] as const;
@@ -84,51 +76,24 @@ const THEME = {
   blue: '#3B82F6'
 };
 
-// Game Logic
-const createDeck = (): Card[] => {
+// Game Logic - exported for multiplayer initializers
+export const createDeck = (): Card[] => {
   const deck: Card[] = [];
-  
-  // Add regular cards
   SUITS.forEach(suit => {
     RANKS.forEach(rank => {
       let value: number;
       if (rank === 'A') value = 15;
       else if (['J', 'Q', 'K'].includes(rank)) value = 10;
       else value = parseInt(rank);
-      
-      deck.push({
-        id: `${rank}${suit.charAt(0).toUpperCase()}`,
-        suit,
-        rank,
-        value,
-        isWild: false
-      });
+      deck.push({ id: `${rank}${suit.charAt(0).toUpperCase()}`, suit, rank, value, isWild: false });
     });
   });
-  
-  // Add Jokers
-  deck.push({
-    id: 'BJ',
-    suit: 'joker',
-    rank: 'Big Joker',
-    value: 20,
-    isWild: true,
-    isBigJoker: true
-  });
-  
-  deck.push({
-    id: 'LJ',
-    suit: 'joker',
-    rank: 'Little Joker',
-    value: 15,
-    isWild: true,
-    isLittleJoker: true
-  });
-  
+  deck.push({ id: 'BJ', suit: 'joker', rank: 'Big Joker', value: 20, isWild: true, isBigJoker: true });
+  deck.push({ id: 'LJ', suit: 'joker', rank: 'Little Joker', value: 15, isWild: true, isLittleJoker: true });
   return deck;
 };
 
-const shuffleDeck = (deck: Card[]): Card[] => {
+export const shuffleDeck = (deck: Card[]): Card[] => {
   const shuffled = [...deck];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -143,31 +108,18 @@ const getWildRankValue = (rank: string): number => {
   return parseInt(rank);
 };
 
-const dealInitialCards = (deck: Card[], numPlayers: number): { players: Player[], wildRank: string, wildRankValue: number, remainingDeck: Card[] } => {
-  const players: Player[] = [
-    {
-      id: 'hero',
-      name: 'You',
-      hand: [],
-      melds: [],
-      score: 0,
-      isAI: false,
-      isCurrentPlayer: true,
-      color: THEME.champagne
-    }
-  ];
-
-  // Add AI players based on numPlayers
-  const colors = [THEME.emerald, THEME.blue, THEME.red, THEME.gold];
-  for (let i = 0; i < numPlayers - 1; i++) {
+export const dealInitialCards = (deck: Card[], numPlayers: number, forMultiplayer = false): { players: Player[], wildRank: string, wildRankValue: number, remainingDeck: Card[] } => {
+  const colors = [THEME.champagne, THEME.emerald, THEME.blue, THEME.red, THEME.gold, '#059669', '#8B5CF6', '#EC4899', '#F59E0B'];
+  const players: Player[] = [];
+  for (let i = 0; i < numPlayers; i++) {
     players.push({
-      id: `ai${i + 1}`,
-      name: `AI Player ${i + 1}`,
+      id: forMultiplayer ? (i === 0 ? 'hero' : `player_${i}`) : (i === 0 ? 'hero' : `ai${i}`),
+      name: forMultiplayer ? (i === 0 ? 'You' : `Player ${i + 1}`) : (i === 0 ? 'You' : `AI Player ${i}`),
       hand: [],
       melds: [],
       score: 0,
-      isAI: true,
-      isCurrentPlayer: false,
+      isAI: !forMultiplayer && i > 0,
+      isCurrentPlayer: i === 0,
       color: colors[i % colors.length]
     });
   }
@@ -220,14 +172,14 @@ const getCardDisplay = (card: Card) => {
   if (card.suit === 'joker') {
     return card.isBigJoker ? '🃏' : '🃏';
   }
-  
+
   const suitSymbols = {
     spades: '♠',
     hearts: '♥',
     diamonds: '♦',
     clubs: '♣'
   };
-  
+
   return `${card.rank}${suitSymbols[card.suit]}`;
 };
 
@@ -244,7 +196,7 @@ const isValidMeld = (cards: Card[]): { isValid: boolean; type?: 'set' | 'run' } 
   // Check for set (same rank)
   const ranks = cards.map(c => c.rank).filter(r => r !== 'Big Joker' && r !== 'Little Joker');
   const uniqueRanks = Array.from(new Set(ranks));
-  
+
   if (uniqueRanks.length === 1) {
     return { isValid: true, type: 'set' };
   }
@@ -270,53 +222,6 @@ const isValidMeld = (cards: Card[]): { isValid: boolean; type?: 'set' | 'run' } 
   }
 
   return { isValid: true, type: 'run' };
-};
-
-// AI Logic
-const getAIMove = (player: Player, gameState: GameState, difficulty: any): { action: 'draw' | 'discard' | 'meld'; card?: Card; meldCards?: Card[] } => {
-  // Simple AI: draw from deck, try to meld if possible, discard lowest card
-  const random = Math.random();
-  
-  if (random < 0.3 && player.hand.length > 0) {
-    // Try to create a meld
-    const meldResult = findBestMeld(player.hand);
-    if (meldResult.isValid) {
-      return { action: 'meld', meldCards: meldResult.cards };
-    }
-  }
-  
-  // Draw from deck
-  if (gameState.deck.length > 0) {
-    return { action: 'draw' };
-  }
-  
-  // Discard lowest card
-  const lowestCard = player.hand.reduce((lowest, card) => 
-    card.value < lowest.value ? card : lowest
-  );
-  
-  return { action: 'discard', card: lowestCard };
-};
-
-const findBestMeld = (hand: Card[]): { isValid: boolean; cards?: Card[] } => {
-  // Simple meld finding: look for sets first, then runs
-  const rankGroups = hand.reduce((groups, card) => {
-    if (!groups[card.rank]) groups[card.rank] = [];
-    groups[card.rank].push(card);
-    return groups;
-  }, {} as Record<string, Card[]>);
-
-  // Find sets
-  for (const [rank, cards] of Object.entries(rankGroups)) {
-    if (cards.length >= 3) {
-      const meldResult = isValidMeld(cards.slice(0, 3));
-      if (meldResult.isValid) {
-        return { isValid: true, cards: cards.slice(0, 3) };
-      }
-    }
-  }
-
-  return { isValid: false };
 };
 
 // Card Component
@@ -358,20 +263,56 @@ const CardComponent: React.FC<{
   );
 };
 
+interface FiveThousandNWSProps {
+  isMultiplayer?: boolean;
+  syncedGameState?: unknown;
+  onUpdateGameState?: (state: unknown) => void;
+  onBack?: () => void;
+  playerIndex?: number;
+  isSpectator?: boolean;
+}
+
+const getDefaultFiveThousandState = (): GameState => ({
+  players: [],
+  currentPlayer: 0,
+  deck: [],
+  discardPile: [],
+  wildRank: '',
+  wildRankValue: 0,
+  gamePhase: 'dealing',
+  roundNumber: 1,
+  winner: null,
+  gameWinner: null
+});
+
 // Main Five Thousand NWS Component
-const FiveThousandNWS: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>({
-    players: [],
-    currentPlayer: 0,
-    deck: [],
-    discardPile: [],
-    wildRank: '',
-    wildRankValue: 0,
-    gamePhase: 'dealing',
-    roundNumber: 1,
-    winner: null,
-    gameWinner: null
-  });
+const FiveThousandNWS: React.FC<FiveThousandNWSProps> = ({
+  isMultiplayer = false,
+  syncedGameState,
+  onUpdateGameState,
+  onBack,
+  playerIndex = 0,
+  isSpectator = false
+}) => {
+  const [localState, setLocalState] = useState<GameState>(getDefaultFiveThousandState);
+
+  const gameState = (isMultiplayer && syncedGameState ? syncedGameState : localState) as GameState;
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+  const setGameState = useCallback((updater: GameState | ((prev: GameState) => GameState)) => {
+    if (isMultiplayer && onUpdateGameState) {
+      const next = typeof updater === 'function' ? updater(gameStateRef.current) : updater;
+      onUpdateGameState(next);
+      return;
+    }
+
+    setLocalState(updater as React.SetStateAction<GameState>);
+  }, [isMultiplayer, onUpdateGameState]);
+
+  const isHeroTurn = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : (gameState.players[gameState.currentPlayer]?.id === 'hero');
+  const canInteract = isMultiplayer ? (gameState.currentPlayer === playerIndex && !isSpectator) : true;
 
   const [aiDifficulty, setAiDifficulty] = useState(AI_DIFFICULTIES[1]);
   const [aiPlayerCount, setAiPlayerCount] = useState<number>(3); // 3 AI players by default
@@ -379,145 +320,17 @@ const FiveThousandNWS: React.FC = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [isAITurn, setIsAITurn] = useState(false);
   const [selectedCards, setSelectedCards] = useState<Card[]>([]);
-
-  // Create AI players based on count
-  const createAIPlayers = useCallback((count: number) => {
-    const aiPlayers = [];
-    const colors = [THEME.emerald, THEME.blue, THEME.red, THEME.gold];
-    
-    for (let i = 0; i < count; i++) {
-      aiPlayers.push({
-        id: `ai${i + 1}`,
-        name: `AI Player ${i + 1}`,
-        hand: [],
-        melds: [],
-        score: 0,
-        isAI: true,
-        isCurrentPlayer: false,
-        color: colors[i % colors.length]
-      });
-    }
-    return aiPlayers;
-  }, []);
-
-  // Update game state when AI player count changes
-  useEffect(() => {
-    if (gameState.gamePhase === 'dealing') {
-      const aiPlayers = createAIPlayers(aiPlayerCount);
-      const humanPlayer = {
-        id: 'hero',
-        name: 'You',
-        hand: [],
-        melds: [],
-        score: 0,
-        isAI: false,
-        isCurrentPlayer: true,
-        color: THEME.champagne
-      };
-      
-      setGameState(prev => ({
-        ...prev,
-        players: [humanPlayer, ...aiPlayers]
-      }));
-    }
-  }, [aiPlayerCount, createAIPlayers, gameState.gamePhase]);
+  const [hasDrawnThisTurn, setHasDrawnThisTurn] = useState(false);
 
   const currentPlayer = gameState.players[gameState.currentPlayer];
-  const isHeroTurn = currentPlayer?.id === 'hero';
 
-  // Initialize game
+  // Reset turn-only selections whenever the active player changes.
   useEffect(() => {
-    startNewGame();
-  }, []);
-
-  // AI turn handling
-  useEffect(() => {
-    if (gameState.gamePhase === 'playing' && 
-        gameState.players[gameState.currentPlayer]?.isAI && 
-        !isAITurn) {
-      setIsAITurn(true);
-      setTimeout(() => {
-        performAITurn();
-        setIsAITurn(false);
-      }, 1000);
+    if (gameState.gamePhase === 'playing') {
+      setHasDrawnThisTurn(false);
+      setSelectedCards([]);
     }
-  }, [gameState.currentPlayer, gameState.gamePhase, gameState.players, isAITurn]);
-
-  const performAITurn = useCallback(() => {
-    const currentPlayer = gameState.players[gameState.currentPlayer];
-    if (!currentPlayer?.isAI) return;
-
-    // AI logic: Try to create melds first, then draw a card, then discard
-    const possibleMelds = findPossibleMelds(currentPlayer.hand);
-    
-    if (possibleMelds.length > 0) {
-      // Create the best meld
-      const bestMeld = possibleMelds[0]; // Simple strategy: take first available meld
-      createMeld(bestMeld);
-    } else {
-      // Draw a card
-      drawCard();
-      
-      // After drawing, try to create melds again
-      setTimeout(() => {
-        const newPossibleMelds = findPossibleMelds(currentPlayer.hand);
-        if (newPossibleMelds.length > 0) {
-          createMeld(newPossibleMelds[0]);
-        } else {
-          // Discard the worst card
-          const worstCard = findWorstCard(currentPlayer.hand);
-          if (worstCard) {
-            discardCard(worstCard);
-          }
-        }
-      }, 500);
-    }
-  }, [gameState.players, gameState.currentPlayer]);
-
-  const findPossibleMelds = useCallback((hand: Card[]): Card[][] => {
-    const melds: Card[][] = [];
-    
-    // Find sets (3 or 4 of same rank)
-    const rankGroups = hand.reduce((groups, card) => {
-      const rank = card.rank;
-      if (!groups[rank]) groups[rank] = [];
-      groups[rank].push(card);
-      return groups;
-    }, {} as Record<string, Card[]>);
-    
-    Object.values(rankGroups).forEach(group => {
-      if (group.length >= 3) {
-        melds.push(group.slice(0, 3));
-        if (group.length >= 4) {
-          melds.push(group);
-        }
-      }
-    });
-    
-    // Find runs (3+ consecutive cards of same suit)
-    const suitGroups = hand.reduce((groups, card) => {
-      const suit = card.suit;
-      if (!groups[suit]) groups[suit] = [];
-      groups[suit].push(card);
-      return groups;
-    }, {} as Record<string, Card[]>);
-    
-    Object.values(suitGroups).forEach(group => {
-      if (group.length >= 3) {
-        // Sort by rank value for run detection
-        group.sort((a, b) => a.value - b.value);
-        
-        for (let i = 0; i <= group.length - 3; i++) {
-          const run = group.slice(i, i + 3);
-          if (isConsecutiveRun(run)) {
-            melds.push(run);
-          }
-        }
-      }
-    });
-    
-    return melds;
-  }, []);
+  }, [gameState.currentPlayer, gameState.gamePhase]);
 
   const isConsecutiveRun = useCallback((cards: Card[]): boolean => {
     for (let i = 1; i < cards.length; i++) {
@@ -528,9 +341,54 @@ const FiveThousandNWS: React.FC = () => {
     return true;
   }, []);
 
+  const findPossibleMelds = useCallback((hand: Card[]): Card[][] => {
+    const melds: Card[][] = [];
+
+    // Find sets (3 or 4 of same rank)
+    const rankGroups = hand.reduce((groups, card) => {
+      const rank = card.rank;
+      if (!groups[rank]) groups[rank] = [];
+      groups[rank].push(card);
+      return groups;
+    }, {} as Record<string, Card[]>);
+
+    Object.values(rankGroups).forEach(group => {
+      if (group.length >= 3) {
+        melds.push(group.slice(0, 3));
+        if (group.length >= 4) {
+          melds.push(group);
+        }
+      }
+    });
+
+    // Find runs (3+ consecutive cards of same suit)
+    const suitGroups = hand.reduce((groups, card) => {
+      const suit = card.suit;
+      if (!groups[suit]) groups[suit] = [];
+      groups[suit].push(card);
+      return groups;
+    }, {} as Record<string, Card[]>);
+
+    Object.values(suitGroups).forEach(group => {
+      if (group.length >= 3) {
+        // Sort by rank value for run detection
+        group.sort((a, b) => a.value - b.value);
+
+        for (let i = 0; i <= group.length - 3; i++) {
+          const run = group.slice(i, i + 3);
+          if (isConsecutiveRun(run)) {
+            melds.push(run);
+          }
+        }
+      }
+    });
+
+    return melds;
+  }, [isConsecutiveRun]);
+
   const findWorstCard = useCallback((hand: Card[]): Card | null => {
     if (hand.length === 0) return null;
-    
+
     // Prefer to discard high-value cards that aren't part of potential melds
     const sortedHand = [...hand].sort((a, b) => b.value - a.value);
     return sortedHand[0];
@@ -540,7 +398,7 @@ const FiveThousandNWS: React.FC = () => {
     const deck = shuffleDeck(createDeck());
     const totalPlayers = aiPlayerCount + 1; // Human player + AI players
     const { players, wildRank, wildRankValue, remainingDeck } = dealInitialCards(deck, totalPlayers);
-    
+
     setGameState({
       players,
       currentPlayer: 0,
@@ -553,58 +411,68 @@ const FiveThousandNWS: React.FC = () => {
       winner: null,
       gameWinner: null
     });
-  }, [aiPlayerCount]);
+    setHasDrawnThisTurn(false);
+    setSelectedCards([]);
+  }, [aiPlayerCount, setGameState]);
+
+  // Initialize game (skip in multiplayer - state comes from room).
+  useEffect(() => {
+    if (isMultiplayer) return;
+    startNewGame();
+  }, [isMultiplayer, startNewGame]);
 
   const drawCard = useCallback(() => {
-    if (gameState.gamePhase !== 'playing' || !isHeroTurn || gameState.deck.length === 0) return;
+    if (gameState.gamePhase !== 'playing' || !isHeroTurn || !canInteract || gameState.deck.length === 0 || hasDrawnThisTurn) return;
 
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const player = newPlayers[prev.currentPlayer];
-      const card = prev.deck[prev.deck.length - 1];
-      
+      const card = { ...prev.deck[prev.deck.length - 1] };
+
       if (card.rank === prev.wildRank || card.suit === 'joker') {
         card.isWild = true;
         if (card.rank === prev.wildRank) {
           card.isWildRank = true;
         }
       }
-      
+
       player.hand.push(card);
-      
+
       return {
         ...prev,
         players: newPlayers,
         deck: prev.deck.slice(0, -1)
       };
     });
-  }, [gameState.gamePhase, isHeroTurn, gameState.deck.length]);
+
+    setHasDrawnThisTurn(true);
+  }, [gameState.gamePhase, isHeroTurn, canInteract, gameState.deck.length, hasDrawnThisTurn, setGameState]);
 
   const discardCard = useCallback((card: Card) => {
-    if (gameState.gamePhase !== 'playing' || !isHeroTurn) return;
+    if (gameState.gamePhase !== 'playing' || !isHeroTurn || !canInteract || !hasDrawnThisTurn) return;
 
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const player = newPlayers[prev.currentPlayer];
-      
+
       // Remove card from hand
       player.hand = player.hand.filter(c => c.id !== card.id);
-      
+
       // Add to discard pile
       const newDiscardPile = [card, ...prev.discardPile];
-      
+
       // Check if player has won
       let newGamePhase = prev.gamePhase;
       let winner = prev.winner;
-      
+
       if (player.hand.length === 0) {
         newGamePhase = 'complete';
         winner = player.id;
       }
-      
+
       // Move to next player
       const nextPlayer = (prev.currentPlayer + 1) % newPlayers.length;
-      
+
       return {
         ...prev,
         players: newPlayers,
@@ -614,10 +482,14 @@ const FiveThousandNWS: React.FC = () => {
         winner
       };
     });
-  }, [gameState.gamePhase, isHeroTurn]);
+
+    // Reset draw flag for next turn
+    setHasDrawnThisTurn(false);
+    setSelectedCards([]);
+  }, [gameState.gamePhase, isHeroTurn, canInteract, hasDrawnThisTurn, setGameState]);
 
   const createMeld = useCallback((cards: Card[]) => {
-    if (gameState.gamePhase !== 'playing' || !isHeroTurn) return;
+    if (gameState.gamePhase !== 'playing' || !isHeroTurn || !canInteract) return;
 
     const meldResult = isValidMeld(cards);
     if (!meldResult.isValid) return;
@@ -625,12 +497,12 @@ const FiveThousandNWS: React.FC = () => {
     setGameState(prev => {
       const newPlayers = [...prev.players];
       const player = newPlayers[prev.currentPlayer];
-      
+
       // Remove cards from hand
       cards.forEach(card => {
         player.hand = player.hand.filter(c => c.id !== card.id);
       });
-      
+
       // Create meld
       const newMeld: Meld = {
         id: `meld_${Date.now()}`,
@@ -638,67 +510,140 @@ const FiveThousandNWS: React.FC = () => {
         type: meldResult.type!,
         owner: player.id
       };
-      
+
       player.melds.push(newMeld);
-      
+
       return {
         ...prev,
         players: newPlayers
       };
     });
-    
-    setSelectedCards([]);
-  }, [gameState.gamePhase, isHeroTurn]);
 
-  // AI turn handling
+    setSelectedCards([]);
+  }, [gameState.gamePhase, isHeroTurn, canInteract, setGameState]);
+
+  // AI turn handling (skip in multiplayer)
+  const performAITurn = useCallback(() => {
+    setGameState(prev => {
+      if (prev.gamePhase !== 'playing') return prev;
+
+      const newPlayers = prev.players.map(player => ({
+        ...player,
+        hand: [...player.hand],
+        melds: player.melds.map(meld => ({ ...meld, cards: [...meld.cards] })),
+        isCurrentPlayer: false
+      }));
+      const player = newPlayers[prev.currentPlayer];
+
+      if (!player?.isAI) return prev;
+
+      const deck = [...prev.deck];
+      const discardPile = [...prev.discardPile];
+      const markWild = (card: Card): Card => {
+        const isWild = card.rank === prev.wildRank || card.suit === 'joker' || card.isWild;
+        return {
+          ...card,
+          isWild,
+          isWildRank: card.rank === prev.wildRank || card.isWildRank
+        };
+      };
+
+      if (deck.length > 0) {
+        player.hand.push(markWild(deck.pop()!));
+      }
+
+      const possibleMeld = findPossibleMelds(player.hand)[0];
+      if (possibleMeld) {
+        const meldResult = isValidMeld(possibleMeld);
+        if (meldResult.isValid) {
+          const meldCardIds = new Set(possibleMeld.map(card => card.id));
+          player.hand = player.hand.filter(card => !meldCardIds.has(card.id));
+          player.melds.push({
+            id: `meld_${Date.now()}_${player.id}`,
+            cards: [...possibleMeld],
+            type: meldResult.type!,
+            owner: player.id
+          });
+        }
+      }
+
+      const discard = findWorstCard(player.hand);
+      if (discard) {
+        player.hand = player.hand.filter(card => card.id !== discard.id);
+        discardPile.unshift(discard);
+      }
+
+      const winner = player.hand.length === 0 ? player.id : prev.winner;
+      const nextPlayer = (prev.currentPlayer + 1) % newPlayers.length;
+      newPlayers[nextPlayer] = {
+        ...newPlayers[nextPlayer],
+        isCurrentPlayer: true
+      };
+
+      return {
+        ...prev,
+        players: newPlayers,
+        currentPlayer: nextPlayer,
+        deck,
+        discardPile,
+        gamePhase: winner ? 'complete' : prev.gamePhase,
+        winner
+      };
+    });
+  }, [findPossibleMelds, findWorstCard, setGameState]);
+
   useEffect(() => {
+    if (isMultiplayer) return;
     if (gameState.gamePhase === 'playing' && currentPlayer?.isAI && !isAITurn) {
       setIsAITurn(true);
-      setTimeout(() => {
-        const aiMove = getAIMove(currentPlayer, gameState, aiDifficulty);
-        
-        if (aiMove.action === 'draw' && gameState.deck.length > 0) {
-          drawCard();
-        } else if (aiMove.action === 'discard' && aiMove.card) {
-          discardCard(aiMove.card);
-        } else if (aiMove.action === 'meld' && aiMove.meldCards) {
-          createMeld(aiMove.meldCards);
-        }
-        
-        setTimeout(() => {
-          setIsAITurn(false);
-        }, 1000);
-      }, 1000);
+      const timer = window.setTimeout(() => {
+        performAITurn();
+        setIsAITurn(false);
+      }, 900);
+
+      return () => window.clearTimeout(timer);
     }
-  }, [gameState.gamePhase, currentPlayer, isAITurn, aiDifficulty, drawCard, discardCard, createMeld]);
+  }, [isMultiplayer, gameState.gamePhase, currentPlayer, isAITurn, performAITurn]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx to-onyxLight text-ivory">
+    <div className="game-shell">
       {/* Header */}
-      <div className="bg-onyxLight border-b border-champagne/20 p-4">
-        <div className="flex justify-between items-center">
+      <div className="game-header">
+        <div className="game-header-inner">
           <div className="flex items-center space-x-4">
-            <Link
-              to="/hub"
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
-            >
-              <FaArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-3xl font-bold text-champagne">5000 NWS</h1>
+            {isMultiplayer && onBack ? (
+              <button
+                onClick={onBack}
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/hub"
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            <h1 className="text-3xl font-bold text-champagne">
+              5000 NWS {isMultiplayer && '(Multiplayer)'}
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             {showHints && (
               <button
-                onClick={() => {/* TODO: Show hint */}}
-                className="p-2 rounded-lg bg-emerald text-white hover:bg-emeraldLight transition-colors"
+                onClick={() => {}}
+                className="game-icon-button bg-emerald text-white"
                 disabled={isAITurn}
+                title="Hints coming soon"
               >
                 <FaCircleQuestion className="w-5 h-5" />
               </button>
             )}
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
+              className="game-icon-button"
             >
               <FaGear className="w-5 h-5" />
             </button>
@@ -708,8 +653,8 @@ const FiveThousandNWS: React.FC = () => {
 
       <div className="p-6">
         {/* Game Info */}
-        <div className="bg-onyxLight rounded-lg p-4 mb-6">
-          <div className="flex justify-between items-center">
+        <div className="game-panel mb-6">
+          <div className="game-stat-grid">
             <div>
               <h3 className="text-lg font-semibold text-champagne">5000 NWS</h3>
               <p className="text-ivory/80">NWS House Rules with custom joker values</p>
@@ -732,7 +677,7 @@ const FiveThousandNWS: React.FC = () => {
         {/* Discard Pile */}
         {gameState.discardPile.length > 0 && (
           <div className="flex justify-center mb-6">
-            <div className="bg-onyxLight rounded-lg p-4">
+            <div className="game-panel">
               <h3 className="text-lg font-semibold text-champagne mb-2 text-center">Discard Pile</h3>
               <div className="flex space-x-2">
                 {gameState.discardPile.slice(0, 5).map((card, index) => (
@@ -751,7 +696,7 @@ const FiveThousandNWS: React.FC = () => {
         {/* Players */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           {gameState.players.map((player, index) => (
-            <div key={player.id} className="bg-onyxLight rounded-lg p-4">
+            <div key={player.id} className="game-panel">
               <div className="flex items-center justify-between mb-2">
                 <h3 className={`font-semibold ${player.id === 'hero' ? 'text-champagne' : 'text-ivory'}`}>
                   {player.name} {player.id === 'hero' && '(You)'}
@@ -767,7 +712,7 @@ const FiveThousandNWS: React.FC = () => {
                 <div>Melds: {player.melds.length}</div>
                 {player.isCurrentPlayer && <div className="text-champagne font-bold">Current Turn</div>}
               </div>
-              
+
               {/* Player's Melds */}
               {player.melds.length > 0 && (
                 <div className="mt-2">
@@ -789,7 +734,7 @@ const FiveThousandNWS: React.FC = () => {
 
         {/* Hero's Hand */}
         {currentPlayer?.id === 'hero' && (
-          <div className="bg-onyxLight rounded-lg p-6 mb-6">
+          <div className="game-panel mb-6">
             <h3 className="text-lg font-semibold text-champagne mb-4">Your Hand</h3>
             <div className="flex flex-wrap gap-2 mb-4">
               {currentPlayer.hand.map((card) => (
@@ -808,33 +753,43 @@ const FiveThousandNWS: React.FC = () => {
                 />
               ))}
             </div>
-            
+
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4">
               <button
                 onClick={drawCard}
-                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors"
-                disabled={gameState.deck.length === 0}
+                className={`px-6 py-3 text-white font-bold rounded-lg transition-colors ${
+                  hasDrawnThisTurn || gameState.deck.length === 0
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+                disabled={hasDrawnThisTurn || gameState.deck.length === 0}
               >
-                Draw Card ({gameState.deck.length})
+                {hasDrawnThisTurn ? 'Already Drew' : `Draw Card (${gameState.deck.length})`}
               </button>
-              
+
               {selectedCards.length > 0 && (
                 <button
                   onClick={() => createMeld(selectedCards)}
-                  className="px-6 py-3 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-colors"
+                  className="game-success-action"
                 >
                   Create Meld
                 </button>
               )}
-              
-              {selectedCards.length === 1 && (
+
+              {selectedCards.length === 1 && hasDrawnThisTurn && (
                 <button
                   onClick={() => discardCard(selectedCards[0])}
-                  className="px-6 py-3 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors"
+                  className="game-danger-action"
                 >
                   Discard Card
                 </button>
+              )}
+
+              {hasDrawnThisTurn && selectedCards.length === 0 && (
+                <div className="px-6 py-3 bg-yellow-600 text-white font-bold rounded-lg">
+                  Select a card to discard
+                </div>
               )}
             </div>
           </div>
@@ -851,7 +806,7 @@ const FiveThousandNWS: React.FC = () => {
         <div className="flex justify-center space-x-4 mb-6">
           <button
             onClick={startNewGame}
-            className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors"
+            className="game-primary-action"
           >
             New Game
           </button>
@@ -884,7 +839,7 @@ const FiveThousandNWS: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   AI Difficulty
                 </label>
-                <select 
+                <select
                   value={aiDifficulty.name}
                   onChange={(e) => {
                     const difficulty = AI_DIFFICULTIES.find(d => d.name === e.target.value);
@@ -903,7 +858,7 @@ const FiveThousandNWS: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   Number of AI Players
                 </label>
-                <select 
+                <select
                   className="w-full bg-onyx text-ivory rounded-lg p-2 border border-champagne/20"
                   value={aiPlayerCount}
                   onChange={(e) => setAiPlayerCount(parseInt(e.target.value))}
@@ -918,9 +873,9 @@ const FiveThousandNWS: React.FC = () => {
                 <label className="block text-sm font-medium text-ivory mb-2">
                   Show Hints
                 </label>
-                <input 
-                  type="checkbox" 
-                  checked={showHints} 
+                <input
+                  type="checkbox"
+                  checked={showHints}
                   onChange={(e) => setShowHints(e.target.checked)}
                   className="mr-2"
                 />

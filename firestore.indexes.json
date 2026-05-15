@@ -1,4 +1,36 @@
 {
-  "indexes": [],
+  "indexes": [
+    {
+      "collectionGroup": "raffles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "endsAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "raffles",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "startsAt", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "raffle_entries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "stripePaymentIntentId", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "raffle_entries",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "raffleId", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" }
+      ]
+    }
+  ],
   "fieldOverrides": []
 }

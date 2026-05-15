@@ -36,17 +36,16 @@ const VideoCall: React.FC<VideoCallProps> = ({ roomUrl, onClose }) => {
 
       callObjectRef.current = callObject;
 
-      // Join the room
-      await callObject.join({ url: demoRoomUrl });
-
-      setIsInCall(true);
-      setIsJoining(false);
-
-      // Handle when user leaves the call
+      // Register handlers before join to avoid race conditions
       callObject.on('left-meeting', () => {
         setIsInCall(false);
         if (onClose) onClose();
       });
+
+      await callObject.join({ url: demoRoomUrl });
+
+      setIsInCall(true);
+      setIsJoining(false);
 
     } catch (err) {
       console.error('Error joining call:', err);
@@ -58,9 +57,11 @@ const VideoCall: React.FC<VideoCallProps> = ({ roomUrl, onClose }) => {
   const leaveCall = () => {
     if (callObjectRef.current) {
       callObjectRef.current.leave();
+      // left-meeting event will handle cleanup
+    } else {
+      setIsInCall(false);
+      if (onClose) onClose();
     }
-    setIsInCall(false);
-    if (onClose) onClose();
   };
 
   useEffect(() => {

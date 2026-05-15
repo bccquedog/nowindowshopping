@@ -4,6 +4,29 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+const CHUNK_RELOAD_KEY = 'nws_chunk_reload_once';
+
+const reloadOnceForChunkError = () => {
+  if (sessionStorage.getItem(CHUNK_RELOAD_KEY) === '1') return;
+  sessionStorage.setItem(CHUNK_RELOAD_KEY, '1');
+  window.location.reload();
+};
+
+window.addEventListener('error', (event) => {
+  const message = String((event as ErrorEvent).message || '');
+  if (message.includes('ChunkLoadError') || message.includes('Loading chunk')) {
+    reloadOnceForChunkError();
+  }
+});
+
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = (event as PromiseRejectionEvent).reason;
+  const message = String(reason?.message || reason || '');
+  if (message.includes('ChunkLoadError') || message.includes('Loading chunk')) {
+    reloadOnceForChunkError();
+  }
+});
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );

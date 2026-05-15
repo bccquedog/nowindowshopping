@@ -30,8 +30,7 @@ export interface SystemHealth {
 }
 
 const modules = [
-  { name: 'LandingPage', path: './App', critical: true },
-  { name: 'InteractiveHub', path: './App', critical: true },
+  { name: 'HubHome', path: './App', critical: true },
   { name: 'CoachCare', path: './App', critical: true },
   { name: 'ITServices', path: './App', critical: false },
   { name: 'MGCU', path: './App', critical: false },

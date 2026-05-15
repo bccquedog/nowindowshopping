@@ -1,8 +1,18 @@
 # Video Chat Setup Guide
 
-This guide will help you set up the video chat feature for coaching sessions and group sessions using Daily.co.
+This guide will help you set up the video chat feature for coaching sessions and group sessions. The project supports two video backends:
+
+- **WebRTC** (peer-to-peer): Used for 2-player game room calls. Lower latency, from LoveQuest implementation.
+- **Daily.co**: Used for 3+ player sessions and coaching.
 
 ## Features Added
+
+✅ **WebRTC 1:1 Video Calls** (from LoveQuest videochat implementation)
+- Peer-to-peer for lower latency
+- Reconnect grace period on transient disconnect
+- ICE restart on failure
+- TURN support for restrictive networks (corporate, mobile)
+- Firestore signaling: `gameRoomCalls/{roomId}`
 
 ✅ **Enhanced VideoChat Component**
 - Support for both coaching (1:1) and group sessions
@@ -54,6 +64,11 @@ Create a `.env` file in the root directory:
 
 ```env
 REACT_APP_DAILY_API_KEY=your_daily_api_key_here
+
+# WebRTC TURN servers (recommended for mobile/corporate networks)
+REACT_APP_TURN_URLS=turn:your-turn-server.com:3478
+REACT_APP_TURN_USERNAME=your_username
+REACT_APP_TURN_CREDENTIAL=your_credential
 ```
 
 ### 4. Update Room URLs

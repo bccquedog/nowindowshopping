@@ -1,150 +1,150 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  ClipboardCheck,
+  LockKeyhole,
+  MessageSquare,
+  ShieldCheck,
+  Target,
+  Users,
+} from 'lucide-react';
 import { LoginScreen } from './LoginScreen';
+
+const accessPoints = [
+  'Session schedule and video access',
+  'Active goals and coaching milestones',
+  'Shared notes, action items, and support links',
+];
+
+const audienceCards = [
+  {
+    title: 'Clients',
+    description: 'See what is next, review progress, and keep action items visible between sessions.',
+    icon: Target,
+  },
+  {
+    title: 'Coaches',
+    description: 'Manage relationships, sessions, notes, and follow-up rhythms from one workspace.',
+    icon: Users,
+  },
+  {
+    title: 'Administrators',
+    description: 'Keep operations, requests, and client experience details organized behind the scenes.',
+    icon: ClipboardCheck,
+  },
+];
 
 export const CoachCareLanding: React.FC = () => {
   const [showLogin, setShowLogin] = useState(false);
 
-  // If user wants to login, show the full login screen
   if (showLogin) {
     return <LoginScreen />;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-900 dark:via-indigo-900 dark:to-purple-900 flex items-center justify-center py-8 px-4 sm:py-12 sm:px-6 lg:px-8">
-      <div className="max-w-4xl w-full">
-        {/* Header */}
-        <div className="text-center mb-8 sm:mb-12">
-          <div className="mx-auto h-12 w-12 sm:h-16 sm:w-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-            <span className="text-white text-lg sm:text-2xl font-bold">CC</span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4">
-            Welcome to CoachCare
-          </h1>
-          <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto px-2">
-            Your comprehensive platform for coaching excellence. Whether you're a coach looking to grow your practice or a client seeking transformation, we're here to support your journey.
-          </p>
-        </div>
-
-        {/* Main Options */}
-        <div className="grid md:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
-          {/* Sign In Option */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
-            <div className="text-center mb-4 sm:mb-6">
-              <div className="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-blue-600 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Sign In to CoachCare
-              </h2>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                Access your dashboard, manage clients, and track your coaching journey.
-              </p>
-            </div>
-            
-            <div className="space-y-3 sm:space-y-4">
-              <button
-                onClick={() => setShowLogin(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 sm:py-3 px-6 rounded-lg transition-colors touch-manipulation"
-              >
-                Sign In to Existing Account
-              </button>
-              
-              <div className="text-center">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-2 sm:mb-3">
-                  New to CoachCare?
-                </p>
-                <button
-                  onClick={() => setShowLogin(true)}
-                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm sm:text-base touch-manipulation"
-                >
-                  Create a new account
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Consultation Option */}
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
-            <div className="text-center mb-4 sm:mb-6">
-              <div className="mx-auto h-10 w-10 sm:h-12 sm:w-12 bg-purple-600 rounded-full flex items-center justify-center mb-3 sm:mb-4">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-              </div>
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-2">
-                Book a Free Consultation
-              </h2>
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
-                Discover how coaching can transform your life or business. Schedule a complimentary session.
-              </p>
-            </div>
-            
-            <div className="space-y-3 sm:space-y-4">
-              <Link
-                to="/coachcare/booking"
-                className="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 sm:py-3 px-6 rounded-lg transition-colors text-center touch-manipulation"
-              >
-                Schedule Free Consultation
-              </Link>
-              
-              <div className="text-center">
-                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                  No commitment required • 30-minute session
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Features */}
-        <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="text-center">
-            <div className="mx-auto h-8 w-8 sm:h-10 sm:w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Proven Results</h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Transformative coaching that delivers measurable outcomes</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="mx-auto h-8 w-8 sm:h-10 sm:w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Secure Platform</h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Your data and conversations are protected and confidential</p>
-          </div>
-          
-          <div className="text-center">
-            <div className="mx-auto h-8 w-8 sm:h-10 sm:w-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center mb-2 sm:mb-3">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-1 text-sm sm:text-base">Flexible Sessions</h3>
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">Schedule sessions that fit your lifestyle and goals</p>
-          </div>
-        </div>
-
-        {/* Back to Hub */}
-        <div className="text-center">
+    <main className="min-h-screen bg-stone-50 text-slate-950">
+      <section className="border-b border-slate-200 bg-white">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             to="/hub"
-            className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors text-sm sm:text-base touch-manipulation"
+            className="inline-flex min-h-10 items-center gap-2 rounded-md px-2 text-sm font-bold text-slate-600 transition hover:bg-slate-100 hover:text-slate-950"
           >
-            <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            Back to Hub
+            <ArrowLeft className="h-4 w-4" />
+            Back to hub
+          </Link>
+          <Link
+            to="/support"
+            className="hidden min-h-10 items-center gap-2 rounded-md border border-slate-300 px-3 text-sm font-bold text-slate-700 transition hover:border-slate-950 hover:bg-slate-950 hover:text-white sm:inline-flex"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Support
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+
+      <section className="bg-slate-950 text-white">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-14 sm:px-6 sm:py-16 lg:grid-cols-[1fr_0.8fr] lg:px-8">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/[0.06] px-3 py-2 text-sm font-bold text-amber-200">
+              <LockKeyhole className="h-4 w-4" />
+              CoachCare access
+            </div>
+            <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-normal sm:text-5xl">
+              Coaching work should feel organized before and after the session.
+            </h1>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/70">
+              CoachCare gives clients and coaches a cleaner place to track the relationship: schedule, goals, notes, and next steps.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <button
+                onClick={() => setShowLogin(true)}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-amber-400 px-5 py-3 text-base font-bold text-slate-950 transition hover:bg-amber-300"
+              >
+                <ShieldCheck className="h-5 w-5" />
+                Sign in
+              </button>
+              <Link
+                to="/coachcare/booking"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/25 px-5 py-3 text-base font-bold text-white transition hover:bg-white hover:text-slate-950"
+              >
+                <CalendarDays className="h-5 w-5" />
+                Book consultation
+              </Link>
+            </div>
+          </div>
+
+          <aside className="rounded-lg border border-white/10 bg-white/[0.06] p-6">
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-300">Inside the portal</p>
+            <div className="mt-5 space-y-4">
+              {accessPoints.map((point) => (
+                <div key={point} className="flex gap-3">
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 flex-none text-amber-300" />
+                  <p className="text-sm font-semibold leading-6 text-white/80">{point}</p>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="grid gap-4 md:grid-cols-3">
+          {audienceCards.map((card) => {
+            const CardIcon = card.icon;
+
+            return (
+              <article key={card.title} className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-teal-700 text-white">
+                  <CardIcon className="h-5 w-5" />
+                </span>
+                <h2 className="mt-5 text-xl font-extrabold tracking-normal text-slate-950">{card.title}</h2>
+                <p className="mt-3 text-sm leading-6 text-slate-600">{card.description}</p>
+              </article>
+            );
+          })}
+        </div>
+
+        <div className="mt-8 rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:flex sm:items-center sm:justify-between sm:gap-6">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">New client?</p>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-normal text-slate-950">Start with a consultation.</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              The best first step is a short conversation about goals, fit, and the right coaching path.
+            </p>
+          </div>
+          <Link
+            to="/coachcare/booking"
+            className="mt-5 inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-slate-950 px-5 py-3 text-base font-bold text-white transition hover:bg-teal-800 sm:mt-0"
+          >
+            Schedule now
+            <ArrowRight className="h-5 w-5" />
+          </Link>
+        </div>
+      </section>
+    </main>
   );
-}; 
+};

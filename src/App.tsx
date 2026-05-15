@@ -12,11 +12,12 @@ import {
   FaGear, 
   FaDesktop, 
   FaCircleQuestion, 
-  FaClock, 
+  FaClock,
   FaBullhorn,
-  FaStore,
   FaEnvelope,
-  FaInstagram
+  FaInstagram, 
+  FaLifeRing,
+  FaGamepad
 } from 'react-icons/fa6';
 
 // Icon wrapper to fix TypeScript issues with React 19
@@ -50,7 +51,7 @@ const BlogPostFinancialLiteracy = React.lazy(() => import('./BlogPostFinancialLi
 const UserGuide = React.lazy(() => import('./UserGuide'));
 const LQ = React.lazy(() => import('./LQ'));
 const AdminGuide = React.lazy(() => import('./AdminGuide'));
-// AdminDashboard temporarily disabled
+const AdminDashboard = React.lazy(() => import('./AdminDashboard'));
 const CoachCareApp = React.lazy(() => import('./coachcare/CoachCareApp').then(module => ({ default: module.CoachCareApp })));
 const BlogPostNWSLaws = React.lazy(() => import('./BlogPostNWSLaws'));
 const ShoutOut = React.lazy(() => import('./ShoutOut'));
@@ -85,6 +86,7 @@ const BlogPostEscaping90s1 = React.lazy(() => import('./BlogPostEscaping90s1'));
 const BlogPostEscaping90s2 = React.lazy(() => import('./BlogPostEscaping90s2'));
 const BlogPostEscaping90s3 = React.lazy(() => import('./BlogPostEscaping90s3'));
 const Brians42nd = React.lazy(() => import('./Brians42nd'));
+const VDaySurprise = React.lazy(() => import('./VDaySurprise'));
 const SlipperySlopesHub = React.lazy(() => import('./SlipperySlopesHub'));
 const SeatAtTableHub = React.lazy(() => import('./SeatAtTableHub'));
 const PeakedHSHub = React.lazy(() => import('./PeakedHSHub'));
@@ -92,14 +94,19 @@ const BlogPostFinessing101 = React.lazy(() => import('./BlogPostFinessing101'));
 const About = React.lazy(() => import('./About'));
 const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
 const TermsConditions = React.lazy(() => import('./TermsConditions'));
-const LandingPage = React.lazy(() => import('./LandingPage'));
 const BlackjackLux = React.lazy(() => import('./BlackjackLux'));
 const CheckersLux = React.lazy(() => import('./CheckersLux'));
 const Tycoon = React.lazy(() => import('./Tycoon'));
 const NWSSpades = React.lazy(() => import('./NWSSpades'));
 const FiveThousandNWS = React.lazy(() => import('./FiveThousandNWS'));
+const HoldemLux = React.lazy(() => import('./HoldemLux'));
 const GameHub = React.lazy(() => import('./GameHub'));
 const MultiplayerLobby = React.lazy(() => import('./components/MultiplayerLobby'));
+const RaffleHub = React.lazy(() => import('./raffle/RaffleHub'));
+const RaffleDetail = React.lazy(() => import('./raffle/RaffleDetail'));
+const RaffleAdmin = React.lazy(() => import('./raffle/RaffleAdmin'));
+const PageMonitorDownload = React.lazy(() => import('./PageMonitorDownload'));
+const SoftwareHub = React.lazy(() => import('./SoftwareHub'));
 
 // Loading component for Suspense fallback
 const LoadingSpinner = () => (
@@ -174,6 +181,13 @@ const InteractiveHub = () => (
               to="/applications"
               icon={<IconWrapper icon={FaDesktop} className="text-4xl" />}
             />
+            {/* Games Card */}
+            <HubCard
+              title="Games"
+              description="Play the NWS arcade: cards, checkers, property strategy, and multiplayer rooms."
+              to="/games"
+              icon={<IconWrapper icon={FaGamepad} className="text-4xl" />}
+            />
             {/* User Guide Card */}
             <HubCard
               title="User Guide"
@@ -194,6 +208,20 @@ const InteractiveHub = () => (
               description="Live venue messaging platform for real-time audience engagement and venue monetization."
               to="/shoutout"
               icon={<IconWrapper icon={FaBullhorn} className="text-4xl" />}
+            />
+            {/* Support Card */}
+            <HubCard
+              title="Support"
+              description="Need help? Submit a support ticket for technical issues, billing, or general inquiries."
+              to="/support"
+              icon={<IconWrapper icon={FaLifeRing} className="text-4xl" />}
+            />
+            {/* Raffles Card */}
+            <HubCard
+              title="Raffles"
+              description="Enter for a chance to win exclusive items. Each raffle has a countdown—buy tickets before time runs out!"
+              to="/raffle"
+              icon={<IconWrapper icon={FaBullseye} className="text-4xl" />}
             />
           </div>
         </div>
@@ -276,15 +304,16 @@ const InteractiveHub = () => (
 // Card component for the hub
 const HubCard = ({ title, description, to, icon }: { title: string; description: string; to: string; icon: React.ReactNode }) => {
   const isLQCard = title === "Luminère Qualité";
-  
+
   return (
-    <div className={`
-      ${isLQCard 
-        ? 'bg-black border-2 border-yellow-400 text-white hover:border-yellow-300 group hover:scale-105 hover:rotate-1 transition-all duration-500 shadow-2xl hover:shadow-yellow-400/20' 
-        : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:scale-105'
-      } 
-      rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col px-4 sm:px-6 py-4 sm:py-6 md:py-8 justify-between h-full group touch-manipulation
-    `}>
+    <Link
+      to={to}
+      className={`${
+        isLQCard
+          ? 'bg-black border-2 border-yellow-400 text-white hover:border-yellow-300 hover:shadow-yellow-400/20'
+          : 'bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700'
+      } hover:scale-105 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col px-4 sm:px-6 py-4 sm:py-6 md:py-8 justify-between h-full group touch-manipulation no-underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500`}
+    >
       <div>
         <div className={`text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 text-center group-hover:scale-110 transition-transform duration-300 ${
           isLQCard ? 'text-yellow-400' : ''
@@ -292,58 +321,26 @@ const HubCard = ({ title, description, to, icon }: { title: string; description:
           {icon}
         </div>
         <h3 className={`text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3 text-center leading-tight ${
-          isLQCard 
-            ? 'text-yellow-400 font-serif' 
-            : 'text-gray-900 dark:text-white'
+          isLQCard ? 'text-yellow-400 font-serif' : 'text-gray-900 dark:text-white'
         }`}>
           {title}
         </h3>
         <p className={`mb-3 sm:mb-4 md:mb-6 text-xs sm:text-sm leading-relaxed text-center ${
-          isLQCard 
-            ? 'text-gray-300 font-serif' 
-            : 'text-gray-700 dark:text-gray-300'
+          isLQCard ? 'text-gray-300 font-serif' : 'text-gray-700 dark:text-gray-300'
         }`}>
           {description}
         </p>
       </div>
-      <Link 
-        to={to} 
-        className={`
-          ${isLQCard 
-            ? 'bg-yellow-400 text-black hover:bg-yellow-300 font-serif font-semibold' 
-            : 'bg-gray-900 text-white hover:bg-gray-800 group-hover:bg-blue-600'
-          } 
-          py-3 sm:py-2 md:py-3 px-4 sm:px-6 rounded-xl font-semibold transition-colors text-center text-sm sm:text-base touch-manipulation
-        `}
-      >
+      <span className={`py-3 sm:py-2 md:py-3 px-4 sm:px-6 rounded-xl font-semibold transition-colors text-center text-sm sm:text-base touch-manipulation ${
+        isLQCard
+          ? 'bg-yellow-400 text-black group-hover:bg-yellow-300 font-serif'
+          : 'bg-gray-900 text-white group-hover:bg-blue-600'
+      }`}>
         {isLQCard ? 'Discover' : 'Explore'}
-      </Link>
-    </div>
+      </span>
+    </Link>
   );
 };
-
-const WebStoreMaintenance = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-100 to-pink-100 dark:from-gray-900 dark:to-pink-900 py-12 px-4">
-    {/* Back Button */}
-    <div className="w-full max-w-2xl mb-6">
-      <Link 
-        to="/hub" 
-        className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
-      >
-        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to Hub
-      </Link>
-    </div>
-
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-10 flex flex-col items-center">
-      <IconWrapper icon={FaStore} className="text-6xl mb-4 text-pink-600 dark:text-pink-400" />
-      <h1 className="text-2xl font-bold mb-2 text-pink-600 dark:text-pink-400">Web Store Under Maintenance</h1>
-      <p className="text-gray-700 dark:text-gray-300 text-lg">Our store is getting a glow-up! Please check back soon for new merch and digital goodies.</p>
-    </div>
-  </div>
-);
 
 const ContactPage = () => (
   <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-pink-100">
@@ -361,12 +358,26 @@ const ContactPage = () => (
   </div>
 );
 
+const WebStore = React.lazy(() => import('./webstore/WebStore'));
+const ProductDetail = React.lazy(() => import('./webstore/ProductDetail'));
+const WebstoreAdmin = React.lazy(() => import('./webstore/admin/WebstoreAdmin'));
+const TechClientAdmin = React.lazy(() => import('./tech-clients/admin/TechClientAdmin'));
+const TechClientPortal = React.lazy(() => import('./tech-clients/portal/TechClientPortal'));
+const SupportRequest = React.lazy(() => import('./support/public/SupportRequest'));
+const SupportAdmin = React.lazy(() => import('./support/admin/SupportAdmin'));
+const ClientIntake = React.lazy(() => import('./ClientIntake'));
+const FeedbackForm = React.lazy(() => import('./FeedbackForm'));
+
 const App = () => (
   <Router>
     <MultiplayerProvider>
       <Suspense fallback={<LoadingSpinner />}>
         <Routes>
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<InteractiveHub />} />
+        <Route path="/love" element={<VDaySurprise />} />
+        <Route path="/love/" element={<VDaySurprise />} />
+        <Route path="/vdaysurprise" element={<VDaySurprise />} />
+        <Route path="/vdaysurprise/" element={<VDaySurprise />} />
         <Route path="/hub" element={<InteractiveHub />} />
         <Route path="/healthcheck" element={<HealthcheckScreen />} />
         <Route path="/feature-status" element={<FeatureStatusScreen />} />
@@ -409,7 +420,7 @@ const App = () => (
         <Route path="/guide" element={<UserGuide />} />
         <Route path="/lq" element={<LQ />} />
         <Route path="/admin/guide" element={<AdminGuide />} />
-                        {/* AdminDashboard route temporarily disabled */}
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/coachcare/booking" element={<Booking />} />
         <Route path="/coachcare/*" element={<CoachCareApp />} />
         <Route path="/blog/nws-laws" element={<BlogPostNWSLaws />} />
@@ -425,7 +436,22 @@ const App = () => (
         <Route path="/mgcu/about" element={<MGCUAbout />} />
         <Route path="/mgcu/settings" element={<MGCUSettings />} />
         <Route path="/mgcu/discord" element={<MGCUDiscord />} />
-        <Route path="/webstore" element={<WebStoreMaintenance />} />
+        <Route path="/webstore" element={<WebStore />} />
+        <Route path="/webstore/:slug" element={<ProductDetail />} />
+        <Route path="/webstore/admin" element={<WebstoreAdmin />} />
+        <Route path="/admin/tech-clients" element={<TechClientAdmin />} />
+        <Route path="/tech-clients" element={<TechClientPortal />} />
+        <Route path="/support" element={<SupportRequest />} />
+        <Route path="/admin/support" element={<SupportAdmin />} />
+        <Route path="/clientintake" element={<ClientIntake />} />
+        <Route path="/feedback" element={<FeedbackForm />} />
+        <Route path="/raffle" element={<RaffleHub />} />
+        <Route path="/raffle/admin" element={<RaffleAdmin />} />
+        <Route path="/raffle/:id" element={<RaffleDetail />} />
+        <Route path="/pagemonitor" element={<PageMonitorDownload />} />
+        <Route path="/pagemonitor/" element={<PageMonitorDownload />} />
+        <Route path="/softwarehub" element={<SoftwareHub />} />
+        <Route path="/softwarehub/" element={<SoftwareHub />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/about" element={<About />} />
         <Route path="/services" element={<Services />} />
@@ -439,17 +465,17 @@ const App = () => (
         <Route path="/about-us" element={<About />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-conditions" element={<TermsConditions />} />
-                 <Route path="/blackjack" element={<BlackjackLux />} />
-         <Route path="/checkers" element={<CheckersLux />} />
-         <Route path="/tycoon" element={<Tycoon />} />
+        <Route path="/blackjack" element={<BlackjackLux />} />
+        <Route path="/checkers" element={<CheckersLux />} />
+        <Route path="/tycoon" element={<Tycoon />} />
         <Route path="/spades" element={<NWSSpades />} />
         <Route path="/5000" element={<FiveThousandNWS />} />
+        <Route path="/holdem" element={<HoldemLux />} />
         <Route path="/games" element={<GameHub />} />
         
         {/* Multiplayer Routes */}
         <Route path="/multiplayer/:gameType" element={
           <MultiplayerLobby 
-            gameType={window.location.pathname.split('/')[2] || ''} 
             onStartGame={() => {}} 
             onBack={() => window.history.back()} 
           />

@@ -1,12 +1,10 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   FaArrowLeft,
   FaGear,
   FaCircleQuestion,
-  FaPlay,
-  FaPause,
   FaXmark,
   FaCheck
 } from 'react-icons/fa6';
@@ -88,17 +86,8 @@ const isDarkSquare = (row: number, col: number): boolean => {
   return (row + col) % 2 === 1;
 };
 
-const getSquareKey = (pos: Position): string => {
-  return `${pos.row}-${pos.col}`;
-};
-
-const getPositionFromKey = (key: string): Position => {
-  const [row, col] = key.split('-').map(Number);
-  return { row, col };
-};
-
-// Game Logic
-const createInitialBoard = (): Piece[] => {
+// Game Logic - exported for multiplayer initializers
+export const createInitialBoard = (): Piece[] => {
   const pieces: Piece[] = [];
   let id = 0;
 
@@ -247,7 +236,7 @@ const getMultiJumpMoves = (piece: Piece, pieces: Piece[], capturedPositions: Pos
   return multiJumps;
 };
 
-const getAllLegalMoves = (pieces: Piece[], currentPlayer: 'dark' | 'light'): Move[] => {
+export const getAllLegalMoves = (pieces: Piece[], currentPlayer: 'dark' | 'light'): Move[] => {
   const playerPieces = pieces.filter(p => p.color === currentPlayer);
   const allMoves: Move[] = [];
 
@@ -452,23 +441,60 @@ const CheckerPiece: React.FC<{
   );
 };
 
+interface CheckersLuxProps {
+  isMultiplayer?: boolean;
+  syncedGameState?: GameState | null;
+  onUpdateGameState?: (state: GameState) => void;
+  onBack?: () => void;
+  playerIndex?: number;
+  isSpectator?: boolean;
+}
+
+const defaultGameState: GameState = {
+  pieces: createInitialBoard(),
+  currentPlayer: 'dark',
+  selectedPiece: null,
+  legalMoves: [],
+  gamePhase: 'playing',
+  winner: null,
+  moveHistory: [],
+  moveCount: 0,
+  lastMove: null,
+  forcedCapture: false
+};
+
 // Main Checkers Component
-const CheckersLux: React.FC = () => {
-  const [gameState, setGameState] = useState<GameState>({
-    pieces: createInitialBoard(),
-    currentPlayer: 'dark',
-    selectedPiece: null,
-    legalMoves: [],
-    gamePhase: 'playing',
-    winner: null,
-    moveHistory: [],
-    moveCount: 0,
-    lastMove: null,
-    forcedCapture: false
-  });
+const CheckersLux: React.FC<CheckersLuxProps> = ({
+  isMultiplayer = false,
+  syncedGameState,
+  onUpdateGameState,
+  onBack,
+  playerIndex = 0,
+  isSpectator = false
+}) => {
+  const [localState, setLocalState] = useState<GameState>(defaultGameState);
+
+  const gameState = isMultiplayer && syncedGameState ? syncedGameState : localState;
+  const gameStateRef = useRef(gameState);
+  useEffect(() => {
+    gameStateRef.current = gameState;
+  }, [gameState]);
+  const setGameState = useCallback((updater: GameState | ((prev: GameState) => GameState)) => {
+    if (isMultiplayer && onUpdateGameState) {
+      const next = typeof updater === 'function' ? updater(gameStateRef.current) : updater;
+      onUpdateGameState(next);
+      return;
+    }
+
+    setLocalState(updater as React.SetStateAction<GameState>);
+  }, [isMultiplayer, onUpdateGameState]);
+
+  const ourColor: 'dark' | 'light' = playerIndex === 0 ? 'dark' : 'light';
+  const isOurTurn = gameState.currentPlayer === ourColor;
+  const canInteract = isMultiplayer ? (isOurTurn && !isSpectator) : true;
 
   const [aiDifficulty, setAiDifficulty] = useState<AIDifficulty>(AI_DIFFICULTIES[1]);
-  const [isAIGame, setIsAIGame] = useState<boolean>(true);
+  const [isAIGame, setIsAIGame] = useState<boolean>(!isMultiplayer);
   const [showHints, setShowHints] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [isAITurn, setIsAITurn] = useState<boolean>(false);
@@ -492,21 +518,7 @@ const CheckersLux: React.FC = () => {
         winner: prev.currentPlayer === 'dark' ? 'light' : 'dark'
       }));
     }
-  }, [gameState.pieces, gameState.currentPlayer]);
-
-  // AI turn handling
-  useEffect(() => {
-    if (isAIGame && gameState.currentPlayer === 'light' && gameState.gamePhase === 'playing' && !isAITurn) {
-      setIsAITurn(true);
-      setTimeout(() => {
-        const aiMove = getBestMove(gameState.pieces, 'light', aiDifficulty);
-        if (aiMove) {
-          makeMove(aiMove);
-        }
-        setIsAITurn(false);
-      }, AI_DELAY);
-    }
-  }, [gameState.currentPlayer, gameState.gamePhase, isAIGame, aiDifficulty, isAITurn]);
+  }, [gameState.pieces, gameState.currentPlayer, setGameState]);
 
   const makeMove = useCallback((move: Move) => {
     setGameState(prev => {
@@ -524,11 +536,26 @@ const CheckersLux: React.FC = () => {
         lastMove: move
       };
     });
-  }, []);
+  }, [setGameState]);
+
+  // AI turn handling (skip in multiplayer)
+  useEffect(() => {
+    if (isMultiplayer || !isAIGame) return;
+    if (gameState.currentPlayer === 'light' && gameState.gamePhase === 'playing' && !isAITurn) {
+      setIsAITurn(true);
+      const timer = window.setTimeout(() => {
+        const aiMove = getBestMove(gameState.pieces, 'light', aiDifficulty);
+        if (aiMove) {
+          makeMove(aiMove);
+        }
+        setIsAITurn(false);
+      }, AI_DELAY);
+      return () => window.clearTimeout(timer);
+    }
+  }, [isMultiplayer, gameState.currentPlayer, gameState.gamePhase, gameState.pieces, isAIGame, aiDifficulty, isAITurn, makeMove]);
 
   const handlePieceClick = useCallback((piece: Piece) => {
-    if (gameState.gamePhase !== 'playing' || isAITurn) return;
-    
+    if (gameState.gamePhase !== 'playing' || isAITurn || !canInteract) return;
     if (piece.color !== gameState.currentPlayer) return;
 
     setGameState(prev => ({
@@ -537,10 +564,10 @@ const CheckersLux: React.FC = () => {
       legalMoves: getAllLegalMoves(prev.pieces, prev.currentPlayer)
         .filter(move => move.from.row === piece.position.row && move.from.col === piece.position.col)
     }));
-  }, [gameState.gamePhase, gameState.currentPlayer, isAITurn]);
+  }, [gameState.gamePhase, gameState.currentPlayer, isAITurn, canInteract, setGameState]);
 
   const handleSquareClick = useCallback((position: Position) => {
-    if (!gameState.selectedPiece || gameState.gamePhase !== 'playing' || isAITurn) return;
+    if (!gameState.selectedPiece || gameState.gamePhase !== 'playing' || isAITurn || !canInteract) return;
 
     const legalMove = gameState.legalMoves.find(move => 
       move.to.row === position.row && move.to.col === position.col
@@ -549,7 +576,7 @@ const CheckersLux: React.FC = () => {
     if (legalMove) {
       makeMove(legalMove);
     }
-  }, [gameState.selectedPiece, gameState.legalMoves, gameState.gamePhase, isAITurn, makeMove]);
+  }, [gameState.selectedPiece, gameState.legalMoves, gameState.gamePhase, isAITurn, canInteract, makeMove]);
 
   const resetGame = useCallback(() => {
     setGameState({
@@ -565,7 +592,7 @@ const CheckersLux: React.FC = () => {
       forcedCapture: false
     });
     setIsAITurn(false);
-  }, []);
+  }, [setGameState]);
 
   const getHint = useCallback(() => {
     if (gameState.gamePhase !== 'playing' || isAITurn) return;
@@ -584,7 +611,7 @@ const CheckersLux: React.FC = () => {
       ) || null,
       legalMoves: [bestMove]
     }));
-  }, [gameState.gamePhase, gameState.pieces, gameState.currentPlayer, isAITurn]);
+  }, [gameState.gamePhase, gameState.pieces, gameState.currentPlayer, isAITurn, setGameState]);
 
   const renderBoard = () => {
     const board = [];
@@ -627,24 +654,35 @@ const CheckersLux: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx to-onyxLight text-ivory">
+    <div className="game-shell">
       {/* Header */}
-      <div className="bg-onyxLight border-b border-champagne/20 p-4">
-        <div className="flex justify-between items-center">
+      <div className="game-header">
+        <div className="game-header-inner">
           <div className="flex items-center space-x-4">
-            <Link
-              to="/hub"
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
-            >
-              <FaArrowLeft className="w-5 h-5" />
-            </Link>
-            <h1 className="text-3xl font-bold text-champagne">CheckersLux</h1>
+            {isMultiplayer && onBack ? (
+              <button
+                onClick={onBack}
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </button>
+            ) : (
+              <Link
+                to="/hub"
+                className="game-back-button"
+              >
+                <FaArrowLeft className="w-5 h-5" />
+              </Link>
+            )}
+            <h1 className="text-3xl font-bold text-champagne">
+              CheckersLux {isMultiplayer && '(Multiplayer)'}
+            </h1>
           </div>
           <div className="flex items-center space-x-4">
             {showHints && (
               <button
                 onClick={getHint}
-                className="p-2 rounded-lg bg-emerald text-white hover:bg-emeraldLight transition-colors"
+                className="game-icon-button bg-emerald text-white"
                 disabled={isAITurn}
               >
                 <FaCircleQuestion className="w-5 h-5" />
@@ -652,9 +690,9 @@ const CheckersLux: React.FC = () => {
             )}
             <button
               onClick={() => setShowSettings(!showSettings)}
-              className="p-2 rounded-lg bg-onyxLight text-champagne hover:bg-emerald transition-colors"
+              className="game-icon-button"
             >
-                              <FaGear className="w-5 h-5" />
+              <FaGear className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -662,8 +700,8 @@ const CheckersLux: React.FC = () => {
 
       <div className="p-6">
         {/* Game Info */}
-        <div className="bg-onyxLight rounded-lg p-4 mb-6">
-          <div className="flex justify-between items-center">
+        <div className="game-panel mb-6">
+          <div className="game-stat-grid">
             <div>
               <h3 className="text-lg font-semibold text-champagne">Current Player</h3>
               <p className="text-2xl font-bold text-ivory capitalize">
@@ -677,7 +715,7 @@ const CheckersLux: React.FC = () => {
             <div>
               <h3 className="text-lg font-semibold text-champagne">Game Mode</h3>
               <p className="text-xl font-bold text-ivory">
-                {isAIGame ? `vs AI (${aiDifficulty.name})` : '2 Players'}
+                {isMultiplayer ? `Multiplayer (You: ${ourColor})` : isAIGame ? `vs AI (${aiDifficulty.name})` : '2 Players'}
               </p>
             </div>
             {gameState.forcedCapture && (
@@ -702,13 +740,13 @@ const CheckersLux: React.FC = () => {
         <div className="flex justify-center space-x-4 mb-6">
           <button
             onClick={resetGame}
-            className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors"
+            className="game-primary-action"
           >
             New Game
           </button>
           <button
             onClick={() => setIsAIGame(!isAIGame)}
-            className="px-6 py-3 bg-emerald text-white font-bold rounded-lg hover:bg-emeraldLight transition-colors"
+            className="game-success-action"
           >
             {isAIGame ? 'Switch to 2 Players' : 'Switch to AI'}
           </button>
@@ -731,7 +769,7 @@ const CheckersLux: React.FC = () => {
             </p>
             <button
               onClick={resetGame}
-              className="px-6 py-3 bg-champagne text-onyx font-bold rounded-lg hover:bg-champagneLight transition-colors"
+              className="game-primary-action"
             >
               Play Again
             </button>
@@ -740,7 +778,7 @@ const CheckersLux: React.FC = () => {
 
         {/* Move History */}
         {gameState.moveHistory.length > 0 && (
-          <div className="bg-onyxLight rounded-lg p-4">
+          <div className="game-panel">
             <h3 className="text-lg font-semibold text-champagne mb-2">Move History</h3>
             <div className="bg-onyx rounded-lg p-3 max-h-32 overflow-y-auto">
               <div className="text-sm text-ivory">

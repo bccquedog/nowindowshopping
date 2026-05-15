@@ -19,6 +19,7 @@ export const defaultFeatureStatus: FeatureStatus[] = [
   { key: 'contact', name: 'Contact', status: 'Complete', priority: 'Medium' },
   { key: 'support', name: 'Support/Ticketing', status: 'In Progress', priority: 'High', notes: 'Basic structure exists, needs enhancement' },
   { key: 'webstore', name: 'Web Store', status: 'Not Started', priority: 'Medium', notes: 'Placeholder exists, no e-commerce functionality' },
+  { key: 'raffle', name: 'Raffles', status: 'Complete', priority: 'Medium', notes: 'Raffle hub with Stripe checkout, admin UI, winner selection, 1hr cooldown' },
   { key: 'terms', name: 'Terms', status: 'Not Started', priority: 'Low', notes: 'No content implemented' },
   { key: 'booking', name: 'Booking', status: 'Not Started', priority: 'High', notes: 'No booking system implemented' },
   { key: 'settings', name: 'Settings', status: 'Complete', priority: 'Medium' },

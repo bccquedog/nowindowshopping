@@ -16,6 +16,60 @@ const applications = [
     isInternal: true
   },
   {
+    name: 'Luminère Qualité',
+    url: '/lq',
+    description: 'Time Redefined. Premium timepieces where elegance meets precision craftsmanship.',
+    isInternal: true
+  },
+  {
+    name: 'ShoutOut',
+    url: '/shoutout',
+    description: 'Live venue messaging platform for real-time audience engagement and venue monetization.',
+    isInternal: true
+  },
+  {
+    name: 'PageMonitor',
+    url: '/pagemonitor',
+    description: 'Download the latest PageMonitor Chrome extension ZIP file.',
+    isInternal: true
+  },
+  {
+    name: 'Software Hub',
+    url: '/softwarehub',
+    description: 'Central access point for Page Monitor Pro and Product Research Tool.',
+    isInternal: true
+  },
+  {
+    name: 'Quest Social Discovery and Dating',
+    url: 'https://questdatingapp.com/',
+    description: 'Social discovery and dating platform.',
+    isInternal: false
+  },
+  {
+    name: 'Rainy Days Personal Finance and Budgeting',
+    url: 'https://web-nu-one-79.vercel.app/',
+    description: 'Personal finance and budgeting tool.',
+    isInternal: false
+  },
+  {
+    name: 'Pokemon Video Game Companion',
+    url: 'https://poke-panion-app.vercel.app/',
+    description: 'Resource webapp for Pokemon video games.',
+    isInternal: false
+  },
+  {
+    name: 'Estimator Flow',
+    url: 'https://estimator-flow.vercel.app/',
+    description: 'Professional estimation platform.',
+    isInternal: false
+  },
+  {
+    name: 'Bright Steps Children\'s Development Application',
+    url: 'https://brightstepsapp.com/',
+    description: 'Fun learning for kids.',
+    isInternal: false
+  },
+  {
     name: 'Application Name 1',
     url: '#', // Replace with your hyperlink
     description: 'Description of the application',

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import VideoChat from './VideoChat';
+import { videoConfig } from '../config/videoConfig';
 
 interface Session {
   id: string;
@@ -36,7 +37,7 @@ const VideoSessionManager: React.FC<VideoSessionManagerProps> = ({
 
   // Generate a unique room URL for Daily.co
   const generateRoomUrl = (sessionTitle: string) => {
-    const baseUrl = 'https://your-domain.daily.co';
+    const baseUrl = `https://${videoConfig.daily.domain}`;
     const roomId = sessionTitle.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
     return `${baseUrl}/${roomId}`;
   };
