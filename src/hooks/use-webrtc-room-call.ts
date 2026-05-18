@@ -28,22 +28,29 @@ export function useWebRTCRoomCall(
     if (!roomId || !localPlayerId || !partnerPlayerId) return;
 
     const ref = doc(getFirestore(), COLLECTION, roomId);
-    const unsubscribe = onSnapshot(ref, (snapshot) => {
-      if (!snapshot.exists()) return;
-      const data = snapshot.data();
-      const calleeId = data.calleeId || data.partnerId;
-      if (calleeId !== localPlayerId) return; // not for us
-      if (data.offer && !data.answer) {
-        setIncomingCall({
-          connectionId: roomId,
-          callerId: data.callerId || data.userId,
-          callerName: partnerPlayerName,
-          callType: (data.connectionType || 'video') as 'voice' | 'video',
-        });
-      } else {
+    const unsubscribe = onSnapshot(
+      ref,
+      (snapshot) => {
+        if (!snapshot.exists()) return;
+        const data = snapshot.data();
+        const calleeId = data.calleeId || data.partnerId;
+        if (calleeId !== localPlayerId) return; // not for us
+        if (data.offer && !data.answer) {
+          setIncomingCall({
+            connectionId: roomId,
+            callerId: data.callerId || data.userId,
+            callerName: partnerPlayerName,
+            callType: (data.connectionType || 'video') as 'voice' | 'video',
+          });
+        } else {
+          setIncomingCall(null);
+        }
+      },
+      (error) => {
+        console.warn('[useWebRTCRoomCall] Call signaling is unavailable:', error.message);
         setIncomingCall(null);
       }
-    });
+    );
 
     return () => unsubscribe();
   }, [roomId, localPlayerId, partnerPlayerId, partnerPlayerName]);

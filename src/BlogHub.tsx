@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { getNextWeeklyPost, getPublishedWeeklyPosts, weeklyBlogPosts } from './weeklyBlogPosts';
 
 const blogs = [
   {
@@ -179,45 +180,115 @@ const blogs = [
   }
 ];
 
-const BlogHub: React.FC = () => (
-  <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-8 sm:py-12 px-4">
-    <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-8 sm:mb-12">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white px-2">NWS Blog</h1>
-        <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2">
-          Insights, tips, and stories on business, mindset, and personal development.
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        {blogs.map((blog) => (
-          <Link
-            key={blog.title}
-            to={blog.to}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
-          >
-            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-center group-hover:scale-110 transition-transform duration-300">
-              {blog.icon}
+const BlogHub: React.FC = () => {
+  const publishedWeeklyPosts = getPublishedWeeklyPosts();
+  const nextWeeklyPost = getNextWeeklyPost();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-100 dark:from-gray-900 dark:via-purple-900 dark:to-pink-900 py-8 sm:py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white px-2">NWS Blog</h1>
+          <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-2">
+            Weekly action notes, mindset resets, and older essays for people who are done window shopping their own life.
+          </p>
+        </div>
+
+        <section className="mb-8 sm:mb-12 rounded-2xl bg-gray-950 p-5 text-white shadow-2xl sm:p-8">
+          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+            <div>
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wide text-blue-200">No Window Shopping Weekly</p>
+              <h2 className="mb-4 text-2xl font-bold sm:text-4xl">52 Mondays of movement</h2>
+              <p className="max-w-2xl text-base leading-relaxed text-gray-200 sm:text-lg">
+                A full year of Monday posts is queued to help turn interest into action. Each week brings one focused move,
+                one reflection, and one practice.
+              </p>
             </div>
-            <h2 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
-              {blog.title}
-            </h2>
-            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 leading-relaxed">
-              {blog.description}
-            </p>
-            <div className="flex justify-between items-center">
-              <span className="text-xs text-gray-500 dark:text-gray-400">
-                {blog.date}
-              </span>
-              <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium group-hover:underline">
-                Read More →
-              </span>
+            <div className="rounded-xl border border-white/10 bg-white/10 p-5">
+              <p className="text-sm uppercase tracking-wide text-blue-200">Series status</p>
+              <p className="mt-2 text-3xl font-bold">{publishedWeeklyPosts.length} / {weeklyBlogPosts.length}</p>
+              <p className="mt-1 text-sm text-gray-300">published so far</p>
+              {nextWeeklyPost && (
+                <Link
+                  to={`/blog/weekly/${nextWeeklyPost.slug}`}
+                  className="mt-5 block rounded-lg bg-white px-4 py-3 text-sm font-bold text-gray-950 transition-colors hover:bg-blue-100"
+                >
+                  Next up: {nextWeeklyPost.title}
+                  <span className="block text-xs font-semibold text-gray-600">
+                    {nextWeeklyPost.displayDate} at {nextWeeklyPost.displayTime}
+                  </span>
+                </Link>
+              )}
             </div>
-          </Link>
-        ))}
+          </div>
+        </section>
+
+        {publishedWeeklyPosts.length > 0 && (
+          <section className="mb-10">
+            <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Latest Monday Posts</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {publishedWeeklyPosts.slice().reverse().map((post) => (
+                <Link
+                  key={post.slug}
+                  to={`/blog/weekly/${post.slug}`}
+                  className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
+                >
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-blue-600 dark:text-blue-300">
+                    Week {post.week}
+                  </p>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                    {post.title}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 leading-relaxed">
+                    {post.description}
+                  </p>
+                  <div className="flex justify-between items-center gap-3">
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {post.displayDate} at {post.displayTime}
+                    </span>
+                    <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium group-hover:underline">
+                      Read More
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+
+        <section>
+          <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Archive</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {blogs.map((blog) => (
+              <Link
+                key={blog.title}
+                to={blog.to}
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 sm:p-6 hover:scale-105 transition-all duration-300 border border-gray-200 dark:border-gray-700 group"
+              >
+                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4 text-center group-hover:scale-110 transition-transform duration-300">
+                  {blog.icon}
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-tight">
+                  {blog.title}
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-3 sm:mb-4 line-clamp-3 leading-relaxed">
+                  {blog.description}
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {blog.date}
+                  </span>
+                  <span className="text-blue-600 dark:text-blue-400 text-xs sm:text-sm font-medium group-hover:underline">
+                    Read More
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default BlogHub; 

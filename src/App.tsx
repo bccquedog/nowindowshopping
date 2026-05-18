@@ -91,6 +91,7 @@ const SlipperySlopesHub = React.lazy(() => import('./SlipperySlopesHub'));
 const SeatAtTableHub = React.lazy(() => import('./SeatAtTableHub'));
 const PeakedHSHub = React.lazy(() => import('./PeakedHSHub'));
 const BlogPostFinessing101 = React.lazy(() => import('./BlogPostFinessing101'));
+const WeeklyBlogPost = React.lazy(() => import('./WeeklyBlogPost'));
 const About = React.lazy(() => import('./About'));
 const PrivacyPolicy = React.lazy(() => import('./PrivacyPolicy'));
 const TermsConditions = React.lazy(() => import('./TermsConditions'));
@@ -416,6 +417,7 @@ const App = () => (
         <Route path="/blog/wedding-crashing" element={<PrinciplesWeddingCrashing />} />
         <Route path="/blog/parody-rules" element={<PrinciplesParodyRules />} />
         <Route path="/blog/29-things-every-man-should-know" element={<Principles29ThingsEveryManShouldKnow />} />
+        <Route path="/blog/weekly/:slug" element={<WeeklyBlogPost />} />
         <Route path="/blog-hub" element={<BlogHub />} />
         <Route path="/guide" element={<UserGuide />} />
         <Route path="/lq" element={<LQ />} />

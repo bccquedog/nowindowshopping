@@ -162,42 +162,52 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
       limit(50)
     );
 
-    const unsubscribe = onSnapshot(roomsQuery, (snapshot) => {
-      const rooms: GameRoom[] = [];
-      const viewing: GameRoom[] = [];
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const room: GameRoom = {
-          id: docSnap.id,
-          gameType: data.gameType || 'blackjack',
-          players: data.players || [],
-          maxPlayers: data.maxPlayers || 4,
-          gameState: data.gameState || {},
-          isStarted: data.isStarted || false,
-          isPrivate: data.isPrivate || false,
-          password: data.password,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-          settings: data.settings || {
-            aiDifficulty: 'Standard',
-            timeLimit: null,
-            customRules: null,
-            allowSpectators: true,
-            maxSpectators: 20,
-            humanOnly: true
+    const unsubscribe = onSnapshot(
+      roomsQuery,
+      (snapshot) => {
+        const rooms: GameRoom[] = [];
+        const viewing: GameRoom[] = [];
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const room: GameRoom = {
+            id: docSnap.id,
+            gameType: data.gameType || 'blackjack',
+            players: data.players || [],
+            maxPlayers: data.maxPlayers || 4,
+            gameState: data.gameState || {},
+            isStarted: data.isStarted || false,
+            isPrivate: data.isPrivate || false,
+            password: data.password,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+            settings: data.settings || {
+              aiDifficulty: 'Standard',
+              timeLimit: null,
+              customRules: null,
+              allowSpectators: true,
+              maxSpectators: 20,
+              humanOnly: true
+            }
+          };
+          if (!data.deleted) {
+            if (!data.isStarted && data.players.length < data.maxPlayers) {
+              rooms.push(room);
+            } else if (data.isStarted && (data.settings?.allowSpectators !== false)) {
+              viewing.push(room);
+            }
           }
-        };
-        if (!data.deleted) {
-          if (!data.isStarted && data.players.length < data.maxPlayers) {
-            rooms.push(room);
-          } else if (data.isStarted && (data.settings?.allowSpectators !== false)) {
-            viewing.push(room);
-          }
-        }
-      });
-      setAvailableRooms(rooms);
-      setViewingRooms(viewing);
-    });
+        });
+        setAvailableRooms(rooms);
+        setViewingRooms(viewing);
+        setConnectionStatus('connected');
+      },
+      (error) => {
+        console.warn('[MultiplayerProvider] Room list is unavailable:', error.message);
+        setAvailableRooms([]);
+        setViewingRooms([]);
+        setConnectionStatus('error');
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -207,38 +217,45 @@ export const MultiplayerProvider: React.FC<MultiplayerProviderProps> = ({ childr
     if (!currentRoom) return;
 
     const roomRef = doc(db, 'gameRooms', currentRoom.id);
-    const unsubscribe = onSnapshot(roomRef, (doc) => {
-      if (doc.exists()) {
-        const data = doc.data();
-        setCurrentRoom({
-          id: doc.id,
-          gameType: data.gameType || 'blackjack',
-          players: data.players || [],
-          maxPlayers: data.maxPlayers || 4,
-          gameState: data.gameState || {},
-          isStarted: data.isStarted || false,
-          isPrivate: data.isPrivate || false,
-          password: data.password,
-          createdAt: data.createdAt?.toDate() || new Date(),
-          updatedAt: data.updatedAt?.toDate() || new Date(),
-          settings: data.settings || {
-            aiDifficulty: 'Standard',
-            timeLimit: null,
-            customRules: null,
-            allowSpectators: true,
-            maxSpectators: 20,
-            humanOnly: true
-          }
-        });
-        setGameState(data.gameState);
-        if (currentPlayer) {
-          const syncedPlayer = (data.players || []).find((p: Player) => p.id === currentPlayer.id);
-          if (syncedPlayer) {
-            setCurrentPlayer(prev => prev ? { ...prev, ...syncedPlayer } : prev);
+    const unsubscribe = onSnapshot(
+      roomRef,
+      (doc) => {
+        if (doc.exists()) {
+          const data = doc.data();
+          setCurrentRoom({
+            id: doc.id,
+            gameType: data.gameType || 'blackjack',
+            players: data.players || [],
+            maxPlayers: data.maxPlayers || 4,
+            gameState: data.gameState || {},
+            isStarted: data.isStarted || false,
+            isPrivate: data.isPrivate || false,
+            password: data.password,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+            settings: data.settings || {
+              aiDifficulty: 'Standard',
+              timeLimit: null,
+              customRules: null,
+              allowSpectators: true,
+              maxSpectators: 20,
+              humanOnly: true
+            }
+          });
+          setGameState(data.gameState);
+          if (currentPlayer) {
+            const syncedPlayer = (data.players || []).find((p: Player) => p.id === currentPlayer.id);
+            if (syncedPlayer) {
+              setCurrentPlayer(prev => prev ? { ...prev, ...syncedPlayer } : prev);
+            }
           }
         }
+      },
+      (error) => {
+        console.warn('[MultiplayerProvider] Room updates are unavailable:', error.message);
+        setConnectionStatus('error');
       }
-    });
+    );
 
     return () => unsubscribe();
   }, [currentRoom?.id, currentPlayer]);

@@ -26,12 +26,19 @@ const CommentsSection = () => {
 
   useEffect(() => {
     const q = query(collection(db, 'comments'), orderBy('timestamp', 'desc'));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setComments(snapshot.docs.map(doc => {
-        const data = doc.data();
-        return { id: doc.id, text: data.text || '' };
-      }));
-    });
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        setComments(snapshot.docs.map(doc => {
+          const data = doc.data();
+          return { id: doc.id, text: data.text || '' };
+        }));
+      },
+      (error) => {
+        console.warn('[CommentsSection] Comments are unavailable:', error.message);
+        setComments([]);
+      }
+    );
     return () => unsubscribe();
   }, []);
 
