@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { track } from '@vercel/analytics';
 import { AudiobookData, formatSeconds } from './booksData';
 
 interface Props {
@@ -9,9 +10,22 @@ interface Props {
 
 const STORAGE_KEY_PREFIX = 'mgcu-audiobook-position:';
 
+// Fire once per session per event/chapter pair to avoid double-counting on
+// every play/pause toggle. Sets are scoped to a single render, so they reset
+// on page reload — that's the "unique per visit" definition we want.
+function useFireOnce() {
+  const fired = useRef(new Set<string>());
+  return useCallback((key: string, fn: () => void) => {
+    if (fired.current.has(key)) return;
+    fired.current.add(key);
+    fn();
+  }, []);
+}
+
 const MGCUAudiobookPlayer: React.FC<Props> = ({ bookTitle, bookSlug, audiobook }) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const storageKey = `${STORAGE_KEY_PREFIX}${bookSlug}`;
+  const fireOnce = useFireOnce();
 
   const [chapterIndex, setChapterIndex] = useState<number>(0);
   const [playing, setPlaying] = useState(false);
@@ -66,12 +80,20 @@ const MGCUAudiobookPlayer: React.FC<Props> = ({ bookTitle, bookSlug, audiobook }
     const a = audioRef.current;
     if (!a) return;
     if (a.paused) {
-      a.play().then(() => setPlaying(true)).catch((e) => setError(e?.message ?? 'Playback failed.'));
+      a.play()
+        .then(() => {
+          setPlaying(true);
+          fireOnce('first-play', () => track('audiobook_listen_started', { book: bookSlug }));
+          fireOnce(`chapter-${chapterIndex}-played`, () =>
+            track('audiobook_chapter_played', { book: bookSlug, chapter: chapterIndex }),
+          );
+        })
+        .catch((e) => setError(e?.message ?? 'Playback failed.'));
     } else {
       a.pause();
       setPlaying(false);
     }
-  }, []);
+  }, [bookSlug, chapterIndex, fireOnce]);
 
   const skip = useCallback((secs: number) => {
     const a = audioRef.current;
@@ -88,9 +110,11 @@ const MGCUAudiobookPlayer: React.FC<Props> = ({ bookTitle, bookSlug, audiobook }
   };
 
   const onChapterEnd = () => {
+    track('audiobook_chapter_completed', { book: bookSlug, chapter: chapterIndex });
     if (chapterIndex < audiobook.chapters.length - 1) {
       setChapterIndex(chapterIndex + 1);
     } else {
+      track('audiobook_completed', { book: bookSlug });
       setPlaying(false);
     }
   };
@@ -218,6 +242,7 @@ const MGCUAudiobookPlayer: React.FC<Props> = ({ bookTitle, bookSlug, audiobook }
               <a
                 href={audiobook.fullMp3}
                 download
+                onClick={() => track('audiobook_download', { book: bookSlug, format: 'mp3' })}
                 className="flex-1 text-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold py-2 px-3 rounded-full transition-colors"
               >
                 ⬇ MP3
@@ -225,6 +250,7 @@ const MGCUAudiobookPlayer: React.FC<Props> = ({ bookTitle, bookSlug, audiobook }
               <a
                 href={audiobook.fullM4b}
                 download
+                onClick={() => track('audiobook_download', { book: bookSlug, format: 'm4b' })}
                 className="flex-1 text-center bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold py-2 px-3 rounded-full transition-colors"
               >
                 ⬇ M4B
